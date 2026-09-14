@@ -167,6 +167,8 @@ html:not([data-level]) .lv-k5,html[data-level="k5"] .lv-k5,html[data-level="g8"]
 .teach{margin-top:2.2rem;font-size:1rem}
 @media (prefers-reduced-motion:reduce){.missions li.just .box{animation:none}}
 .panel canvas.short{aspect-ratio:16/9}
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
 
 .home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
 .home:hover{color:var(--yellow)}
@@ -191,6 +193,14 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
 .how p{color:var(--chalk-dim);font-size:.97rem}
 .next{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--chalk-faint);border-radius:12px;color:var(--chalk-dim);font-size:.97rem}
 .next b{color:var(--chalk)}
+.check{margin-top:.1rem;padding:.8rem 1rem .9rem;border:2px solid var(--chalk-faint);border-radius:10px;display:grid;gap:.5rem}
+.check .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.check .q{font-weight:700;margin-bottom:.5rem}
+.cf{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.cf input{width:7.5rem;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .6rem;font:700 1rem var(--body)}
+.cf select,.controls select{background:var(--board-2);color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .5rem;font:700 .9rem var(--body)}
+.fb{margin:0;font-size:.95rem;min-height:1.2em}
+.fb.ok{color:var(--green)}.fb.bad{color:var(--pink)}
 </style>
 </head>
 <body>
@@ -200,7 +210,7 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
   <div class="text" style="max-width:70ch">
     <p class="eyebrow">Hard ideas, made playable</p>
     <h1>The Chalkboard</h1>
-    <p class="lede" style="max-width:48ch">Every board here takes one famous, hard idea and explains it with hands-on experiments at five reading levels, from kindergarten to graduate school. Pick a board. Pick who's reading. Do the missions.</p>
+    <p class="lede" style="max-width:48ch">Every board here takes one famous, hard idea and explains it with hands-on experiments at five reading levels, from kindergarten to graduate school. Four boards so far. Pick one. Pick who's reading. Do the missions.</p>
   </div>
 </header>
 <main>
@@ -208,13 +218,14 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
 <a class="card" href="https://thedimension5.github.io/one-rule-for-everything/"><span class="subj">Physics</span><svg viewBox="0 0 72 72" fill="none" stroke="#F6D46B" stroke-width="2.4" stroke-linecap="round"><circle cx="28" cy="38" r="11" fill="#F6D46B"/><ellipse cx="28" cy="38" rx="24" ry="8" opacity=".6"/><rect x="50" y="18" width="16" height="9" rx="2" fill="#F596A8" stroke="#F596A8"/><rect x="50" y="27" width="16" height="9" rx="2" fill="#8CC4EE" stroke="#8CC4EE"/></svg><h2>One Rule for Everything</h2><p>Einstein's thirty-year hunt for one rule behind gravity and magnetism, with every attempt he made as an experiment you can play.</p><span class="meta">10 chapters · 21 missions · teacher's guide</span><span class="go">Open the board →</span></a>
 <a class="card" href="https://thedimension5.github.io/chalkboard/infinity/"><span class="subj">Mathematics</span><svg viewBox="0 0 72 72" fill="none" stroke="#F6D46B" stroke-width="3" stroke-linecap="round"><path d="M18 36c-8-14 8-14 18 0s26 14 18 0-26-14-18 0-8 14-18 0z"/><path d="M14 56h44M14 62h44" stroke="#8CC4EE" opacity=".7"/></svg><h2>Bigger than Infinity</h2><p>Cantor's proof that some infinities are bigger than others, from pairing socks and Hilbert's Hotel to the question that turned out to have no answer.</p><span class="meta">5 chapters · 10 missions</span><span class="go">Open the board →</span></a>
 <a class="card" href="https://thedimension5.github.io/chalkboard/history/"><span class="subj">History preservation</span><svg viewBox="0 0 72 72" fill="none" stroke="#F6D46B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 14h34a6 6 0 0 1 0 12H16a6 6 0 0 1 0-12z"/><path d="M22 26v30h28V26"/><path d="M22 56a6 6 0 0 0 0 12h28a6 6 0 0 0 0-12"/><path d="M28 34h16M28 41h12M28 48h16" stroke="#F1ECDF" opacity=".8"/></svg><h2>How History Survives</h2><p>Scribes and their errors, family trees of books, decoding a dead script, the carbon clock, rotting bits, and why what survives is a biased sample.</p><span class="meta">6 chapters · 12 missions</span><span class="go">Open the board →</span></a>
+<a class="card" href="https://thedimension5.github.io/chalkboard/electricity/"><span class="subj">Engineering</span><svg viewBox="0 0 72 72" fill="none" stroke="#F6D46B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M40 8L22 40h14l-4 24 18-32H36l4-24z" fill="#F6D46B"/><rect x="8" y="50" width="22" height="12" rx="3" stroke="#8CC4EE"/><rect x="30" y="53" width="3" height="6" fill="#8CC4EE" stroke="#8CC4EE"/><path d="M12 56h10" stroke="#9DDBA3" stroke-width="4"/></svg><h2>Electricity From Zero</h2><p>Watts and watt-hours, volts, amps and ohms, real batteries, Kirchhoff, AC, power factor, what actually moves in a wire, and a checker for any system you meet.</p><span class="meta">10 chapters · 23 missions · unit-checked teach-backs</span><span class="go">Open the board →</span></a>
 </div>
 <div class="how">
   <div><h3>Pick who's reading</h3><p>Five levels on every board: Kids (K to 5th), 8th grade, High school, College, and Max. The words, the readouts and the experiments all change. The choice is saved and shared through the link.</p></div>
   <div><h3>Do the missions</h3><p>Every experiment has missions the page checks off by itself. The count at the top grows with the level, and progress is saved in your browser.</p></div>
   <div><h3>Read to me, and for teachers</h3><p>On the two youngest levels a button reads each chapter aloud. Boards come with discussion questions for classrooms, starting with the physics board.</p></div>
 </div>
-<div class="next"><b>On the list, not built yet:</b> Why primes hide (the Riemann hypothesis) · Gödel's unprovable truth · How your body learns a germ · The atlas of deep time (plate tectonics) · Why the sky is dark at night.</div>
+<div class="next"><b>On the list, not built yet:</b> How your body learns a germ · Why primes hide (the Riemann hypothesis) · Gödel's unprovable truth · How your body learns a germ · The atlas of deep time (plate tectonics) · Why the sky is dark at night.</div>
 </main>
 <footer class="closing" style="padding-top:3rem">
   <p class="eyebrow">Made with chalk</p>
