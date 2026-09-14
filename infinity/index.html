@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>Bigger than Infinity</title>
+<meta name="description" content="Cantor's proof that some infinities are bigger than others, with games at five reading levels from kindergarten to graduate school.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;700;900&display=swap">
+<style>
+:root{
+  --board:#1B2923;--board-2:#1F2F28;--board-3:#2A3B33;
+  --chalk:#F1ECDF;--chalk-dim:rgba(241,236,223,.66);--chalk-faint:rgba(241,236,223,.32);--chalk-line:rgba(241,236,223,.15);
+  --yellow:#F6D46B;--blue:#8CC4EE;--pink:#F596A8;--green:#9DDBA3;
+  --tray:#5C3D27;--tray-2:#3B2718;
+  --display:'Caveat','Segoe Print','Bradley Hand',cursive;
+  --body:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{margin:0;background:var(--board);color:var(--chalk);font-family:var(--body);font-size:1.0625rem;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background-color:var(--board);background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E"),radial-gradient(ellipse at 12% 0%,rgba(255,255,255,.05),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(255,255,255,.045),transparent 50%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.28));background-attachment:scroll,fixed,fixed,fixed;background-size:240px 240px,auto,auto,auto;background-repeat:repeat,no-repeat,no-repeat,no-repeat}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem);position:relative;z-index:1}
+.skip{position:absolute;left:-999px;top:0;background:var(--yellow);color:var(--board);padding:.5rem 1rem;z-index:10;font-weight:900}
+.skip:focus{left:1rem;top:1rem}
+
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:clamp(3.2rem,7.5vw,6rem)}
+h2{font-size:clamp(2.3rem,4.6vw,3.5rem)}
+h3{font-size:1.75rem}
+p{margin:0}
+a{color:var(--yellow)}
+.eyebrow{font-weight:900;font-size:.76rem;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem}
+.eyebrow.dim{color:var(--chalk-dim)}
+.lede{font-size:1.28rem;max-width:34ch;margin-top:1.1rem}
+.text{max-width:60ch}
+.text h2{margin-bottom:1rem}
+.text p+p{margin-top:.95em}
+.text em{font-style:normal;color:var(--yellow)}
+.text .when{font-family:var(--display);font-size:1.45rem;color:var(--chalk-dim);margin-top:-.4rem;margin-bottom:1rem}
+.chalkword{font-family:var(--display);font-size:1.25em;line-height:1;color:var(--yellow)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;padding:clamp(2.5rem,6vw,5rem) 0 clamp(2rem,5vw,4rem)}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.4rem;margin-top:1.8rem}
+.hint{font-family:var(--display);font-size:1.3rem;color:var(--chalk-dim)}
+.chapter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:start;padding:clamp(3rem,7vw,6rem) 0;border-top:1px solid var(--chalk-line);scroll-margin-top:.5rem}
+.chapter.wide{grid-template-columns:1fr}
+.chapter.wide .text{max-width:70ch}
+@media (max-width:860px){.hero,.chapter{grid-template-columns:1fr}}
+
+.panel{position:relative;border:2px solid var(--chalk-faint);border-radius:10px;background:rgba(0,0,0,.16);box-shadow:inset 0 0 70px rgba(0,0,0,.28);overflow:hidden}
+.panel canvas{display:block;width:100%;aspect-ratio:4/3;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.panel canvas.short{aspect-ratio:16/10}
+.panel .doodle{position:absolute;right:1.1rem;bottom:.6rem;font-family:var(--display);font-size:1.6rem;color:var(--chalk-faint);transform:rotate(-5deg);pointer-events:none}
+.lab{margin:0;display:flex;flex-direction:column;gap:.85rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem .9rem;align-items:center}
+.controls .sep{width:1px;height:1.6rem;background:var(--chalk-line)}
+.btn{font:900 .88rem/1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-dim);border-radius:999px;padding:.66rem 1.05rem;cursor:pointer;transition:background .15s,color .15s,transform .15s,border-color .15s}
+.btn:hover{background:var(--chalk);color:var(--board);border-color:var(--chalk)}
+.btn:active{transform:scale(.97)}
+.btn.is-on{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--board);font-size:1rem;padding:.85rem 1.5rem}
+.btn.primary:hover{background:var(--chalk);border-color:var(--chalk)}
+.btn.blue{border-color:var(--blue);color:var(--blue)}.btn.blue:hover,.btn.blue.is-on{background:var(--blue);color:var(--board)}
+.btn.pink{border-color:var(--pink);color:var(--pink)}.btn.pink:hover,.btn.pink.is-on{background:var(--pink);color:var(--board)}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.slider{display:flex;align-items:center;gap:.6rem;font-weight:900;font-size:.85rem;letter-spacing:.03em}
+.slider input{accent-color:var(--yellow);width:150px;margin:0}
+.slider .val{font-family:var(--display);font-size:1.25rem;font-weight:700;min-width:3.2ch;color:var(--yellow);font-variant-numeric:tabular-nums}
+figcaption{font-size:.95rem;color:var(--chalk-dim)}
+figcaption b{color:var(--chalk);font-weight:900}
+
+.grownups{margin-top:1.5rem;border-left:3px solid var(--chalk-faint);padding:.2rem 0 .2rem 1rem;font-size:.95rem;color:var(--chalk-dim)}
+.grownups summary{cursor:pointer;font-weight:900;color:var(--chalk);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:.55rem}
+.grownups summary::-webkit-details-marker{display:none}
+.grownups summary::before{content:"+";font-family:var(--display);font-size:1.5rem;line-height:1;color:var(--yellow)}
+.grownups[open] summary::before{content:"–"}
+.grownups p{margin-top:.6rem;max-width:62ch}
+
+.trail{position:fixed;left:1rem;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:.6rem;margin:0;padding:0;list-style:none}
+.trail a{display:block;width:11px;height:11px;border-radius:50%;border:2px solid var(--chalk-faint);position:relative;transition:background .2s,border-color .2s}
+.trail a.is-active{background:var(--yellow);border-color:var(--yellow)}
+.trail a span{position:absolute;left:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font:700 .8rem var(--body);color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .15s;background:var(--board-3);padding:.2rem .55rem;border-radius:4px}
+.trail a:hover span,.trail a:focus-visible span{opacity:1}
+@media (max-width:1320px){.trail{display:none}}
+
+.forces{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;position:relative;margin-top:1.5rem}
+.force{border:2px solid var(--chalk-faint);border-radius:12px;padding:1.1rem 1.1rem 1.2rem;background:var(--board-2);transition:transform .8s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:.45rem;position:relative}
+.force h3{font-size:1.9rem}
+.force p{font-size:.92rem;color:var(--chalk-dim)}
+.force .tag{font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.force .tag.later{color:var(--pink)}
+.force svg{width:60px;height:60px;display:block}
+.forces.united .force[data-f="em"]{transform:translateX(calc(100% + 1rem)) rotate(-4deg)}
+.forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+.forces.united .force[data-f="weak"]{transform:scale(1.03)}
+.forces.united .force[data-f="gravity"]{animation:wobble 1.3s ease-in-out 1}
+.united-label{position:absolute;left:0;right:0;bottom:-2.6rem;text-align:center;font-family:var(--display);font-size:1.7rem;color:var(--yellow);opacity:0;transition:opacity .5s .5s;pointer-events:none}
+.forces.united .united-label{opacity:1}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(2deg)}}
+@media (max-width:760px){
+  .forces{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forces.united .force[data-f="em"]{transform:translate(calc(-100% - 1rem),calc(100% + 1rem)) rotate(-4deg)}
+  .forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.force{transition:none}.forces.united .force[data-f="gravity"]{animation:none}}
+
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2.5rem;margin-top:2.5rem;align-items:start}
+.timeline{list-style:none;margin:.5rem 0 0;padding:0}
+.timeline li{display:grid;grid-template-columns:5.2rem 1fr;gap:1rem;align-items:baseline;padding:.5rem 0;border-bottom:1px dashed var(--chalk-line)}
+.timeline .year{font-family:var(--display);font-size:1.6rem;font-weight:700;color:var(--yellow);font-variant-numeric:tabular-nums}
+.timeline .what{font-size:.95rem}
+.timeline .what b{font-weight:900}
+
+.checks{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.85rem}
+.checks li{display:grid;grid-template-columns:2rem 1fr;gap:.8rem;align-items:start}
+.checks .box{width:1.55rem;height:1.55rem;border:2px solid var(--chalk-dim);border-radius:5px;display:grid;place-items:center;font-family:var(--display);font-size:1.5rem;line-height:1;margin-top:.1rem}
+.checks .box.ok{color:var(--green)}.checks .box.q{color:var(--yellow)}
+.checks small{display:block;color:var(--chalk-dim);font-size:.9rem}
+
+.note{border:2px dashed var(--chalk-faint);border-radius:12px;padding:1.2rem 1.3rem;margin-top:1.8rem;font-size:.97rem}
+.note h3{font-size:1.6rem;margin-bottom:.4rem}
+.note ul{margin:.4rem 0 0;padding-left:1.2rem}
+.note li+li{margin-top:.35rem}
+
+.closing{text-align:center;padding:clamp(3rem,7vw,6rem) 0 3rem;border-top:1px solid var(--chalk-line)}
+.closing p{max-width:52ch;margin:1rem auto 0;font-size:1.15rem}
+.closing .big{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.1;color:var(--yellow);max-width:20ch;margin-top:1.5rem}
+.tray{height:20px;background:linear-gradient(var(--tray),var(--tray-2));border-top:2px solid rgba(255,255,255,.14);position:relative;z-index:1}
+.tray::before,.tray::after{content:"";position:absolute;top:-8px;height:8px;width:54px;border-radius:3px;background:var(--chalk);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tray::before{left:12%}
+.tray::after{left:calc(12% + 70px);width:38px;background:var(--pink)}
+
+.levels{position:sticky;top:0;z-index:6;background:rgba(27,41,35,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--chalk-line)}
+.levels-in{display:flex;align-items:center;gap:1rem;padding-top:.5rem;padding-bottom:.5rem}
+.levels-label{font-family:var(--display);font-size:1.4rem;color:var(--chalk-dim);white-space:nowrap}
+.levels-btns{display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;padding:3px}
+.levels-btns::-webkit-scrollbar{display:none}
+.levels-btns button{font:900 .82rem/1.1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.4rem .9rem;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:.12rem;transition:background .15s,color .15s,border-color .15s}
+.levels-btns button small{font-weight:700;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.levels-btns button:hover{border-color:var(--chalk)}
+.levels-btns button[aria-selected="true"]{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+@media (max-width:560px){.levels-label{display:none}}
+.lv{display:none}
+html:not([data-level]) .lv-k5,html[data-level="k5"] .lv-k5,html[data-level="g8"] .lv-g8,html[data-level="hs"] .lv-hs,html[data-level="col"] .lv-col,html[data-level="max"] .lv-max{display:block}
+.eq{font-family:Georgia,'Times New Roman',serif;font-style:italic;white-space:nowrap;color:var(--yellow)}
+.text sub,.text sup{font-size:.72em;line-height:0}
+.chapter,.hero{scroll-margin-top:4.6rem}
+.note p+p{margin-top:0}
+[hidden]{display:none!important}
+
+.labs{display:grid;gap:2.4rem}
+.missions{list-style:none;margin:.1rem 0 0;padding:.7rem .95rem .8rem;border:2px dashed var(--chalk-faint);border-radius:10px;display:grid;gap:.45rem}
+.missions .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.missions li.m{display:grid;grid-template-columns:1.45rem 1fr;gap:.6rem;align-items:start;font-size:.95rem}
+.missions .box{width:1.35rem;height:1.35rem;border:2px solid var(--chalk-dim);border-radius:4px;display:grid;place-items:center;font-family:var(--display);font-size:1.3rem;line-height:1;color:transparent;margin-top:.05rem}
+.missions li.done .box{color:var(--green);border-color:var(--green)}
+.missions li.done span:last-child{color:var(--chalk-dim)}
+.missions li.just .box{animation:pop .7s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.7) rotate(-8deg)}100%{transform:scale(1)}}
+.mcount{margin-left:auto;font-family:var(--display);font-size:1.35rem;color:var(--yellow);white-space:nowrap}
+.btn.read{display:inline-flex;align-items:center;gap:.45rem;margin:.1rem 0 1rem;padding:.5rem .9rem;font-size:.8rem}
+.btn.read svg{width:16px;height:16px}
+.lv.reading{border-left:3px solid var(--yellow);padding-left:.9rem;margin-left:-1.1rem}
+.teach{margin-top:2.2rem;font-size:1rem}
+@media (prefers-reduced-motion:reduce){.missions li.just .box{animation:none}}
+.panel canvas.short{aspect-ratio:16/9}
+
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+.keys{display:flex;flex-wrap:wrap;gap:.3rem}
+.key{width:2.15rem;height:2.15rem;border:2px solid var(--chalk-faint);border-radius:6px;background:transparent;color:var(--chalk);font:900 .9rem var(--body);cursor:pointer}
+.key:hover{background:var(--chalk);color:var(--board)}
+.controls .lbl{font-weight:900;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+input[type=number]{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.4rem .5rem;font:700 .95rem var(--body)}
+.hero-art{padding:1.2rem}
+.hero-art svg{width:100%;height:auto;display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.4rem;margin-top:2.2rem}
+.card{display:flex;flex-direction:column;gap:.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.4rem 1.5rem;background:var(--board-2);text-decoration:none;color:var(--chalk);transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:var(--yellow)}
+.card svg{width:72px;height:72px;display:block}
+.card h2{font-size:2.2rem;color:var(--chalk)}
+.card .subj{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.card p{color:var(--chalk-dim);font-size:.98rem}
+.card .meta{margin-top:auto;font-family:var(--display);font-size:1.2rem;color:var(--chalk-dim)}
+.card .go{font-weight:900;font-size:.85rem;letter-spacing:.05em;color:var(--yellow)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.6rem;margin-top:3.5rem;padding-top:2.2rem;border-top:1px solid var(--chalk-line)}
+.how h3{font-size:1.7rem;margin-bottom:.3rem}
+.how p{color:var(--chalk-dim);font-size:.97rem}
+.next{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--chalk-faint);border-radius:12px;color:var(--chalk-dim);font-size:.97rem}
+.next b{color:var(--chalk)}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#ch1">Skip to the story</a>
+<ul class="trail" aria-label="Chapters"><li><a href="#top" data-for="top"><span>Start</span></a></li><li><a href="#ch1" data-for="ch1"><span>1 · Counting by matching</span></a></li><li><a href="#ch2" data-for="ch2"><span>2 · Hilbert's Hotel</span></a></li><li><a href="#ch3" data-for="ch3"><span>3 · More fractions?</span></a></li><li><a href="#ch4" data-for="ch4"><span>4 · The diagonal trick</span></a></li><li><a href="#ch5" data-for="ch5"><span>5 · The ladder</span></a></li></ul>
+<nav class="levels" aria-label="Reading level">
+  <div class="wrap levels-in">
+    <a class="home" href="https://thedimension5.github.io/chalkboard/">The Chalkboard</a>
+    <span class="levels-label">Who's reading?</span>
+    <div class="levels-btns" role="tablist">
+      <button role="tab" data-level="k5" aria-selected="true">Kids<small>K to 5th</small></button>
+      <button role="tab" data-level="g8" aria-selected="false">8th grade<small>middle school</small></button>
+      <button role="tab" data-level="hs" aria-selected="false">High school<small>physics class</small></button>
+      <button role="tab" data-level="col" aria-selected="false">College<small>major</small></button>
+      <button role="tab" data-level="max" aria-selected="false">Max<small>no limits</small></button>
+    </div>
+    <span class="mcount" id="mcount"></span>
+  </div>
+</nav>
+<div class="wrap" id="top">
+<header class="hero">
+  <div class="text">
+    <p class="eyebrow">Georg Cantor's dangerous idea</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <h1>Bigger than Infinity</h1>
+    <div class="lv lv-k5"><p class="lede">Is infinity the biggest number? In 1874 Georg Cantor found out that some infinities are <em>bigger</em> than others. It made people so angry they tried to stop him. Here is how he did it, with games you can play.</p></div><div class="lv lv-g8"><p class="lede">In 1874 Georg Cantor proved that there are different sizes of infinity. Some mathematicians called it a disease. Today it is the foundation of mathematics. This page walks through his argument step by step, with games that let you check each step yourself.</p></div><div class="lv lv-hs"><p class="lede">Cantor's proof that the real numbers cannot be listed is one of the shortest deep proofs in mathematics. This page builds it from counting by matching, through Hilbert's Hotel and the zigzag through the fractions, to the diagonal argument and the question that turned out to have no answer.</p></div><div class="lv lv-col"><p class="lede">Cardinality by bijection, countability of ℚ, uncountability of ℝ by diagonalization, Cantor's theorem for power sets, the aleph hierarchy, and the independence of the continuum hypothesis from ZFC. Each step has an interactive check.</p></div><div class="lv lv-max"><p class="lede">From Cantor's 1874 and 1891 arguments to Gödel's constructible universe and Cohen's forcing: what is provable, what is independent, and why the continuum problem, first on Hilbert's list, remains open in the sense that matters.</p></div>
+    <div class="hero-cta"><a class="btn primary" href="#ch1">Start the story</a></div>
+  </div>
+  <div class="panel hero-art"><svg viewBox="0 0 400 300" fill="none" stroke="#F1ECDF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M120 150c-40-70 40-70 80 0s120 70 80 0-120-70-80 0-40 70-80 0z" stroke="#F6D46B" stroke-width="5"/><g opacity=".8"><rect x="30" y="215" width="34" height="50" rx="4"/><rect x="74" y="215" width="34" height="50" rx="4"/><rect x="118" y="215" width="34" height="50" rx="4"/><rect x="162" y="215" width="34" height="50" rx="4"/><rect x="206" y="215" width="34" height="50" rx="4"/><rect x="250" y="215" width="34" height="50" rx="4"/><text x="300" y="250" font-family="Caveat,cursive" font-size="34" fill="#F1ECDF" stroke="none">…</text></g><g fill="#8CC4EE" stroke="none"><circle cx="47" cy="248" r="7"/><circle cx="91" cy="248" r="7"/><circle cx="135" cy="248" r="7"/><circle cx="179" cy="248" r="7"/><circle cx="223" cy="248" r="7"/><circle cx="267" cy="248" r="7"/></g><text x="200" y="60" text-anchor="middle" font-family="Caveat,cursive" font-size="40" fill="#F596A8" stroke="none">ℵ₀ &lt; 2^ℵ₀ &lt; …</text></svg></div>
+</header>
+<main>
+<section class="chapter" id="ch1">
+  <div class="text">
+    <p class="eyebrow">Chapter 1</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <div class="lv lv-k5"><h2>Counting by matching</h2><p>How do you know two piles have the same amount without counting? <em>Pair them up.</em> One apple, one cup. If nothing is left over, the piles are the same size. You never needed numbers at all.</p><p>Cantor's big idea: use pairing for infinite piles too, where counting would never finish.</p></div>
+    <div class="lv lv-g8"><h2>Counting by matching</h2><p>A pairing where every item on each side has exactly one partner is called a one-to-one match. Two collections have the same size exactly when such a match exists.</p><p>This definition works for finite piles, and it is the only definition that still makes sense for infinite ones. Try the uneven piles: one item is left over, so no match exists, so the sizes differ.</p></div>
+    <div class="lv lv-hs"><h2>Bijections</h2><p>A bijection between sets A and B is a function that is one-to-one and onto. Cantor defined |A| = |B| to mean that a bijection exists. For finite sets this agrees with counting; for infinite sets it <em>is</em> the definition.</p><p>|A| ≤ |B| means an injection A → B exists. The Cantor–Schröder–Bernstein theorem says that injections both ways give a bijection, so ≤ behaves like an order.</p></div>
+    <div class="lv lv-col"><h2>Cardinality as an equivalence relation</h2><p>Cardinality is the equivalence relation on sets defined by bijections; ≤ is defined by injections; Cantor–Schröder–Bernstein shows ≤ is antisymmetric, and with the axiom of choice it is total, so any two sets are comparable. Without choice, comparability can fail.</p><p>Note what the definition does not say: same size is not same shape. ℕ and ℤ are in bijection but not order-isomorphic. Cardinality forgets everything except matching.</p></div>
+    <div class="lv lv-max"><h2>Cardinality without choice</h2><p>Hartogs' theorem gives, for any set X, an ordinal that does not inject into X, choice-free; comparability of all cardinals is equivalent to AC (Hartogs 1915). In ZF alone there are Dedekind-finite infinite sets: infinite, but with no countable subset and no bijection with a proper subset, so 'infinite' splits into inequivalent notions.</p><p>Cardinal arithmetic begins here: κ ≤ λ iff an injection exists, and κ² = κ for all infinite κ is itself equivalent to AC (Tarski 1924).</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The pairing idea is the whole foundation. Everything that follows is 'pair it up, and see whether anything is left over.'</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-match" aria-label="Apples on the left, cups on the right. Drag from an apple to a cup to pair them."></canvas></div>
+    <div class="controls"><button class="btn" id="match-reset">Start over</button></div>
+    <figcaption><b>Try this:</b> drag from each apple to a cup. <span data-lv="k5">If nothing is left over, the piles are the same size.</span><span data-lv="g8 hs col max">Above the Kids level the piles are uneven: find what is left over.</span></figcaption>
+    <ul class="missions" data-ch="ch1"></ul>
+  </figure>
+</section>
+<section class="chapter" id="ch2">
+  <div class="text">
+    <p class="eyebrow">Chapter 2</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <div class="lv lv-k5"><h2>Hilbert's Hotel</h2><p class="when">David Hilbert, 1924</p><p>Imagine a hotel with rooms numbered 1, 2, 3 and so on <em>forever</em>, and every room is full. A new guest arrives. No problem: everyone moves up one room, and room 1 is free.</p><p>A bus with infinitely many people arrives. Still no problem: everyone moves to double their room number, and all the odd rooms are free. A full hotel with room for more. That is what infinity is like.</p></div>
+    <div class="lv lv-g8"><h2>Hilbert's Hotel</h2><p class="when">David Hilbert, 1924</p><p>David Hilbert used this hotel to show something strange: an infinite set can be matched one-to-one with <em>part of itself</em>. The guests in all the rooms match perfectly with the guests in only the even rooms. For finite piles that is impossible.</p><p>In fact that strangeness became the definition: a set is infinite exactly when it can be paired with a part of itself.</p></div>
+    <div class="lv lv-hs"><h2>Countable infinity</h2><p class="when">David Hilbert, 1924</p><p>The whole numbers ℕ, the even numbers, the integers ℤ, and even ℕ × ℕ all have the same cardinality, written ℵ₀ (aleph-null). A set that can be paired with ℕ is called countable.</p><p>Dedekind turned the hotel trick into a definition: a set is infinite if it is in bijection with a proper subset of itself. The bus is the map n ↦ 2n; the infinitely many buses need a pairing of ℕ × ℕ with ℕ.</p></div>
+    <div class="lv lv-col"><h2>ℵ₀ and its arithmetic</h2><p class="when">David Hilbert, 1924</p><p>Countable unions of countable sets are countable (using countable choice), which is the infinitely-many-buses case: send passenger m of bus n to room 2ⁿ3ᵐ, or use the pairing function (n, m) ↦ (n + m)(n + m + 1)/2 + m.</p><p>So ℵ₀ + ℵ₀ = ℵ₀ · ℵ₀ = ℵ₀. Infinite cardinal arithmetic is degenerate: with choice, κ + λ = κ · λ = max(κ, λ).</p></div>
+    <div class="lv lv-max"><h2>Where choice hides</h2><p class="when">David Hilbert, 1924</p><p>The infinitely-many-buses step silently uses countable choice: to enumerate a countable union you must choose an enumeration of each set. In ZF alone, ℝ can be a countable union of countable sets (the Feferman–Levy model).</p><p>Dedekind-infinite versus infinite, and the dependence of cardinal arithmetic on AC, are the fault lines. The hotel is a theorem about ω; the buses are a theorem about choice.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The hotel is a picture of the fact that the even numbers are 'as many' as all the whole numbers. Kids often find this outrageous. That is the right reaction; Cantor's contemporaries had it too.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-hotel" aria-label="A row of numbered hotel rooms with a guest in each. Buttons bring a new guest or an infinite bus."></canvas></div>
+    <div class="controls"><button class="btn" id="hotel-guest">A new guest arrives</button><button class="btn blue" id="hotel-bus">An infinite bus arrives</button><button class="btn" id="hotel-reset">Fill the hotel again</button></div>
+    <figcaption><b>Try this:</b> the hotel is full. Make room for one more, then for a whole busload. <span data-lv="hs col max">The bus is the map n ↦ 2n.</span></figcaption>
+    <ul class="missions" data-ch="ch2"></ul>
+  </figure>
+</section>
+<section class="chapter" id="ch3">
+  <div class="text">
+    <p class="eyebrow">Chapter 3</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <div class="lv lv-k5"><h2>More fractions than whole numbers?</h2><p class="when">Cantor, 1874</p><p>Between any two whole numbers there are endless fractions. So there must be more fractions than whole numbers, right?</p><p>Cantor said: let's try to pair them. Write every fraction in a giant grid and walk through it in a zigzag. Every fraction gets a number on the way. So there are exactly as many fractions as whole numbers. Surprise.</p></div>
+    <div class="lv lv-g8"><h2>More fractions than whole numbers?</h2><p class="when">Cantor, 1874</p><p>The zigzag visits every fraction eventually, so it gives each one a label: 1st, 2nd, 3rd. That is a one-to-one match between fractions and counting numbers. The fractions are <em>countable</em>.</p><p>Being densely packed does not make a set bigger than the counting numbers. Density and size are different things.</p></div>
+    <div class="lv lv-hs"><h2>ℚ is countable</h2><p class="when">Cantor, 1874</p><p>List positive fractions p/q in a grid indexed by (p, q), walk the diagonals p + q = 2, 3, 4, ..., skip repeats like 2/4, and interleave negatives. Every rational appears at a finite step.</p><p>So |ℚ| = ℵ₀, despite ℚ being dense in ℝ. The same trick shows the set of all finite strings over a finite alphabet is countable, so there are only countably many computer programs.</p></div>
+    <div class="lv lv-col"><h2>Countable sets everywhere</h2><p class="when">Cantor, 1874</p><p>The algebraic numbers are countable (Cantor 1874): each is a root of a polynomial with integer coefficients, there are countably many such polynomials, and each has finitely many roots.</p><p>That was Cantor's first route to transcendental numbers, before the diagonal argument: ℝ is uncountable, the algebraic numbers are countable, so transcendentals exist, and in fact almost all reals are transcendental, without exhibiting a single one.</p></div>
+    <div class="lv lv-max"><h2>The 1874 proof</h2><p class="when">Cantor, 1874</p><p>Cantor's 1874 paper proves uncountability of ℝ by nested intervals, not diagonalization: given any sequence (xₙ), build nested closed intervals avoiding each xₙ; their intersection is nonempty by completeness. The 1891 diagonal argument is the one that generalized, to power sets, Gödel's incompleteness, the halting problem, and Russell's paradox.</p><p>The countability of the algebraic numbers is the enumeration half of the first non-constructive existence proof for transcendentals, five years after Hermite's constructive proof for e.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The zigzag is a real proof, not a trick. The point for children is that 'more crowded' and 'more of them' are different ideas.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-zigzag" aria-label="A grid of fractions with a zigzag path numbering them one by one."></canvas></div>
+    <div class="controls"><button class="btn" id="zig-next">Next fraction</button><button class="btn" id="zig-auto" aria-pressed="false">Auto</button><button class="btn" id="zig-reset">Start over</button></div>
+    <figcaption><b>Try this:</b> step the zigzag and watch every fraction get a whole number. <span data-lv="hs col max">Repeats such as 2/4 are skipped, since 1/2 already has a number.</span></figcaption>
+    <ul class="missions" data-ch="ch3"></ul>
+  </figure>
+</section>
+<section class="chapter" id="ch4">
+  <div class="text">
+    <p class="eyebrow">Chapter 4</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <div class="lv lv-k5"><h2>The diagonal trick</h2><p class="when">Cantor, 1891</p><p>Now try the same trick with all the numbers between 0 and 1, written as endless strings of digits. Suppose you had a list of all of them.</p><p>Cantor makes a new number: look at the first digit of the first number and change it. Then the second digit of the second number, and change it. And so on down the diagonal. The new number is different from <em>every</em> number on the list. So the list was never complete. No list can ever be. These numbers are a bigger infinity.</p></div>
+    <div class="lv lv-g8"><h2>The diagonal trick</h2><p class="when">Cantor, 1891</p><p>Here is why the new number cannot be on the list. Is it the 1st number? No, its first digit is different. The 2nd? No, its second digit is different. It differs from the nth number at the nth digit, for every n.</p><p>Any list you write leaves something out, so the numbers between 0 and 1 cannot be paired with 1, 2, 3, .... They form a bigger infinity than the counting numbers.</p></div>
+    <div class="lv lv-hs"><h2>The diagonal argument</h2><p class="when">Cantor, 1891</p><p>Suppose f: ℕ → {0,1}^ℕ lists every infinite binary sequence, with f(n) = (aₙ₁, aₙ₂, ...). Define b by bₙ = 1 − aₙₙ. Then b differs from f(n) in position n, for every n, so b is not on the list. Contradiction.</p><p>Hence the infinite binary sequences are uncountable, and so is ℝ (via binary expansions, taking care with dual representations such as 0.0111... = 0.1000...). The cardinality of ℝ is written 𝔠, or 2^ℵ₀.</p></div>
+    <div class="lv lv-col"><h2>Cantor's theorem</h2><p class="when">Cantor, 1891</p><p>The argument generalizes: for any set X there is no surjection X → 𝒫(X). Given g: X → 𝒫(X), let D = {x : x ∉ g(x)}; if D = g(d) then d ∈ D ⟺ d ∉ D.</p><p>The same shape appears in Russell's paradox, in Gödel's incompleteness theorem (a sentence saying 'I am unprovable'), in Turing's halting problem, and in the Y combinator. Lawvere's fixed-point theorem (1969) states the common form: in a cartesian closed category, a point-surjective map A → Y^A forces every endomorphism of Y to have a fixed point.</p></div>
+    <div class="lv lv-max"><h2>Diagonalization as a fixed-point theorem</h2><p class="when">Cantor, 1891</p><p>Lawvere's theorem shows Cantor, Russell, Gödel, Tarski and Turing are one theorem in different categories; Yanofsky (2003) gives the uniform treatment. Constructively the argument is fine: it proves that no surjection exists, an intuitionistically valid negative statement.</p><p>What needs more is the classical corollary that ℝ has a definite aleph as its size: in models of ZF without choice ℝ can fail to be well-orderable, so 𝔠 need not be an aleph at all.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>This is the proof that made Cantor famous and hated. The key sentence for a child: the new number is different from every number on the list, so the list was never complete.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-diag" aria-label="A list of rows of binary digits. Flip the diagonal to build a row that is not on the list."></canvas></div>
+    <div class="controls"><button class="btn" id="diag-flip">Flip the diagonal</button><button class="btn blue" id="diag-add">Add it to the list</button><button class="btn" id="diag-reset">New list</button></div>
+    <figcaption><b>Try this:</b> flip the diagonal to build a new number, then add it to the list and flip again. The list can never catch up.</figcaption>
+    <ul class="missions" data-ch="ch4"></ul>
+  </figure>
+</section>
+<section class="chapter" id="ch5">
+  <div class="text">
+    <p class="eyebrow">Chapter 5</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <div class="lv lv-k5"><h2>The ladder, and the question nobody could answer</h2><p>Is there a biggest infinity? No. Cantor showed how to always make a bigger one: take all the different groups you can make from a set. That collection is always bigger than the set you started with. So the infinities climb a ladder that never ends.</p><p>Then he asked: is there an infinity in between the counting numbers and the numbers on the line? He couldn't answer it. He spent years on it. The answer, found seventy years later, was the strangest of all: <em>the question has no answer</em>. Both yes and no fit all the rules of mathematics.</p></div>
+    <div class="lv lv-g8"><h2>The ladder, and the question nobody could answer</h2><p>A set with 3 things has 8 subsets. With 4 things, 16. In general 2ⁿ. Cantor proved the same holds for infinite sets: the subsets of a set always make a bigger infinity. So the infinities go up like a ladder: ℵ₀, then bigger, then bigger.</p><p>Cantor's question, the continuum hypothesis: is the infinity of the number line the very next rung after ℵ₀? In 1940 Kurt Gödel showed you cannot prove it false. In 1963 Paul Cohen showed you cannot prove it true. The usual rules of mathematics simply do not decide it.</p></div>
+    <div class="lv lv-hs"><h2>Cantor's ladder and the continuum hypothesis</h2><p>Cantor's theorem: |X| < |𝒫(X)| for every set X, so ℵ₀ < 2^ℵ₀ < 2^(2^ℵ₀) < .... The continuum hypothesis (CH) says 2^ℵ₀ = ℵ₁, the first uncountable cardinal: there is no set strictly between ℕ and ℝ in size.</p><p>Gödel (1940) proved CH is consistent with the standard axioms, ZFC. Cohen (1963) proved its negation is consistent too. CH is independent of ZFC. Hilbert had put it first on his 1900 list of problems.</p></div>
+    <div class="lv lv-col"><h2>Independence</h2><p>Gödel built the constructible universe L, in which every set is definable from earlier stages; L satisfies ZFC + GCH, so CH cannot be refuted. Cohen invented forcing: adjoin ℵ₂ generic reals to a model of ZFC without collapsing cardinals, giving a model where 2^ℵ₀ = ℵ₂.</p><p>Easton's theorem shows 2^κ for regular κ can be almost anything consistent with König's theorem (cf(2^κ) > κ). ZFC says remarkably little about the continuum.</p></div>
+    <div class="lv lv-max"><h2>After independence</h2><p>Independence was not the end. Woodin's Ω-logic program argued for ¬CH (2^ℵ₀ = ℵ₂) from forcing axioms and the structure of H(ω₂); his later Ultimate-L program points toward CH. Forcing axioms such as PFA and MM imply 2^ℵ₀ = ℵ₂. Large cardinals settle projective statements but not CH (Levy–Solovay).</p><p>Whether CH has a determinate truth value is a live question in the philosophy of mathematics: the multiverse view (Hamkins) against the universe view (Gödel's realism, Woodin). Set-theoretic geology and the modal logic of forcing are the modern tools.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Kids like the ending: the greatest mathematicians could not answer the question, and eventually proved that it cannot be answered from the usual rules. 'No answer' is itself a discovery.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-ladder" aria-label="All subsets of a small set, and a ladder of ever larger infinities."></canvas></div>
+    <div class="controls"><label class="slider">Things in the set <input type="range" id="ladder-n" min="1" max="5" step="1" value="3"><span class="val" id="ladder-n-val">3</span></label><button class="btn" id="ladder-ch" data-lv="hs col max" aria-pressed="true">Continuum hypothesis: true</button></div>
+    <figcaption><b>Try this:</b> count the subsets as the set grows. <span data-lv="hs col max">Then flip the continuum hypothesis and watch nothing break. Both answers are consistent with the rules.</span></figcaption>
+    <ul class="missions" data-ch="ch5"></ul>
+  </figure>
+</section>
+</main>
+<footer class="closing">
+  <p class="eyebrow">The end, for now</p>
+  <p>Cantor spent his last years in and out of hospital, sure he was right and mostly alone. He was right. The next rung is still waiting for someone to say what it looks like.</p>
+  <p class="big" style="margin-left:auto;margin-right:auto">Cantor's ladder has no top.</p>
+  <p class="teach"><a href="https://thedimension5.github.io/chalkboard/">More boards at The Chalkboard</a></p>
+</footer>
+</div>
+<div class="tray" aria-hidden="true"></div>
+<script>window.Chalk=(function(){
+'use strict';
+const C={chalk:'#F1ECDF',yellow:'#F6D46B',blue:'#8CC4EE',pink:'#F596A8',green:'#9DDBA3',board:'#1B2923'};
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>Number(v).toFixed(d);
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';const sup=n=>String(n).split('').map(c=>c==='-'?'⁻':(SUP[+c]||c)).join('');
+const pct=v=>Math.round(v*100)+'%';
+function text(ctx,str,x,y,o={}){const{size=20,color=C.chalk,align='center',fam='display',alpha=1,base='middle'}=o;ctx.save();ctx.globalAlpha=alpha;ctx.font=fam==='display'?`700 ${size}px Caveat, "Segoe Print", cursive`:fam==='mono'?`700 ${size}px "JetBrains Mono", Menlo, Consolas, monospace`:`900 ${size}px Nunito, system-ui, sans-serif`;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline=base;ctx.fillText(str,x,y);ctx.restore()}
+function circle(ctx,x,y,r,fill,stroke,lw=2){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function glow(ctx,x,y,r,color,a=.55){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(color,a));g.addColorStop(1,rgba(color,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function shade(ctx,x,y,r,a=.38){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function poly(ctx,pts,color,lw=1.2,alpha=1,close=false){if(pts.length<2)return;ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);if(close)ctx.closePath();ctx.stroke();ctx.restore()}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r)}else{ctx.rect(x,y,w,h)}}
+function box(ctx,x,y,w,h,fill,stroke,r=6,lw=2){rr(ctx,x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function marble(ctx,x,y,r,color){glow(ctx,x,y,r*2.6,color,.4);circle(ctx,x,y,r,color);circle(ctx,x-r*.3,y-r*.3,r*.3,'rgba(255,255,255,.55)')}
+function readout(ctx,lines,x,y,o={}){const{align='left',size=13,color=C.chalk,alpha=.94}=o;ctx.save();ctx.font=`700 ${size}px Nunito, system-ui, sans-serif`;let mw=0;for(const t of lines)mw=Math.max(mw,ctx.measureText(t).width);const bx=align==='right'?x-mw-8:align==='center'?x-mw/2-8:x-8;ctx.globalAlpha=.6;ctx.fillStyle=C.board;ctx.fillRect(bx,y-5,mw+16,lines.length*(size+5)+6);ctx.globalAlpha=alpha;ctx.textAlign=align;ctx.textBaseline='top';ctx.fillStyle=color;lines.forEach((t,i)=>ctx.fillText(t,x,y+i*(size+5)));ctx.restore()}
+function arrow(ctx,x,y,dx,dy,color,lw=2.2){const L=Math.hypot(dx,dy);if(L<3)return;ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();ctx.translate(x+dx,y+dy);ctx.rotate(Math.atan2(dy,dx));ctx.beginPath();ctx.moveTo(1,0);ctx.lineTo(-8,-4.5);ctx.lineTo(-8,4.5);ctx.closePath();ctx.fill();ctx.restore()}
+function rng(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let r=Math.imul(t^(t>>>15),1|t);r^=r+Math.imul(r^(r>>>7),61|r);return((r^(r>>>14))>>>0)/4294967296}}
+
+/* ---------- level ---------- */
+const LV=['k5','g8','hs','col','max'];const LR={k5:0,g8:1,hs:2,col:3,max:4};let LEVEL='k5';
+const at=l=>LR[LEVEL]>=LR[l];
+function keepPlace(fn){const secs=[...document.querySelectorAll('.hero,.chapter')];let ref=null;for(const s of secs){if(s.getBoundingClientRect().top<=90)ref=s}const before=ref?ref.getBoundingClientRect().top:0;fn();if(ref){const after=ref.getBoundingClientRect().top;window.scrollBy({top:after-before,left:0,behavior:'instant'})}}
+function setLevel(l,fromClick){if(!LV.includes(l))l='k5';LEVEL=l;keepPlace(()=>{document.documentElement.setAttribute('data-level',l);document.querySelectorAll('[data-lv]').forEach(el=>{el.hidden=!el.dataset.lv.split(' ').includes(l)})});
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.setAttribute('aria-selected',b.dataset.level===l?'true':'false'));
+  try{localStorage.setItem('one-rule-level',l)}catch(e){}
+  if(fromClick){try{const u=new URL(location.href);u.searchParams.set('level',l);history.replaceState(null,'',u)}catch(e){}}
+  stopSpeak();renderMissions()}
+
+/* ---------- sims ---------- */
+const sims=[];
+function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getContext('2d');const s=Object.assign({cv,ctx,w:0,h:0,visible:false,t:0,dt:0,pointer:null},def);
+  function resize(){const r=cv.getBoundingClientRect();if(r.width<2)return;const dpr=Math.min(window.devicePixelRatio||1,2);const first=s.w===0;s.w=r.width;s.h=r.height;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);if(first){s.init&&s.init(s)}else{s.onResize&&s.onResize(s)}s.draw(s)}
+  new ResizeObserver(resize).observe(cv);resize();
+  new IntersectionObserver(e=>{s.visible=e[0].isIntersecting},{rootMargin:'120px'}).observe(cv);
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);s.pointer=pos(e);s.down&&s.down(s.pointer,s,e)});
+  cv.addEventListener('pointermove',e=>{s.pointer=pos(e);s.move&&s.move(s.pointer,s,e)});
+  const up=e=>{s.up&&s.up(pos(e),s,e)};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('pointerleave',()=>{s.leave&&s.leave(s)});
+  sims.push(s);return s}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
+const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=()=>{const v=parseFloat(el.value);if(out)out.textContent=f?f(v):v;fn(v)};el.addEventListener('input',go);go()};
+
+/* ---------- missions ---------- */
+let DEFS=[],CHECKS={},KEY='chalk',mdone=new Set();
+const mApplies=m=>m.lv.includes(LEVEL);
+function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:''}
+function renderMissions(){document.querySelectorAll('.missions').forEach(ul=>{const ms=DEFS.filter(m=>m.ch===ul.dataset.ch&&mApplies(m));ul.hidden=!ms.length;ul.innerHTML='<li class="mh">Mission'+(ms.length>1?'s':'')+'</li>'+ms.map(m=>`<li class="m${mdone.has(m.id)?' done':''}" data-m="${m.id}"><span class="box">✓</span><span>${m.text}</span></li>`).join('')});mcount()}
+function checkMissions(){let changed=false;for(const m of DEFS){if(mdone.has(m.id)||!mApplies(m))continue;let ok=false;try{ok=!!(CHECKS[m.id]&&CHECKS[m.id]())}catch(e){ok=false}
+    if(ok){mdone.add(m.id);changed=true;const li=document.querySelector(`.missions li[data-m="${m.id}"]`);if(li)li.classList.add('done','just')}}
+  if(changed){try{localStorage.setItem('chalk:'+KEY+':missions',JSON.stringify([...mdone]))}catch(e){}mcount()}}
+
+/* ---------- read aloud ---------- */
+const canSpeak='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
+let speaking=null;
+function stopSpeak(){if(!canSpeak)return;const was=speaking;speaking=null;try{speechSynthesis.cancel()}catch(e){}if(was){was.btn.classList.remove('is-on');was.btn.querySelector('span').textContent='Read to me';was.block.classList.remove('reading')}}
+function pickVoice(){const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));return vs.find(v=>/Samantha|Google US English|Karen|Daniel|Natural|Premium/i.test(v.name))||vs[0]||null}
+function wireRead(){if(!canSpeak){document.querySelectorAll('.read').forEach(b=>b.remove());return}
+  document.querySelectorAll('.read').forEach(btn=>btn.addEventListener('click',()=>{const sec=btn.closest('.text');const block=[...sec.querySelectorAll('.lv')].find(b=>b.offsetParent!==null);if(!block)return;
+    if(speaking&&speaking.btn===btn){stopSpeak();return}stopSpeak();
+    const parts=[];const h1=sec.querySelector('h1');if(h1)parts.push(h1.textContent.trim());[...block.querySelectorAll('h2,p')].forEach(e=>{const t=e.textContent.trim();if(t)parts.push(t)});
+    const cap=sec.parentElement.querySelector('figcaption');if(cap)parts.push(cap.textContent.replace(/\s+/g,' ').trim());
+    const voice=pickVoice();speaking={btn,block};btn.classList.add('is-on');btn.querySelector('span').textContent='Stop';block.classList.add('reading');
+    parts.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.rate=.95;u.pitch=1.05;if(voice)u.voice=voice;if(i===parts.length-1)u.onend=()=>{if(speaking&&speaking.btn===btn)stopSpeak()};speechSynthesis.speak(u)})}));
+  try{speechSynthesis.getVoices()}catch(e){}window.addEventListener('pagehide',()=>stopSpeak())}
+
+/* ---------- start ---------- */
+function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};
+  try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
+  wireRead();
+  let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
+  setLevel(lv0||'k5',false);setInterval(checkMissions,300);
+  const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
+return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start};
+})();
+</script>
+<script>
+const MISSION_DEFS=[{"id": "inf1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Pair every apple with a cup."}, {"id": "inf1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Pair as many as you can and find the one left over."}, {"id": "inf2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the new guest."}, {"id": "inf2b", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the whole bus."}, {"id": "inf3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Number 20 fractions with the zigzag."}, {"id": "inf3b", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Number 30 fractions and watch the repeats get skipped."}, {"id": "inf4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Flip the diagonal to make a number that is not on the list."}, {"id": "inf4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Add the new number to the list, then flip again."}, {"id": "inf5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Show all 16 subsets of a four-thing set."}, {"id": "inf5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Flip the continuum hypothesis both ways."}];
+const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
+
+/* ---------- CH1: pairing ---------- */
+const match=makeSim('cv-match',{
+  init(s){s.reset(s)},
+  counts(){return at('g8')?[6,5]:[5,5]},
+  reset(s){const[na,nb]=s.counts();s.na=na;s.nb=nb;s.pairs={};s.drag=null},
+  posA(s,i){return{x:s.w*.2,y:s.h*(.14+i*.72/Math.max(s.na-1,1))}},
+  posB(s,j){return{x:s.w*.8,y:s.h*(.14+j*.72/Math.max(s.nb-1,1))}},
+  down(p,s){for(let i=0;i<s.na;i++)if(dist(p,s.posA(s,i))<26){s.drag=i;delete s.pairs[i]}},
+  up(p,s){if(s.drag==null)return;for(let j=0;j<s.nb;j++)if(dist(p,s.posB(s,j))<30){for(const k in s.pairs)if(s.pairs[k]===j)delete s.pairs[k];s.pairs[s.drag]=j}s.drag=null},
+  paired(s){return Object.keys(s.pairs).length},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);if(s.counts()[0]!==s.na)s.reset(s);
+    for(const k in s.pairs){const a=s.posA(s,+k),b=s.posB(s,s.pairs[k]);poly(ctx,[[a.x+16,a.y],[b.x-22,b.y]],C.yellow,2.5,.9)}
+    if(s.drag!=null&&s.pointer){const a=s.posA(s,s.drag);ctx.save();ctx.setLineDash([5,6]);poly(ctx,[[a.x+16,a.y],[s.pointer.x,s.pointer.y]],C.chalk,1.5,.7);ctx.restore()}
+    for(let i=0;i<s.na;i++){const a=s.posA(s,i);glow(ctx,a.x,a.y,26,C.pink,.3);circle(ctx,a.x,a.y,13,C.pink);poly(ctx,[[a.x,a.y-13],[a.x+3,a.y-20]],C.chalk,2.5)}
+    for(let j=0;j<s.nb;j++){const b=s.posB(s,j);box(ctx,b.x-16,b.y-12,32,24,rgba(C.blue,.9),null,[3,3,9,9]);ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(b.x+18,b.y,7,-Math.PI/2,Math.PI/2);ctx.stroke()}
+    text(ctx,'apples',w*.2,h*.95,{size:20,alpha:.7});text(ctx,'cups',w*.8,h*.95,{size:20,alpha:.7});
+    const n=s.paired(s);let msg='drag an apple to a cup';
+    if(s.na===s.nb&&n===s.na)msg='same size, and you never counted!';else if(s.na>s.nb&&n===s.nb)msg='one apple left over: not the same size';else if(n>0)msg=`${n} paired`;
+    text(ctx,msg,w/2,h*.08,{size:24,color:n>=s.nb?C.yellow:C.chalk});
+    if(at('hs'))readout(ctx,[s.na===s.nb?'a bijection: one-to-one and onto':'an injection from cups into apples, no bijection','|A| = |B| means: a bijection exists'],w/2,h*.84,{align:'center',size:12})}
+});
+hook('match-reset',()=>match&&match.reset(match));
+
+/* ---------- CH2: Hilbert's Hotel ---------- */
+const hotel=makeSim('cv-hotel',{
+  init(s){s.reset(s)},
+  reset(s){s.g=[];for(let r=1;r<=14;r++)s.g.push({room:r,x:s.rx(s,r),y:s.h*.62,c:C.yellow});s.msg='every room is full';s.guestDone=false;s.busDone=false;s.busy=0},
+  rx(s,r){return 34+(r-1)*(s.w-60)/12},
+  newGuest(s){if(s.busy>0)return;for(const g of s.g)g.room+=1;s.g.push({room:1,x:-30,y:s.h*.2,c:C.pink});s.msg='everyone moves up one room. Room 1 is free!';s.guestDone=true;s.busy=1.4},
+  bus(s){if(s.busy>0)return;for(const g of s.g)g.room*=2;for(let k=0;k<7;k++)s.g.push({room:2*k+1,x:s.w*.1+k*30,y:-30,c:C.blue});s.msg='everyone doubles their room number. All the odd rooms are free!';s.busDone=true;s.busy=1.6},
+  step(dt,s){s.busy=Math.max(0,s.busy-dt);for(const g of s.g){const tx=s.rx(s,g.room),ty=s.h*.62;g.x+=(tx-g.x)*Math.min(1,dt*4);g.y+=(ty-g.y)*Math.min(1,dt*4)}s.g=s.g.filter(g=>g.room<=40)},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);
+    for(let r=1;r<=13;r++){const x=s.rx(s,r);box(ctx,x-18,h*.44,36,h*.36,null,C.chalk,4,1.5);text(ctx,r<13?String(r):'…',x,h*.34,{size:22,alpha:.85});if(r<13)box(ctx,x-7,h*.62,14,h*.18,rgba(C.chalk,.12),null,2)}
+    poly(ctx,[[10,h*.8],[w-10,h*.8]],C.chalk,2,.5);text(ctx,'HOTEL INFINITY',w/2,h*.14,{size:30,color:C.yellow});
+    for(const g of s.g)marble(ctx,g.x,g.y,9,g.c);
+    text(ctx,s.msg,w/2,h*.92,{size:20,alpha:.85});
+    if(at('g8')){const lines=[];if(s.busDone)lines.push(at('hs')?'n ↦ 2n pairs all the rooms with the even rooms':'all the guests fit into just the even rooms');if(s.guestDone&&!s.busDone)lines.push(at('hs')?'n ↦ n + 1: the hotel matches a part of itself':'a full hotel matched with part of itself');if(at('col'))lines.push('countable union of countable sets: (n, m) ↦ 2ⁿ·3ᵐ');if(lines.length)readout(ctx,lines,w*.03,h*.03,{size:12})}}
+});
+hook('hotel-guest',()=>hotel&&hotel.newGuest(hotel));hook('hotel-bus',()=>hotel&&hotel.bus(hotel));hook('hotel-reset',()=>hotel&&hotel.reset(hotel));
+
+/* ---------- CH3: zigzag through the fractions ---------- */
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const zig=makeSim('cv-zigzag',{
+  init(s){s.N=7;s.path=[];for(let d=2;d<=s.N+1;d++){for(let p=d-1;p>=1;p--){const q=d-p;if(q<=s.N)s.path.push(d%2?[p,q]:[p,q])}}
+    // alternate direction on each diagonal for a real zigzag
+    s.path=[];for(let d=2;d<=2*s.N;d++){const cells=[];for(let p=1;p<d;p++){const q=d-p;if(p<=s.N&&q<=s.N)cells.push([p,q])}if(d%2===0)cells.reverse();s.path.push(...cells)}
+    s.reset(s)},
+  reset(s){s.i=0;s.num=0;s.labels={};s.auto=false;s.tick=0;s.skips=0},
+  next(s){if(s.i>=s.path.length)return;const[p,q]=s.path[s.i];if(gcd(p,q)===1){s.num++;s.labels[p+'/'+q]=s.num}else s.skips++;s.i++},
+  step(dt,s){if(s.auto){s.tick+=dt;if(s.tick>.28){s.tick=0;s.next(s)}}},
+  cell(s,p,q){const m=44,cw=(s.w-m-16)/s.N,ch=(s.h-m-16)/s.N;return{x:m+(q-.5)*cw,y:m+(p-.5)*ch}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);
+    const pts=[];for(let k=0;k<s.i;k++){const[p,q]=s.path[k];const c=s.cell(s,p,q);pts.push([c.x,c.y])}poly(ctx,pts,C.yellow,2,.7);
+    for(let p=1;p<=s.N;p++)for(let q=1;q<=s.N;q++){const c=s.cell(s,p,q);const rep=gcd(p,q)!==1;const lab=s.labels[p+'/'+q];const seen=s.path.findIndex(v=>v[0]===p&&v[1]===q)<s.i;
+      text(ctx,`${p}/${q}`,c.x,c.y,{size:19,alpha:rep?.3:seen?1:.6,color:seen&&!rep?C.chalk:C.chalk});
+      if(lab)text(ctx,String(lab),c.x+16,c.y-14,{size:15,color:C.yellow,fam:'body'});
+      if(rep&&seen&&at('hs'))poly(ctx,[[c.x-14,c.y+8],[c.x+14,c.y-8]],C.pink,1.5,.8)}
+    text(ctx,'q →',w-22,20,{size:18,alpha:.6});text(ctx,'p ↓',20,h-16,{size:18,alpha:.6});
+    const lines=[`numbered: ${s.num}`];if(at('hs'))lines.push(`repeats skipped: ${s.skips}`);if(at('g8'))lines.push(s.num>=20?'every fraction gets a whole number: countable':'each fraction gets the next whole number');readout(ctx,lines,w-16,10,{align:'right',size:12})}
+});
+hook('zig-next',()=>zig&&zig.next(zig));hook('zig-reset',()=>zig&&zig.reset(zig));
+hook('zig-auto',()=>{if(!zig)return;zig.auto=!zig.auto;const b=$('zig-auto');b.classList.toggle('is-on',zig.auto);b.setAttribute('aria-pressed',String(zig.auto))});
+
+/* ---------- CH4: the diagonal ---------- */
+const diag=makeSim('cv-diag',{
+  init(s){s.reset(s)},
+  reset(s){s.n=6;const r=rng(Date.now()&0xffff);s.rows=[];for(let i=0;i<s.n;i++){const row=[];for(let j=0;j<s.n;j++)row.push(r()<.5?0:1);s.rows.push(row)}s.b=null;s.flips=0;s.adds=0},
+  flip(s){s.b=s.rows.map((row,i)=>1-row[i]);s.flips++},
+  add(s){if(!s.b)return;const r=rng(Date.now()&0xffff);for(const row of s.rows)row.push(r()<.5?0:1);const nb=s.b.slice();nb.push(r()<.5?0:1);s.rows.push(nb);s.n++;s.b=null;s.adds++;if(s.n>9){s.rows.shift();s.rows.forEach(r=>r.shift());s.n--}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const cell=Math.min(34,(w-120)/(s.n+1),(h-110)/(s.n+2));const x0=70,y0=44;
+    text(ctx,'the list',x0+cell*s.n/2,y0-24,{size:20,alpha:.8});
+    for(let i=0;i<s.n;i++){text(ctx,`#${i+1}`,x0-30,y0+i*cell+cell/2,{size:16,alpha:.6,fam:'body'});text(ctx,'0.',x0-8,y0+i*cell+cell/2,{size:16,alpha:.6,fam:'mono'});
+      for(let j=0;j<s.n;j++){const d=i===j;if(d)box(ctx,x0+j*cell+2,y0+i*cell+2,cell-4,cell-4,rgba(C.yellow,.25),C.yellow,4,1.5);text(ctx,String(s.rows[i][j]),x0+j*cell+cell/2,y0+i*cell+cell/2+1,{size:18,fam:'mono',color:d?C.yellow:C.chalk})}
+      text(ctx,'…',x0+s.n*cell+12,y0+i*cell+cell/2,{size:18,alpha:.5})}
+    const by=y0+s.n*cell+30;
+    if(s.b){text(ctx,'new',x0-30,by+cell/2,{size:16,color:C.pink,fam:'body'});text(ctx,'0.',x0-8,by+cell/2,{size:16,color:C.pink,fam:'mono'});
+      for(let j=0;j<s.n;j++){box(ctx,x0+j*cell+2,by+2,cell-4,cell-4,rgba(C.pink,.25),C.pink,4,1.5);text(ctx,String(s.b[j]),x0+j*cell+cell/2,by+cell/2+1,{size:18,fam:'mono',color:C.pink});poly(ctx,[[x0+j*cell+cell/2,y0+j*cell+cell-4],[x0+j*cell+cell/2,by+2]],C.pink,1,.35)}
+      text(ctx,'…',x0+s.n*cell+12,by+cell/2,{size:18,alpha:.5});
+      text(ctx,at('g8')?`differs from #${1} at digit 1, from #2 at digit 2, ... from #${s.n} at digit ${s.n}`:'different from every row on the list!',w/2,by+cell+26,{size:at('g8')?17:22,color:C.yellow})}
+    else text(ctx,s.adds?'the list grew, but the diagonal grew with it. Flip again.':'flip the diagonal: change each yellow digit',w/2,by+cell/2,{size:20,alpha:.8});
+    if(at('hs'))readout(ctx,['bₙ = 1 − aₙₙ  ⇒  b ≠ f(n) for every n',at('col')?'Cantor’s theorem: no surjection X → 𝒫(X)':'so {0,1}^ℕ is uncountable'],w-16,10,{align:'right',size:12})}
+});
+hook('diag-flip',()=>diag&&diag.flip(diag));hook('diag-add',()=>diag&&diag.add(diag));hook('diag-reset',()=>diag&&diag.reset(diag));
+
+/* ---------- CH5: the ladder ---------- */
+const ladder=makeSim('cv-ladder',{
+  init(s){s.n=3;s.ch=true;s.chSeen={true:true,false:false}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const n=s.n,total=1<<n;const cols=Math.min(total,n<=3?4:8),rows=Math.ceil(total/cols);const gw=w*.55,cw=gw/cols,chh=Math.min(40,(h*.62)/rows);const x0=16,y0=h*.2;
+    text(ctx,`${n} thing${n>1?'s':''}  →  ${total} subsets`,x0+gw/2,h*.1,{size:26,color:C.yellow});
+    for(let k=0;k<total;k++){const cx=x0+(k%cols)*cw,cy=y0+Math.floor(k/cols)*chh;box(ctx,cx+3,cy+3,cw-6,chh-6,rgba(C.chalk,.06),C.chalk,5,1);
+      for(let i=0;i<n;i++){const inn=(k>>i)&1;const px=cx+8+i*((cw-16)/Math.max(n-1,1)),py=cy+chh/2;circle(ctx,px,py,Math.min(5,cw/12),inn?[C.pink,C.blue,C.green,C.yellow,C.chalk][i]:null,inn?null:rgba(C.chalk,.35),1.2)}}
+    const lx=w*.8;const rungs=at('hs')?['ℵ₀','2^ℵ₀','2^(2^ℵ₀)','…']:['counting numbers','the number line','all its subsets','…'];
+    poly(ctx,[[lx-40,h*.9],[lx-40,h*.14]],C.chalk,2,.6);poly(ctx,[[lx+40,h*.9],[lx+40,h*.14]],C.chalk,2,.6);
+    rungs.forEach((r,i)=>{const y=h*.82-i*h*.2;poly(ctx,[[lx-40,y],[lx+40,y]],C.chalk,2,.6);text(ctx,r,lx,y-16,{size:at('hs')?20:14,color:i===0?C.chalk:C.yellow,fam:at('hs')?'display':'body'})});
+    text(ctx,'bigger every rung',lx,h*.96,{size:16,alpha:.7});
+    if(at('hs')){const y=h*.82-h*.1;text(ctx,s.ch?'ℵ₁ = 2^ℵ₀?  CH: yes':'ℵ₁ < 2^ℵ₀?  ¬CH: also fine',lx,y,{size:15,color:C.pink,fam:'body'});
+      readout(ctx,[s.ch?'Gödel 1940: CH cannot be disproved in ZFC':'Cohen 1963: CH cannot be proved in ZFC',s.chSeen.true&&s.chSeen.false?'both ways consistent: independent of ZFC':'flip it and see'],x0,h*.88,{size:12})}}
+});
+slide('ladder-n',v=>{if(ladder)ladder.n=Math.round(v)},v=>String(Math.round(v)));
+hook('ladder-ch',()=>{if(!ladder)return;ladder.ch=!ladder.ch;ladder.chSeen[ladder.ch]=true;const b=$('ladder-ch');b.textContent='Continuum hypothesis: '+(ladder.ch?'true':'false');b.setAttribute('aria-pressed',String(ladder.ch))});
+
+Chalk.start({key:'infinity',missions:MISSION_DEFS,checks:{
+  inf1:()=>match&&match.na===match.nb&&match.paired(match)===match.na,
+  inf1b:()=>match&&match.na>match.nb&&match.paired(match)===match.nb,
+  inf2:()=>hotel&&hotel.guestDone,inf2b:()=>hotel&&hotel.busDone,
+  inf3:()=>zig&&zig.num>=20,inf3b:()=>zig&&zig.num>=30,
+  inf4:()=>diag&&diag.flips>0,inf4b:()=>diag&&diag.adds>0&&diag.flips>diag.adds,
+  inf5:()=>ladder&&ladder.n===4,inf5b:()=>ladder&&ladder.chSeen.true&&ladder.chSeen.false
+}});
+
+</script>
+</body>
+</html>
