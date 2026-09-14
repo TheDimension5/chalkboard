@@ -167,6 +167,8 @@ html:not([data-level]) .lv-k5,html[data-level="k5"] .lv-k5,html[data-level="g8"]
 .teach{margin-top:2.2rem;font-size:1rem}
 @media (prefers-reduced-motion:reduce){.missions li.just .box{animation:none}}
 .panel canvas.short{aspect-ratio:16/9}
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
 
 .home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
 .home:hover{color:var(--yellow)}
@@ -191,6 +193,14 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
 .how p{color:var(--chalk-dim);font-size:.97rem}
 .next{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--chalk-faint);border-radius:12px;color:var(--chalk-dim);font-size:.97rem}
 .next b{color:var(--chalk)}
+.check{margin-top:.1rem;padding:.8rem 1rem .9rem;border:2px solid var(--chalk-faint);border-radius:10px;display:grid;gap:.5rem}
+.check .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.check .q{font-weight:700;margin-bottom:.5rem}
+.cf{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.cf input{width:7.5rem;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .6rem;font:700 1rem var(--body)}
+.cf select,.controls select{background:var(--board-2);color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .5rem;font:700 .9rem var(--body)}
+.fb{margin:0;font-size:.95rem;min-height:1.2em}
+.fb.ok{color:var(--green)}.fb.bad{color:var(--pink)}
 </style>
 </head>
 <body>
@@ -239,6 +249,7 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="match-reset">Start over</button></div>
     <figcaption><b>Try this:</b> drag from each apple to a cup. <span data-lv="k5">If nothing is left over, the piles are the same size.</span><span data-lv="g8 hs col max">Above the Kids level the piles are uneven: find what is left over.</span></figcaption>
     <ul class="missions" data-ch="ch1"></ul>
+    
   </figure>
 </section>
 <section class="chapter" id="ch2">
@@ -257,6 +268,7 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="hotel-guest">A new guest arrives</button><button class="btn blue" id="hotel-bus">An infinite bus arrives</button><button class="btn" id="hotel-reset">Fill the hotel again</button></div>
     <figcaption><b>Try this:</b> the hotel is full. Make room for one more, then for a whole busload. <span data-lv="hs col max">The bus is the map n ↦ 2n.</span></figcaption>
     <ul class="missions" data-ch="ch2"></ul>
+    
   </figure>
 </section>
 <section class="chapter" id="ch3">
@@ -275,6 +287,7 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="zig-next">Next fraction</button><button class="btn" id="zig-auto" aria-pressed="false">Auto</button><button class="btn" id="zig-reset">Start over</button></div>
     <figcaption><b>Try this:</b> step the zigzag and watch every fraction get a whole number. <span data-lv="hs col max">Repeats such as 2/4 are skipped, since 1/2 already has a number.</span></figcaption>
     <ul class="missions" data-ch="ch3"></ul>
+    
   </figure>
 </section>
 <section class="chapter" id="ch4">
@@ -293,6 +306,7 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="diag-flip">Flip the diagonal</button><button class="btn blue" id="diag-add">Add it to the list</button><button class="btn" id="diag-reset">New list</button></div>
     <figcaption><b>Try this:</b> flip the diagonal to build a new number, then add it to the list and flip again. The list can never catch up.</figcaption>
     <ul class="missions" data-ch="ch4"></ul>
+    
   </figure>
 </section>
 <section class="chapter" id="ch5">
@@ -311,6 +325,7 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><label class="slider">Things in the set <input type="range" id="ladder-n" min="1" max="5" step="1" value="3"><span class="val" id="ladder-n-val">3</span></label><button class="btn" id="ladder-ch" data-lv="hs col max" aria-pressed="true">Continuum hypothesis: true</button></div>
     <figcaption><b>Try this:</b> count the subsets as the set grows. <span data-lv="hs col max">Then flip the continuum hypothesis and watch nothing break. Both answers are consistent with the rules.</span></figcaption>
     <ul class="missions" data-ch="ch5"></ul>
+    
   </figure>
 </section>
 </main>
@@ -396,19 +411,34 @@ function wireRead(){if(!canSpeak){document.querySelectorAll('.read').forEach(b=>
     parts.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.rate=.95;u.pitch=1.05;if(voice)u.voice=voice;if(i===parts.length-1)u.onend=()=>{if(speaking&&speaking.btn===btn)stopSpeak()};speechSynthesis.speak(u)})}));
   try{speechSynthesis.getVoices()}catch(e){}window.addEventListener('pagehide',()=>stopSpeak())}
 
+
+/* ---------- teach-back checks ---------- */
+let passed=new Set(),UNITWHY={};
+const uname=u=>{const o=document.querySelector(`form.cf select option[value="${u}"]`);return o?o.textContent:u};
+function checkPassed(ch){return passed.has(ch+':'+LEVEL)}
+function wireChecks(){document.querySelectorAll('form.cf').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const box=f.closest('.check');const fb=box.querySelector('.fb');const v=parseFloat(String(f.querySelector('input').value).replace(/,/g,''));const u=f.querySelector('select').value;const a=parseFloat(f.dataset.a),want=f.dataset.u,tol=parseFloat(f.dataset.tol||'.02');
+    if(isNaN(v)){fb.textContent='Type a number first.';fb.className='fb bad';return}
+    if(!u){fb.textContent='Pick a unit. A number without a unit is not an answer.';fb.className='fb bad';return}
+    if(u!==want){fb.textContent=`Units first. You answered in ${uname(u)}, but this question wants ${uname(want)}: ${UNITWHY[want]||''}. Try again in ${want}.`;fb.className='fb bad';return}
+    const err=a===0?Math.abs(v):Math.abs(v-a)/Math.abs(a);
+    if(err>tol){fb.textContent='Right unit, wrong number. Hint: '+f.dataset.hint;fb.className='fb bad';return}
+    fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}}))}
+
 /* ---------- start ---------- */
-function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};
+function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
+  try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();
   try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
   document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
   wireRead();
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start};
+return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed};
 })();
 </script>
 <script>
 const MISSION_DEFS=[{"id": "inf1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Pair every apple with a cup."}, {"id": "inf1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Pair as many as you can and find the one left over."}, {"id": "inf2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the new guest."}, {"id": "inf2b", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the whole bus."}, {"id": "inf3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Number 20 fractions with the zigzag."}, {"id": "inf3b", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Number 30 fractions and watch the repeats get skipped."}, {"id": "inf4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Flip the diagonal to make a number that is not on the list."}, {"id": "inf4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Add the new number to the list, then flip again."}, {"id": "inf5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Show all 16 subsets of a four-thing set."}, {"id": "inf5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Flip the continuum hypothesis both ways."}];
+const UNIT_WHY={};
 const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
 
 /* ---------- CH1: pairing ---------- */
