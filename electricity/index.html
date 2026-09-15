@@ -245,6 +245,17 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
 .qlist a{color:var(--chalk);text-decoration:none}
 .qlist a:hover{color:var(--yellow)}
 .qlist small{color:var(--chalk-dim);margin-left:.45rem}
+
+.links.std{font-size:.82rem}.links.std b{color:var(--chalk-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.68rem;margin-right:.3rem}
+.baselist{list-style:none;margin:1.2rem 0 0;padding:0;display:grid;gap:.4rem}
+.baselist li{display:grid;grid-template-columns:4.2rem 1fr;gap:.2rem .8rem;align-items:baseline;padding:.55rem .2rem;border-bottom:1px dashed var(--chalk-line)}
+.baselist .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.2rem .5rem;text-align:center;color:var(--board);background:var(--chalk-dim)}
+.baselist li.built .pill{background:var(--green)}
+.baselist a,.baselist b{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--chalk);text-decoration:none}
+.baselist a{color:var(--yellow)}
+.baselist .what{grid-column:2;color:var(--chalk-dim);font-size:.92rem}
+.baselist .ngss{grid-column:2;font-size:.78rem;color:var(--chalk-dim);letter-spacing:.04em}
+@media (min-width:700px){.baselist li{grid-template-columns:4.2rem 14rem 1fr 14rem}.baselist .what,.baselist .ngss{grid-column:auto}}
 </style>
 </head>
 <body>
@@ -301,6 +312,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="exit"><b>Exit ticket</b> Write one number in watts and one in watt-hours from anything in the room.</p>
       <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/history/#ch4">How History Survives 4, How old is it?</a></p>
       <p class="links"><span class="unitbadge">Energy: rate and amount · step 1</span></p>
+      
     </div>
   </figure>
 </section>
@@ -328,6 +340,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="exit"><b>Exit ticket</b> Fill in: push is measured in ___, flow in ___, opposition in ___.</p>
       <p class="links">After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch1">One Rule for Everything 1, Two kinds of pull</a></p>
       <p class="links"><span class="unitbadge">Fields and forces · step 1</span></p>
+      
     </div>
   </figure>
 </section>
@@ -355,6 +368,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="exit"><b>Exit ticket</b> 1,200 W at 12 V versus 48 V: write both currents.</p>
       
       <p class="links"><span class="unitbadge">Energy: rate and amount · step 3</span></p>
+      
     </div>
   </figure>
 </section>
@@ -382,6 +396,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="exit"><b>Exit ticket</b> Write the real run time formula in words.</p>
       
       <p class="links"><span class="unitbadge">Energy: rate and amount · step 2</span></p>
+      
     </div>
   </figure>
 </section>
@@ -409,6 +424,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="exit"><b>Exit ticket</b> Four 3.2 V cells: give the voltage in series and the Ah in parallel.</p>
       <p class="links">Before this: <a href="https://thedimension5.github.io/chalkboard/history/#ch5">How History Survives 5, Bits rot too</a></p>
       
+      
     </div>
   </figure>
 </section>
@@ -434,6 +450,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="skill"><b>You can now:</b> use 'in equals out' at a junction and 'rises equal drops' round a loop.</p>
       <details class="discuss"><summary>Discuss</summary><ol><li>What would it mean physically if KCL failed?</li><li>Why do the drops around a loop have to add up to the push?</li><li>Where does KVL stop being true?</li></ol></details>
       <p class="exit"><b>Exit ticket</b> Draw a fork and a loop and label both laws.</p>
+      <p class="links">Before this: <a href="https://thedimension5.github.io/chalkboard/launch/#ch4">Launch Lab 4, The crash lab</a></p>
       
       
     </div>
@@ -463,6 +480,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="exit"><b>Exit ticket</b> 120 V RMS: write the peak voltage.</p>
       
       
+      
     </div>
   </figure>
 </section>
@@ -488,6 +506,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="skill"><b>You can now:</b> explain power factor and where the sloshing energy lives.</p>
       <details class="discuss"><summary>Discuss</summary><ol><li>Why are inverters rated in VA rather than W?</li><li>Where does the reactive energy go between cycles?</li><li>Why do utilities charge factories for low power factor?</li></ol></details>
       <p class="exit"><b>Exit ticket</b> 1,000 VA at power factor 0.8: write the real watts.</p>
+      
       
       
     </div>
@@ -516,7 +535,8 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <details class="discuss"><summary>Discuss</summary><ol><li>Why is the hose analogy exactly right here?</li><li>If the wires only guide the energy, what carries it?</li><li>What would happen to the signal speed if you doubled the current?</li></ol></details>
       <p class="exit"><b>Exit ticket</b> One sentence: what moves slowly, what moves fast, and where does the energy go?</p>
       <p class="links">Before this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch3">One Rule for Everything 3, Magnets have invisible hair</a> · After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch4">One Rule for Everything 4, Einstein's wish</a></p>
-      <p class="links"><span class="unitbadge">Fields and forces · step 5</span></p>
+      <p class="links"><span class="unitbadge">Fields and forces · step 6</span></p>
+      
     </div>
   </figure>
 </section>
@@ -542,6 +562,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="skill"><b>You can now:</b> run the analysis sequence on a real system and read its warnings.</p>
       <details class="discuss"><summary>Discuss</summary><ol><li>Why is the fuse sized for the wire and not the load?</li><li>Which limit usually bites first: wire, inverter, or BMS?</li><li>What does 'manufacturer limits' cover that the arithmetic does not?</li></ol></details>
       <p class="exit"><b>Exit ticket</b> Run the checker on any appliance label and write down the run time.</p>
+      
       
       
     </div>
@@ -604,6 +625,7 @@ function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getConte
 let last=performance.now();
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
+function tick(dt){for(const s of sims){if(!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}}
 const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
 const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=()=>{const v=parseFloat(el.value);if(out)out.textContent=f?f(v):v;fn(v)};el.addEventListener('input',go);go()};
 
@@ -654,7 +676,7 @@ function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNI
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed};
+return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions()};
 })();
 </script>
 <script>
