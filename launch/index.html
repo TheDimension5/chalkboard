@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>Launch Lab</title>
+<meta name="description" content="Forces and motion as six minigames: push a car into a box, drop a hammer and a feather on four worlds, launch a car off a ramp at moving targets, crash carts, fire Newton's cannon into orbit, and stage a rocket. Every game scores with the real equations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;700;900&display=swap">
+<style>
+:root{
+  --board:#1B2923;--board-2:#1F2F28;--board-3:#2A3B33;
+  --chalk:#F1ECDF;--chalk-dim:rgba(241,236,223,.66);--chalk-faint:rgba(241,236,223,.32);--chalk-line:rgba(241,236,223,.15);
+  --yellow:#F6D46B;--blue:#8CC4EE;--pink:#F596A8;--green:#9DDBA3;
+  --tray:#5C3D27;--tray-2:#3B2718;
+  --display:'Caveat','Segoe Print','Bradley Hand',cursive;
+  --body:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{margin:0;background:var(--board);color:var(--chalk);font-family:var(--body);font-size:1.0625rem;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background-color:var(--board);background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E"),radial-gradient(ellipse at 12% 0%,rgba(255,255,255,.05),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(255,255,255,.045),transparent 50%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.28));background-attachment:scroll,fixed,fixed,fixed;background-size:240px 240px,auto,auto,auto;background-repeat:repeat,no-repeat,no-repeat,no-repeat}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem);position:relative;z-index:1}
+.skip{position:absolute;left:-999px;top:0;background:var(--yellow);color:var(--board);padding:.5rem 1rem;z-index:10;font-weight:900}
+.skip:focus{left:1rem;top:1rem}
+
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:clamp(3.2rem,7.5vw,6rem)}
+h2{font-size:clamp(2.3rem,4.6vw,3.5rem)}
+h3{font-size:1.75rem}
+p{margin:0}
+a{color:var(--yellow)}
+.eyebrow{font-weight:900;font-size:.76rem;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem}
+.eyebrow.dim{color:var(--chalk-dim)}
+.lede{font-size:1.28rem;max-width:34ch;margin-top:1.1rem}
+.text{max-width:60ch}
+.text h2{margin-bottom:1rem}
+.text p+p{margin-top:.95em}
+.text em{font-style:normal;color:var(--yellow)}
+.text .when{font-family:var(--display);font-size:1.45rem;color:var(--chalk-dim);margin-top:-.4rem;margin-bottom:1rem}
+.chalkword{font-family:var(--display);font-size:1.25em;line-height:1;color:var(--yellow)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;padding:clamp(2.5rem,6vw,5rem) 0 clamp(2rem,5vw,4rem)}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.4rem;margin-top:1.8rem}
+.hint{font-family:var(--display);font-size:1.3rem;color:var(--chalk-dim)}
+.chapter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:start;padding:clamp(3rem,7vw,6rem) 0;border-top:1px solid var(--chalk-line);scroll-margin-top:.5rem}
+.chapter.wide{grid-template-columns:1fr}
+.chapter.wide .text{max-width:70ch}
+@media (max-width:860px){.hero,.chapter{grid-template-columns:1fr}}
+
+.panel{position:relative;border:2px solid var(--chalk-faint);border-radius:10px;background:rgba(0,0,0,.16);box-shadow:inset 0 0 70px rgba(0,0,0,.28);overflow:hidden}
+.panel canvas{display:block;width:100%;aspect-ratio:4/3;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.panel canvas.short{aspect-ratio:16/10}
+.panel .doodle{position:absolute;right:1.1rem;bottom:.6rem;font-family:var(--display);font-size:1.6rem;color:var(--chalk-faint);transform:rotate(-5deg);pointer-events:none}
+.lab{margin:0;display:flex;flex-direction:column;gap:.85rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem .9rem;align-items:center}
+.controls .sep{width:1px;height:1.6rem;background:var(--chalk-line)}
+.btn{font:900 .88rem/1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-dim);border-radius:999px;padding:.66rem 1.05rem;cursor:pointer;transition:background .15s,color .15s,transform .15s,border-color .15s}
+.btn:hover{background:var(--chalk);color:var(--board);border-color:var(--chalk)}
+.btn:active{transform:scale(.97)}
+.btn.is-on{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--board);font-size:1rem;padding:.85rem 1.5rem}
+.btn.primary:hover{background:var(--chalk);border-color:var(--chalk)}
+.btn.blue{border-color:var(--blue);color:var(--blue)}.btn.blue:hover,.btn.blue.is-on{background:var(--blue);color:var(--board)}
+.btn.pink{border-color:var(--pink);color:var(--pink)}.btn.pink:hover,.btn.pink.is-on{background:var(--pink);color:var(--board)}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.slider{display:flex;align-items:center;gap:.6rem;font-weight:900;font-size:.85rem;letter-spacing:.03em}
+.slider input{accent-color:var(--yellow);width:150px;margin:0}
+.slider .val{font-family:var(--display);font-size:1.25rem;font-weight:700;min-width:3.2ch;color:var(--yellow);font-variant-numeric:tabular-nums}
+figcaption{font-size:.95rem;color:var(--chalk-dim)}
+figcaption b{color:var(--chalk);font-weight:900}
+
+.grownups{margin-top:1.5rem;border-left:3px solid var(--chalk-faint);padding:.2rem 0 .2rem 1rem;font-size:.95rem;color:var(--chalk-dim)}
+.grownups summary{cursor:pointer;font-weight:900;color:var(--chalk);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:.55rem}
+.grownups summary::-webkit-details-marker{display:none}
+.grownups summary::before{content:"+";font-family:var(--display);font-size:1.5rem;line-height:1;color:var(--yellow)}
+.grownups[open] summary::before{content:"–"}
+.grownups p{margin-top:.6rem;max-width:62ch}
+
+.trail{position:fixed;left:1rem;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:.6rem;margin:0;padding:0;list-style:none}
+.trail a{display:block;width:11px;height:11px;border-radius:50%;border:2px solid var(--chalk-faint);position:relative;transition:background .2s,border-color .2s}
+.trail a.is-active{background:var(--yellow);border-color:var(--yellow)}
+.trail a span{position:absolute;left:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font:700 .8rem var(--body);color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .15s;background:var(--board-3);padding:.2rem .55rem;border-radius:4px}
+.trail a:hover span,.trail a:focus-visible span{opacity:1}
+@media (max-width:1320px){.trail{display:none}}
+
+.forces{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;position:relative;margin-top:1.5rem}
+.force{border:2px solid var(--chalk-faint);border-radius:12px;padding:1.1rem 1.1rem 1.2rem;background:var(--board-2);transition:transform .8s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:.45rem;position:relative}
+.force h3{font-size:1.9rem}
+.force p{font-size:.92rem;color:var(--chalk-dim)}
+.force .tag{font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.force .tag.later{color:var(--pink)}
+.force svg{width:60px;height:60px;display:block}
+.forces.united .force[data-f="em"]{transform:translateX(calc(100% + 1rem)) rotate(-4deg)}
+.forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+.forces.united .force[data-f="weak"]{transform:scale(1.03)}
+.forces.united .force[data-f="gravity"]{animation:wobble 1.3s ease-in-out 1}
+.united-label{position:absolute;left:0;right:0;bottom:-2.6rem;text-align:center;font-family:var(--display);font-size:1.7rem;color:var(--yellow);opacity:0;transition:opacity .5s .5s;pointer-events:none}
+.forces.united .united-label{opacity:1}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(2deg)}}
+@media (max-width:760px){
+  .forces{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forces.united .force[data-f="em"]{transform:translate(calc(-100% - 1rem),calc(100% + 1rem)) rotate(-4deg)}
+  .forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.force{transition:none}.forces.united .force[data-f="gravity"]{animation:none}}
+
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2.5rem;margin-top:2.5rem;align-items:start}
+.timeline{list-style:none;margin:.5rem 0 0;padding:0}
+.timeline li{display:grid;grid-template-columns:5.2rem 1fr;gap:1rem;align-items:baseline;padding:.5rem 0;border-bottom:1px dashed var(--chalk-line)}
+.timeline .year{font-family:var(--display);font-size:1.6rem;font-weight:700;color:var(--yellow);font-variant-numeric:tabular-nums}
+.timeline .what{font-size:.95rem}
+.timeline .what b{font-weight:900}
+
+.checks{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.85rem}
+.checks li{display:grid;grid-template-columns:2rem 1fr;gap:.8rem;align-items:start}
+.checks .box{width:1.55rem;height:1.55rem;border:2px solid var(--chalk-dim);border-radius:5px;display:grid;place-items:center;font-family:var(--display);font-size:1.5rem;line-height:1;margin-top:.1rem}
+.checks .box.ok{color:var(--green)}.checks .box.q{color:var(--yellow)}
+.checks small{display:block;color:var(--chalk-dim);font-size:.9rem}
+
+.note{border:2px dashed var(--chalk-faint);border-radius:12px;padding:1.2rem 1.3rem;margin-top:1.8rem;font-size:.97rem}
+.note h3{font-size:1.6rem;margin-bottom:.4rem}
+.note ul{margin:.4rem 0 0;padding-left:1.2rem}
+.note li+li{margin-top:.35rem}
+
+.closing{text-align:center;padding:clamp(3rem,7vw,6rem) 0 3rem;border-top:1px solid var(--chalk-line)}
+.closing p{max-width:52ch;margin:1rem auto 0;font-size:1.15rem}
+.closing .big{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.1;color:var(--yellow);max-width:20ch;margin-top:1.5rem}
+.tray{height:20px;background:linear-gradient(var(--tray),var(--tray-2));border-top:2px solid rgba(255,255,255,.14);position:relative;z-index:1}
+.tray::before,.tray::after{content:"";position:absolute;top:-8px;height:8px;width:54px;border-radius:3px;background:var(--chalk);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tray::before{left:12%}
+.tray::after{left:calc(12% + 70px);width:38px;background:var(--pink)}
+
+.levels{position:sticky;top:0;z-index:6;background:rgba(27,41,35,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--chalk-line)}
+.levels-in{display:flex;align-items:center;gap:1rem;padding-top:.5rem;padding-bottom:.5rem}
+.levels-label{font-family:var(--display);font-size:1.4rem;color:var(--chalk-dim);white-space:nowrap}
+.levels-btns{display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;padding:3px}
+.levels-btns::-webkit-scrollbar{display:none}
+.levels-btns button{font:900 .82rem/1.1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.4rem .9rem;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:.12rem;transition:background .15s,color .15s,border-color .15s}
+.levels-btns button small{font-weight:700;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.levels-btns button:hover{border-color:var(--chalk)}
+.levels-btns button[aria-selected="true"]{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+@media (max-width:560px){.levels-label{display:none}}
+.lv{display:none}
+html:not([data-level]) .lv-k5,html[data-level="k5"] .lv-k5,html[data-level="g8"] .lv-g8,html[data-level="hs"] .lv-hs,html[data-level="col"] .lv-col,html[data-level="max"] .lv-max{display:block}
+.eq{font-family:Georgia,'Times New Roman',serif;font-style:italic;white-space:nowrap;color:var(--yellow)}
+.text sub,.text sup{font-size:.72em;line-height:0}
+.chapter,.hero{scroll-margin-top:4.6rem}
+.note p+p{margin-top:0}
+[hidden]{display:none!important}
+
+.labs{display:grid;gap:2.4rem}
+.missions{list-style:none;margin:.1rem 0 0;padding:.7rem .95rem .8rem;border:2px dashed var(--chalk-faint);border-radius:10px;display:grid;gap:.45rem}
+.missions .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.missions li.m{display:grid;grid-template-columns:1.45rem 1fr;gap:.6rem;align-items:start;font-size:.95rem}
+.missions .box{width:1.35rem;height:1.35rem;border:2px solid var(--chalk-dim);border-radius:4px;display:grid;place-items:center;font-family:var(--display);font-size:1.3rem;line-height:1;color:transparent;margin-top:.05rem}
+.missions li.done .box{color:var(--green);border-color:var(--green)}
+.missions li.done span:last-child{color:var(--chalk-dim)}
+.missions li.just .box{animation:pop .7s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.7) rotate(-8deg)}100%{transform:scale(1)}}
+.mcount{margin-left:auto;font-family:var(--display);font-size:1.35rem;color:var(--yellow);white-space:nowrap}
+.btn.read{display:inline-flex;align-items:center;gap:.45rem;margin:.1rem 0 1rem;padding:.5rem .9rem;font-size:.8rem}
+.btn.read svg{width:16px;height:16px}
+.lv.reading{border-left:3px solid var(--yellow);padding-left:.9rem;margin-left:-1.1rem}
+.teach{margin-top:2.2rem;font-size:1rem}
+@media (prefers-reduced-motion:reduce){.missions li.just .box{animation:none}}
+.panel canvas.short{aspect-ratio:16/9}
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+.keys{display:flex;flex-wrap:wrap;gap:.3rem}
+.key{width:2.15rem;height:2.15rem;border:2px solid var(--chalk-faint);border-radius:6px;background:transparent;color:var(--chalk);font:900 .9rem var(--body);cursor:pointer}
+.key:hover{background:var(--chalk);color:var(--board)}
+.controls .lbl{font-weight:900;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+input[type=number]{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.4rem .5rem;font:700 .95rem var(--body)}
+.hero-art{padding:1.2rem}
+.hero-art svg{width:100%;height:auto;display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.4rem;margin-top:2.2rem}
+.card{display:flex;flex-direction:column;gap:.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.4rem 1.5rem;background:var(--board-2);text-decoration:none;color:var(--chalk);transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:var(--yellow)}
+.card svg{width:72px;height:72px;display:block}
+.card h2{font-size:2.2rem;color:var(--chalk)}
+.card .subj{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.card p{color:var(--chalk-dim);font-size:.98rem}
+.card .meta{margin-top:auto;font-family:var(--display);font-size:1.2rem;color:var(--chalk-dim)}
+.card .go{font-weight:900;font-size:.85rem;letter-spacing:.05em;color:var(--yellow)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.6rem;margin-top:3.5rem;padding-top:2.2rem;border-top:1px solid var(--chalk-line)}
+.how h3{font-size:1.7rem;margin-bottom:.3rem}
+.how p{color:var(--chalk-dim);font-size:.97rem}
+.next{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--chalk-faint);border-radius:12px;color:var(--chalk-dim);font-size:.97rem}
+.next b{color:var(--chalk)}
+.check{margin-top:.1rem;padding:.8rem 1rem .9rem;border:2px solid var(--chalk-faint);border-radius:10px;display:grid;gap:.5rem}
+.check .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.check .q{font-weight:700;margin-bottom:.5rem}
+.cf{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.cf input{width:7.5rem;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .6rem;font:700 1rem var(--body)}
+.cf select,.controls select{background:var(--board-2);color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .5rem;font:700 .9rem var(--body)}
+.fb{margin:0;font-size:.95rem;min-height:1.2em}
+.fb.ok{color:var(--green)}.fb.bad{color:var(--pink)}
+.warmup{margin:0 0 1.1rem;padding:.6rem .9rem;border-left:3px solid var(--blue);font-size:.98rem}
+.warmup b{color:var(--blue);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.15rem}
+.lesson-end{display:grid;gap:.6rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--green);border-radius:10px}
+.lesson-end p{margin:0}
+.lesson-end .skill b{color:var(--green)}
+.lesson-end .exit b{color:var(--yellow);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.1rem}
+.discuss summary{cursor:pointer;font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);list-style:none}
+.discuss summary::-webkit-details-marker{display:none}
+.discuss summary::before{content:"+ ";color:var(--yellow)}
+.discuss[open] summary::before{content:"– "}
+.discuss ol{margin:.5rem 0 0;padding-left:1.3rem;display:grid;gap:.35rem;font-size:.95rem}
+.discuss ol.lv{display:none}
+html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5,html[data-level="g8"] .discuss ol.lv-g8,html[data-level="hs"] .discuss ol.lv-hs,html[data-level="col"] .discuss ol.lv-col,html[data-level="max"] .discuss ol.lv-max{display:grid}
+.links{font-size:.9rem;color:var(--chalk-dim)}
+.links a{color:var(--yellow)}
+.unitbadge{display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.18rem .6rem;margin:0 .35rem .3rem 0}
+.cf.choice{flex-direction:column;align-items:flex-start;gap:.35rem}
+.cf label.opt{display:flex;gap:.55rem;align-items:center;font-weight:700;font-size:.95rem;cursor:pointer}
+.cf input[type=radio]{accent-color:var(--yellow);width:1.1rem;height:1.1rem;margin:0}
+.grade{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-top:1.3rem}
+.grade .lbl,.mapbar .lbl{font-weight:900;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-right:.3rem}
+.grade .hint{font-size:1.05rem}
+.mapwrap{margin-top:1.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1rem 1rem .6rem;background:var(--board-2)}
+.mapbar{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-bottom:.6rem}
+.mapbar .hint{font-family:var(--body);font-size:.88rem;color:var(--chalk-dim)}
+.map{position:relative}
+.map canvas{display:block;width:100%;height:auto;cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--board);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .75rem;font-size:.85rem;max-width:300px;display:none;z-index:2;color:var(--chalk)}
+.tip b{display:block;font-family:var(--display);font-size:1.25rem;color:var(--yellow);line-height:1.1}
+.tip small{color:var(--chalk-dim)}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.4rem}
+.unit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.2rem}
+.unit h3{font-size:1.8rem}
+.unit p{color:var(--chalk-dim);font-size:.95rem;margin:.3rem 0 .7rem}
+.unit ol{margin:0;padding-left:1.3rem;display:grid;gap:.3rem;font-size:.95rem}
+.unit ol a{color:var(--chalk);text-decoration:none;border-bottom:1px dotted var(--chalk-faint)}
+.unit ol a:hover{color:var(--yellow)}
+.unit ol small{color:var(--chalk-dim);display:block}
+.qsearch{margin-top:2.8rem}
+.qsearch input{width:100%;max-width:520px;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:999px;padding:.6rem 1rem;font:700 1rem var(--body);margin-top:.6rem}
+.qlist{list-style:none;padding:0;margin:.9rem 0 0;display:grid;gap:.35rem;max-height:18rem;overflow:auto}
+.qlist a{color:var(--chalk);text-decoration:none}
+.qlist a:hover{color:var(--yellow)}
+.qlist small{color:var(--chalk-dim);margin-left:.45rem}
+
+.links.std{font-size:.82rem}.links.std b{color:var(--chalk-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.68rem;margin-right:.3rem}
+.baselist{list-style:none;margin:1.2rem 0 0;padding:0;display:grid;gap:.4rem}
+.baselist li{display:grid;grid-template-columns:4.2rem 1fr;gap:.2rem .8rem;align-items:baseline;padding:.55rem .2rem;border-bottom:1px dashed var(--chalk-line)}
+.baselist .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.2rem .5rem;text-align:center;color:var(--board);background:var(--chalk-dim)}
+.baselist li.built .pill{background:var(--green)}
+.baselist a,.baselist b{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--chalk);text-decoration:none}
+.baselist a{color:var(--yellow)}
+.baselist .what{grid-column:2;color:var(--chalk-dim);font-size:.92rem}
+.baselist .ngss{grid-column:2;font-size:.78rem;color:var(--chalk-dim);letter-spacing:.04em}
+@media (min-width:700px){.baselist li{grid-template-columns:4.2rem 14rem 1fr 14rem}.baselist .what,.baselist .ngss{grid-column:auto}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#ch1">Skip to the story</a>
+<ul class="trail" aria-label="Chapters"><li><a href="#top" data-for="top"><span>Start</span></a></li><li><a href="#ch1" data-for="ch1"><span>1 · Pushes and pulls</span></a></li><li><a href="#ch2" data-for="ch2"><span>2 · Everything falls the same</span></a></li><li><a href="#ch3" data-for="ch3"><span>3 · The launch</span></a></li><li><a href="#ch4" data-for="ch4"><span>4 · The crash lab</span></a></li><li><a href="#ch5" data-for="ch5"><span>5 · Round and round</span></a></li><li><a href="#ch6" data-for="ch6"><span>6 · Rockets</span></a></li></ul>
+<nav class="levels" aria-label="Reading level">
+  <div class="wrap levels-in">
+    <a class="home" href="https://thedimension5.github.io/chalkboard/">The Chalkboard</a>
+    <span class="levels-label">Who's reading?</span>
+    <div class="levels-btns" role="tablist">
+      <button role="tab" data-level="k5" aria-selected="true">Kids<small>K to 5th</small></button>
+      <button role="tab" data-level="g8" aria-selected="false">8th grade<small>middle school</small></button>
+      <button role="tab" data-level="hs" aria-selected="false">High school<small>physics class</small></button>
+      <button role="tab" data-level="col" aria-selected="false">College<small>major</small></button>
+      <button role="tab" data-level="max" aria-selected="false">Max<small>no limits</small></button>
+    </div>
+    <span class="mcount" id="mcount"></span>
+  </div>
+</nav>
+<div class="wrap" id="top">
+<header class="hero">
+  <div class="text">
+    <p class="eyebrow">Forces and motion, K to 12</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <h1>Launch Lab</h1>
+    <div class="lv lv-k5"><p class="lede">Push it. Drop it. Launch it off a ramp. Crash it. Fling it into orbit. Every game here is scored by the real rules of moving things, and the rules never change. Find them, then push them as far as they will go.</p></div><div class="lv lv-g8"><p class="lede">Six games, one set of rules. Newton wrote them down in 1687 and nothing you can build breaks them: a push changes motion, everything falls the same way, and what one thing pushes on pushes back. Each game hides one rule. Find it, use it, then beat your own distance.</p></div><div class="lv lv-hs"><p class="lede">Newton's laws, projectile motion, momentum conservation, circular motion and the rocket equation, each as a game whose score is computed from the physics. Predict before you launch; the lab tells you how close you were.</p></div><div class="lv lv-col"><p class="lede">Kinematics and dynamics with friction and drag, energy methods for the launcher, one-dimensional collisions in the lab and centre-of-mass frames, Newton's cannon as the bridge from projectiles to orbits, and the Tsiolkovsky equation with staging. Every model here states its assumptions.</p></div><div class="lv lv-max"><p class="lede">The same six games read at the level of frames and invariants: Galilean invariance, the equivalence principle, conserved quantities from symmetry, the vis-viva equation, and the exponential cost of Δv. The place where the school picture stops and the real one starts is marked in each chapter.</p></div>
+    <div class="hero-cta"><a class="btn primary" href="#ch1">Start the story</a></div>
+  </div>
+  <div class="panel hero-art"><svg viewBox="0 0 400 300" fill="none" stroke="#F1ECDF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M30 250h340" opacity=".6"/><path d="M40 90l0 160M40 90l90 130 30-14" stroke="#F6D46B" stroke-width="5"/><path d="M160 206c40-70 100-110 170-70" stroke="#8CC4EE" stroke-dasharray="6 8"/><rect x="132" y="180" width="26" height="14" rx="4" fill="#F596A8" stroke="none" transform="rotate(-25 145 187)"/><rect x="300" y="240" width="40" height="12" rx="3" stroke="#9DDBA3"/><text x="320" y="230" text-anchor="middle" font-family="Caveat,cursive" font-size="22" fill="#9DDBA3" stroke="none">the box</text><text x="200" y="60" text-anchor="middle" font-family="Caveat,cursive" font-size="36" fill="#F6D46B" stroke="none">v = √(2gh)</text><circle cx="330" cy="120" r="5" fill="#F1ECDF" stroke="none"/><path d="M330 120c-10 30-10 60 0 90" stroke="#F1ECDF" opacity=".5"/></svg></div>
+</header>
+<main>
+<section class="chapter" id="ch1">
+  <div class="text">
+    <p class="eyebrow">Chapter 1</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>What makes a toy car stop after you push it?</p>
+    <div class="lv lv-k5"><h2>Pushes and pulls</h2><p>A car does not move by itself. It needs a <em>push</em> or a <em>pull</em>. A bigger push makes it go faster. A rough floor slows it down sooner.</p><p>Push from behind, pull from in front, and try to stop the car inside the box. Too hard and it flies past. Too soft and it never gets there.</p></div>
+    <div class="lv lv-g8"><h2>Force changes motion</h2><p>A force is a push or a pull. Forces change how something moves: they speed it up, slow it down, or turn it. When the pushes on a thing balance out, its motion does not change at all: a parked car stays parked, and a sliding puck on smooth ice keeps sliding.</p><p>Friction is the force that slows the car. Rougher floor, more friction, shorter slide. The harder you push and the longer you push, the faster it goes. That is Newton's second law in words: force changes speed, and heavier things change speed more slowly.</p></div>
+    <div class="lv lv-hs"><h2>Newton's first and second laws</h2><p>F = ma: net force equals mass times acceleration. While you push, the net force is your push minus friction; after you let go, only friction acts, so the car decelerates at μg regardless of its mass. Friction on a flat floor is f = μN = μmg.</p><p>Newton's first law is the special case F = 0: no net force, no change in velocity. Try a very smooth floor and a short push: the car keeps going. Motion does not need a force; changing motion does.</p></div>
+    <div class="lv lv-col"><h2>Friction models</h2><p>The lab uses Coulomb friction: f = μN, independent of speed and contact area, opposing motion, with static friction up to μₛN holding the car still until the push exceeds it. Real contact is rougher: static friction usually exceeds kinetic, and lubricated or rolling contact is velocity dependent.</p><p>Work-energy gives the stopping distance directly: ½mv² = μmgd, so d = v²/(2μg), again independent of mass. The mass cancels because both the kinetic energy and the friction force scale with it.</p></div>
+    <div class="lv lv-max"><h2>Frames and invariance</h2><p>Newton's laws hold in inertial frames and are Galilean invariant: a push of 50 N produces the same acceleration whether you measure from the floor or from a train passing at constant speed. Fictitious forces appear only in accelerating frames, and the lab's floor is assumed inertial.</p><p>The deeper statement is that F = ma is a definition of force paired with an empirical claim that forces from identifiable sources (contact, gravity, springs) add as vectors. The content is in the force laws, not in F = ma itself.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The mistake almost everyone makes: thinking motion needs a force. It does not; changing motion does. A push that ends does not stop the car; friction does.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-push" aria-label="A car on a floor with a target box. Press and hold behind the car to push it, in front to pull it."></canvas></div>
+    <div class="controls"><label class="slider">Push strength <input type="range" id="ps-f" min="10" max="300" step="10" value="80"><span class="val" id="ps-f-val">80 N</span></label><label class="slider">Car mass <input type="range" id="ps-m" min="1" max="20" step="1" value="5"><span class="val" id="ps-m-val">5 kg</span></label><label class="slider">Floor roughness <input type="range" id="ps-mu" min="0.02" max="0.6" step="0.02" value="0.2"><span class="val" id="ps-mu-val">0.20</span></label><button class="btn" id="ps-reset">New box</button></div>
+    <figcaption><b>Try this:</b> press and hold on the floor: the car is pushed away from where you press. Stop it inside the box. Then make the floor icy and try again.</figcaption>
+    <ul class="missions" data-ch="ch1"></ul>
+    <div class="check" data-ch="ch1"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">You push a wagon with 20 newtons and your friend pulls it the same way with 10 newtons. Total push?</p><form class="cf" data-a="30" data-u="N" data-tol="0.02" data-hint="Pushes in the same direction add." data-ok="Right. 30 N."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A 2 kg cart gets a net push of 6 N. How fast does its speed change each second?</p><form class="cf" data-a="3" data-u="m/s²" data-tol="0.02" data-hint="Acceleration = force ÷ mass." data-ok="Right. 3 m/s², every second."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">A 4 kg cart slides on a floor with μ = 0.25. How big is the friction force? (g = 9.8)</p><form class="cf" data-a="9.8" data-u="N" data-tol="0.03" data-hint="f = μ m g." data-ok="Right. 0.25 × 4 × 9.8 = 9.8 N."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">A cart at 6 m/s slides to a stop on μ = 0.3. Stopping distance? (g = 9.8)</p><form class="cf" data-a="6.12" data-u="m" data-tol="0.04" data-hint="d = v²/(2μg)." data-ok="Right. 36 ÷ (2 × 0.3 × 9.8) ≈ 6.1 m, for any mass."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">On a train at a steady 30 m/s, a 2 kg cart is pushed with 10 N. Its acceleration relative to the train?</p><form class="cf" data-a="5" data-u="m/s²" data-tol="0.02" data-hint="Galilean invariance: the train&#x27;s speed does not enter." data-ok="Right. 5 m/s², same as on the ground."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> tell a push from the motion it causes, and say what friction does.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does the car keep going after your push ends?</li><li>What would happen on perfectly smooth ice?</li><li>Does a heavier car need a bigger push to reach the same speed? Why?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: does a moving thing need a push to keep moving?</p>
+      
+      <p class="links"><span class="unitbadge">Why things move · step 1</span></p>
+      <p class="links std"><b>Standards</b> K-PS2-1, K-PS2-2, 3-PS2-1, MS-PS2-2, HS-PS2-1</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch2">
+  <div class="text">
+    <p class="eyebrow">Chapter 2</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Drop a hammer and a feather at the same moment. Which lands first, and why?</p>
+    <div class="lv lv-k5"><h2>Everything falls the same</h2><p>Drop a hammer and a feather. The feather floats down slowly, right? Only because of the air. Take the air away and they land <em>together</em>. Astronaut David Scott did exactly this on the Moon in 1971 and they hit the ground at the same moment.</p><p>Try it here. Then try it on the Moon, on Mars, and on Jupiter.</p></div>
+    <div class="lv lv-g8"><h2>Gravity pulls everything equally</h2><p>Gravity speeds up every falling thing by the same amount each second: on Earth, about 9.8 metres per second, every second. Heavy or light does not matter. What makes a feather slow is air pushing back on it, and the air pushes back harder the faster it goes until it stops speeding up.</p><p>On the Moon there is no air and gravity is a sixth of Earth's, so things fall slowly but together. On Jupiter they would fall two and a half times faster than here.</p></div>
+    <div class="lv lv-hs"><h2>Free fall and drag</h2><p>Without air, h = ½gt², so the fall time from height h is t = √(2h/g). With air, drag grows with speed, F = ½ρC_dAv², until it balances weight at the terminal velocity v_t = √(2mg/(ρC_dA)). A feather reaches its terminal velocity in a fraction of a second; a hammer would need to fall for many seconds.</p><p>Mass cancels in free fall because gravitational force is proportional to mass and so is inertia. That equality is not obvious; it is one of the most precisely tested facts in physics.</p></div>
+    <div class="lv lv-col"><h2>The equivalence principle</h2><p>The equality of gravitational and inertial mass has been tested to better than one part in 10¹⁴ (MICROSCOPE, 2022). Einstein promoted it to a principle: in free fall you cannot detect gravity locally. That single idea is the doorway to general relativity, which the One Rule board takes up in chapter 2.</p><p>The drag model here is quadratic, appropriate at the Reynolds numbers of a falling hammer; a dust grain would need the linear (Stokes) regime instead.</p></div>
+    <div class="lv lv-max"><h2>Why mass cancels</h2><p>In Newtonian terms the cancellation is a coincidence between two different masses. In general relativity it is not a coincidence: free fall is geodesic motion, and geodesics do not depend on what is following them. Test bodies of any composition trace the same curve, which is why the feather and hammer land together.</p><p>Composition-dependent violations would signal a fifth force; torsion-balance and atom-interferometry experiments continue to look, and the Moon's own free fall toward the Sun (lunar laser ranging) tests the principle for gravitational binding energy itself.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The hammer and feather video from Apollo 15 is real and two minutes long. Watch it together afterwards.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-fall" aria-label="A hammer and a feather dropped from a tower, with air on or off, on a chosen world."></canvas></div>
+    <div class="controls"><button class="btn primary" id="fl-drop">Drop</button><button class="btn is-on" id="fl-air" aria-pressed="true">Air: on</button><span class="lbl">World</span><button class="btn is-on" data-g="9.8">Earth</button><button class="btn" data-g="1.62">Moon</button><button class="btn" data-g="3.71">Mars</button><button class="btn" data-g="24.8">Jupiter</button></div>
+    <figcaption><b>Try this:</b> drop them with air, then without. Then change worlds and watch the fall times.</figcaption>
+    <ul class="missions" data-ch="ch2"></ul>
+    <div class="check" data-ch="ch2"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">On the Moon with no air, the hammer takes 2 seconds to fall. How long does the feather take?</p><form class="cf" data-a="2" data-u="s" data-tol="0.02" data-hint="They fall the same." data-ok="Right. 2 seconds, together."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Something falls for 3 seconds on Earth with no air. How fast is it going? (9.8 m/s faster each second)</p><form class="cf" data-a="29.4" data-u="m/s" data-tol="0.03" data-hint="Speed = 9.8 × seconds." data-ok="Right. About 29 m/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Fall time from 20 m with no air? (g = 9.8)</p><form class="cf" data-a="2.02" data-u="s" data-tol="0.03" data-hint="t = √(2h/g)." data-ok="Right. About 2.0 s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Terminal velocity of a 1 kg object with drag ½ρC_dA = 0.2 kg/m? (g = 9.8)</p><form class="cf" data-a="7" data-u="m/s" data-tol="0.03" data-hint="v_t = √(mg / 0.2)." data-ok="Right. √49 = 7 m/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Fall time from 20 m on Jupiter, g = 24.8 m/s²?</p><form class="cf" data-a="1.27" data-u="s" data-tol="0.03" data-hint="t = √(2h/g)." data-ok="Right. About 1.3 s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> explain that gravity accelerates everything equally and that air is what slows a feather.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>What is the air doing to the feather?</li><li>Why does the mass not matter?</li><li>What would fall slowest on Jupiter: the hammer, the feather, or neither?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Which lands first on the Moon, and why?</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch2">One Rule for Everything 2, Gravity is a dent</a></p>
+      <p class="links"><span class="unitbadge">Why things move · step 2</span><span class="unitbadge">Fields and forces · step 3</span></p>
+      <p class="links std"><b>Standards</b> 5-PS2-1, MS-PS2-4, HS-PS2-4</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch3">
+  <div class="text">
+    <p class="eyebrow">Chapter 3</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>A car rolls off a ramp. What decides how far it flies?</p>
+    <div class="lv lv-k5"><h2>The launch</h2><p>Roll a car down a ramp and off the end. How far does it fly? Higher ramp, faster car, longer flight. Tilt the lip up and it flies higher and farther, until you tilt too much and it just goes up.</p><p>There is a box to land in. Hit it and the box moves farther away. Keep hitting it. How far can you go?</p></div>
+    <div class="lv lv-g8"><h2>Speed from height, distance from speed</h2><p>Rolling down the ramp turns height into speed. Double the height and the speed goes up by about one and a half times (it is the square root, not double). Once the car leaves the lip, two things happen at once and do not interfere: it keeps moving sideways at the same speed, and gravity pulls it down faster and faster.</p><p>Notice something strange: the mass slider does nothing, unless you turn the air on. A heavy car and a light car fly exactly the same path. Galileo figured that out with ramps four hundred years ago.</p></div>
+    <div class="lv lv-hs"><h2>Projectile motion</h2><p>Energy on the ramp: mgh = ½mv², so v = √(2gh) less whatever friction takes. In flight, x = v cos θ · t and y = h₀ + v sin θ · t − ½gt². Solve y = 0 for the flight time and the range follows. On flat ground the range is v² sin(2θ)/g, greatest at 45°; with a launch height it is a little less than 45°.</p><p>Predict before you launch. The lab will tell you the error. Being within 5% consistently is the real skill.</p></div>
+    <div class="lv lv-col"><h2>Energy methods and drag</h2><p>The ramp is best handled by energy, not forces: friction removes μ mg cos α per unit length along the incline, so v² = 2g(h − h₀) − 2μg L cos α. In flight with quadratic drag the equations couple and have no closed form; the lab integrates them numerically, which is why mass matters once air is on: heavier bodies have more momentum per unit drag.</p><p>The optimum angle with drag is below 45° and depends on the ballistic coefficient m/(C_dA). Real artillery tables were computed this way by hand before computers existed.</p></div>
+    <div class="lv lv-max"><h2>Where the simple model stops</h2><p>Rolling versus sliding: a rolling wheel carries rotational kinetic energy ½Iω², so a solid cylinder leaves the ramp at √(4gh/3) rather than √(2gh). The lab treats the car as sliding. Air resistance, spin (Magnus force), and the Coriolis effect matter at scale; long-range artillery corrects for Earth's rotation.</p><p>Trajectory prediction under uncertainty is a control problem: small errors in launch speed propagate as δR ≈ 2Rδv/v, which is why the game rewards consistency, not one lucky hit.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Let kids fail at the target for a while before giving hints. The discovery that the mass slider does nothing is the point of the chapter.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-launch" aria-label="A car rolls down a ramp and flies off the lip toward a target box. Sliders set ramp height, lip angle, mass, and air."></canvas></div>
+    <div class="controls"><button class="btn primary" id="ln-go">Launch</button><label class="slider">Ramp height <input type="range" id="ln-h" min="1.5" max="9" step="0.1" value="4"><span class="val" id="ln-h-val">4.0 m</span></label><label class="slider">Lip angle <input type="range" id="ln-a" min="0" max="60" step="1" value="20"><span class="val" id="ln-a-val">20°</span></label><label class="slider">Mass <input type="range" id="ln-m" min="0.2" max="5" step="0.1" value="1"><span class="val" id="ln-m-val">1.0 kg</span></label><button class="btn" id="ln-air" aria-pressed="false">Air: off</button><label class="slider" data-lv="hs col max">Ramp friction <input type="range" id="ln-mu" min="0" max="0.3" step="0.01" value="0"><span class="val" id="ln-mu-val">0.00</span></label><label class="slider" data-lv="hs col max">I predict <input type="number" id="ln-pred" step="0.1" min="0" placeholder="m" style="width:5rem"> m</label><button class="btn" id="ln-newt">New target</button></div>
+    <figcaption><b>Try this:</b> hit the box. Each hit moves it farther. Change the mass and notice what does not change. <span data-lv="hs col max">Type a prediction before you launch; the lab scores your error.</span></figcaption>
+    <ul class="missions" data-ch="ch3"></ul>
+    <div class="check" data-ch="ch3"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">The car leaves the ramp going 5 m/s sideways and flies for 2 seconds. How far from the ramp does it land?</p><form class="cf" data-a="10" data-u="m" data-tol="0.02" data-hint="Sideways distance = sideways speed × time." data-ok="Right. 10 m."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A car rolls down from 4.9 m with no friction. Speed at the bottom? (v = √(2gh), g = 9.8)</p><form class="cf" data-a="9.8" data-u="m/s" data-tol="0.03" data-hint="2 × 9.8 × 4.9 = 96, and √96 ≈ 9.8." data-ok="Right. About 9.8 m/s, whatever the mass."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Launched at 10 m/s at 45° from ground level. Range? (g = 9.8)</p><form class="cf" data-a="10.2" data-u="m" data-tol="0.03" data-hint="R = v² sin(2θ)/g." data-ok="Right. 100 ÷ 9.8 ≈ 10.2 m."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Launch height 1 m, 12 m/s at 30°. Flight time? (g = 9.8)</p><form class="cf" data-a="1.37" data-u="s" data-tol="0.05" data-hint="Solve 1 + 6t − 4.9t² = 0." data-ok="Right. About 1.37 s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">A solid cylinder rolls (not slides) down 3 m without slipping. Speed at the bottom? (v = √(4gh/3))</p><form class="cf" data-a="6.26" data-u="m/s" data-tol="0.03" data-hint="Rotational energy takes a third." data-ok="Right. About 6.3 m/s, less than √(2gh) = 7.7."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> predict a landing spot from ramp height and lip angle.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does the mass slider do nothing until the air is on?</li><li>Why is 45° not always the best angle here?</li><li>What would you change to hit a box twice as far away?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Write down two things that change the range and one that does not.</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch10">One Rule for Everything 10, The Rule Lab</a></p>
+      <p class="links"><span class="unitbadge">Why things move · step 3</span></p>
+      <p class="links std"><b>Standards</b> 3-PS2-1, MS-PS2-2, MS-PS3-1, MS-PS3-2, HS-PS2-1, HS-PS3-1</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch4">
+  <div class="text">
+    <p class="eyebrow">Chapter 4</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Two carts crash. What is the same before and after?</p>
+    <div class="lv lv-k5"><h2>The crash lab</h2><p>Two carts on a track. One rolls into the other. What happens depends on how heavy they are and whether they bounce or stick. A light cart hitting a heavy one bounces back. Equal carts that bounce swap: the mover stops dead and the other takes off.</p><p>Try to make the moving cart stop completely.</p></div>
+    <div class="lv lv-g8"><h2>Momentum</h2><p>Momentum is mass times speed, and in a crash the total momentum before equals the total after, always. Sticky crashes share it out: 5 kg at 2 m/s hitting 5 kg at rest gives 10 kg moving at 1 m/s. Bouncy crashes keep the total too, but the carts separate.</p><p>Bouncy crashes also keep the energy of motion. Sticky ones turn some of it into heat, sound and dented plastic. That is why cars have crumple zones: a longer, softer crash means a smaller force on you.</p></div>
+    <div class="lv lv-hs"><h2>Conservation laws in collisions</h2><p>Momentum p = mv is conserved in every collision because the forces between the carts are equal and opposite (Newton's third law) and act for the same time. Kinetic energy is conserved only in elastic collisions. For two carts in one dimension: m₁u₁ + m₂u₂ = m₁v₁ + m₂v₂, plus either energy conservation (elastic) or v₁ = v₂ (perfectly inelastic).</p><p>Elastic, equal masses, one at rest: they exchange velocities. That is the billiard-ball result, and it is why a neutron slows best on hydrogen, whose nucleus has almost the same mass.</p></div>
+    <div class="lv lv-col"><h2>The centre-of-mass frame</h2><p>Every one-dimensional collision is simplest in the frame moving with the centre of mass: total momentum is zero there, so an elastic collision just reverses each velocity and a perfectly inelastic one brings both to rest. Transform back and the lab-frame results follow. The coefficient of restitution e = (v₂ − v₁)/(u₁ − u₂) interpolates between e = 1 (elastic) and e = 0 (sticky).</p><p>Kinetic energy lost in a perfectly inelastic collision is ½μu² with μ the reduced mass m₁m₂/(m₁ + m₂): all the energy of relative motion, none of the centre-of-mass motion.</p></div>
+    <div class="lv lv-max"><h2>Symmetry and conservation</h2><p>Momentum conservation is not an extra law; it is what translation symmetry of space implies (Noether). Energy conservation follows from time symmetry. In a collision the kinetic energy 'lost' is not lost but moved into internal degrees of freedom, and the accounting is exact only when those are included.</p><p>At relativistic speeds momentum is γmv and the same conservation holds; particle physics is the crash lab at 10¹² times the energy, with the same two laws doing the work.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Toy cars or coins on a table reproduce the equal-mass swap. A coin slid into a resting coin stops dead.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-crash" aria-label="Two carts on a track that collide. Sliders set masses and speeds; a toggle sets bouncy or sticky."></canvas></div>
+    <div class="controls"><button class="btn primary" id="cr-go">Roll</button><label class="slider">Cart 1 mass <input type="range" id="cr-m1" min="1" max="10" step="0.5" value="2"><span class="val" id="cr-m1-val">2 kg</span></label><label class="slider">Cart 1 speed <input type="range" id="cr-v1" min="0.5" max="6" step="0.5" value="3"><span class="val" id="cr-v1-val">3 m/s</span></label><label class="slider">Cart 2 mass <input type="range" id="cr-m2" min="1" max="10" step="0.5" value="2"><span class="val" id="cr-m2-val">2 kg</span></label><label class="slider">Cart 2 speed <input type="range" id="cr-v2" min="-4" max="4" step="0.5" value="0"><span class="val" id="cr-v2-val">0 m/s</span></label><button class="btn is-on" id="cr-type" aria-pressed="true">Bouncy</button></div>
+    <figcaption><b>Try this:</b> make the moving cart stop dead. Then make them stick and read the shared speed. Watch the total momentum before and after.</figcaption>
+    <ul class="missions" data-ch="ch4"></ul>
+    <div class="check" data-ch="ch4"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">A 2 kg cart moves at 3 m/s. Its momentum is mass × speed = ?</p><form class="cf" data-a="6" data-u="kg·m/s" data-tol="0.02" data-hint="Multiply." data-ok="Right. 6 kg·m/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">5 kg at 2 m/s hits 5 kg at rest and they stick. Shared speed?</p><form class="cf" data-a="1" data-u="m/s" data-tol="0.02" data-hint="Total momentum 10, total mass 10." data-ok="Right. 1 m/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">2 kg at 4 m/s sticks to 6 kg at rest. Final speed?</p><form class="cf" data-a="1" data-u="m/s" data-tol="0.02" data-hint="8 kg·m/s shared by 8 kg." data-ok="Right. 1 m/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Elastic collision, equal masses, cart 1 at 3 m/s hits cart 2 at rest. Cart 2's speed after?</p><form class="cf" data-a="3" data-u="m/s" data-tol="0.02" data-hint="They exchange velocities." data-ok="Right. 3 m/s, and cart 1 stops."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Perfectly inelastic collision of equal masses, one at rest. Fraction of kinetic energy lost?</p><form class="cf" data-a="0.5" data-u="n" data-tol="0.02" data-hint="½μu² over ½mu² with μ = m/2." data-ok="Right. Half."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> use momentum conservation to predict what happens in a crash.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does the moving cart stop dead when the masses are equal?</li><li>Where did the missing energy go in a sticky crash?</li><li>Why do cars have crumple zones?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Bouncy or sticky: which keeps the energy of motion?</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/electricity/#ch6">Electricity From Zero 6, Kirchhoff</a></p>
+      <p class="links"><span class="unitbadge">Why things move · step 4</span></p>
+      <p class="links std"><b>Standards</b> MS-PS2-1, HS-PS2-2, HS-PS2-3</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch5">
+  <div class="text">
+    <p class="eyebrow">Chapter 5</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Is an astronaut on the space station floating, or falling?</p>
+    <div class="lv lv-k5"><h2>Round and round</h2><p>Newton imagined a cannon on a very tall mountain. Fire it gently and the ball falls to the ground nearby. Fire it harder and it lands farther away. Fire it hard enough and it falls all the way around the Earth and comes back. That is an <em>orbit</em>: falling forever and always missing.</p><p>Find the speed that makes the cannonball come back to the mountain.</p></div>
+    <div class="lv lv-g8"><h2>Falling around the Earth</h2><p>An orbiting satellite is not floating. It is falling, at the same rate any dropped thing falls, but moving sideways so fast that the ground curves away beneath it as fast as it drops. Near Earth's surface that speed is about 7.9 kilometres per second, or 28,000 km/h.</p><p>Too slow and it comes down. Fast enough, about 11.2 km/s, and it never comes back at all: that is escape speed. The Moon is in the same kind of orbit, just far away and slow.</p></div>
+    <div class="lv lv-hs"><h2>Circular motion and gravity</h2><p>A circular orbit needs a centripetal acceleration v²/r, supplied by gravity GM/r². Set them equal: v = √(GM/r), which at Earth's surface (r = 6,371 km) is 7.9 km/s. The period is 2πr/v ≈ 84 minutes at the surface, 90 minutes for the space station a few hundred kilometres up.</p><p>Escape speed comes from energy: ½v² = GM/r gives v = √(2GM/r) = √2 times circular speed. Between those two speeds the orbit is an ellipse; above escape, a hyperbola.</p></div>
+    <div class="lv lv-col"><h2>Kepler from Newton</h2><p>The lab integrates Newton's law numerically; the exact solutions are conic sections. The vis-viva equation, v² = GM(2/r − 1/a), gives the speed anywhere on an orbit of semi-major axis a; circular orbits are a = r, escape is a → ∞. Kepler's third law, T² = 4π²a³/GM, follows and lets a period measure a mass.</p><p>Transfer between orbits uses the same equation twice: the Hohmann transfer is the ellipse tangent to both circles, and its two burns are the cheapest way to move between them.</p></div>
+    <div class="lv lv-max"><h2>Orbits as geometry</h2><p>The inverse-square law is the only power law besides the harmonic oscillator with closed orbits (Bertrand), which is why planets retrace their paths and why the Rule Lab on the One Rule board matters here. The hidden Laplace–Runge–Lenz vector is the conserved quantity behind that closure.</p><p>Perturbations break it: Earth's oblateness precesses satellite orbits (used deliberately for Sun-synchronous orbits), the Moon raises tides that slow Earth's spin, and general relativity adds the 43″ per century of Mercury that the One Rule board simulates.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The idea that an orbit is falling and missing is the single most important sentence on the board.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-cannon" aria-label="Newton's cannon on a mountain on a small planet. A slider sets the launch speed; shots fall, orbit, or escape."></canvas></div>
+    <div class="controls"><button class="btn primary" id="cn-fire">Fire</button><label class="slider">Launch speed <input type="range" id="cn-v" min="1" max="12" step="0.1" value="5"><span class="val" id="cn-v-val">5.0 km/s</span></label><button class="btn" id="cn-clear">Clear shots</button></div>
+    <figcaption><b>Try this:</b> fire faster and faster. Find the speed where the ball comes back to the mountain, then the speed where it never comes back.</figcaption>
+    <ul class="missions" data-ch="ch5"></ul>
+    <div class="check" data-ch="ch5"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">Read it from the lab: what speed makes the cannonball come all the way round?</p><form class="cf" data-a="7.9" data-u="km/s" data-tol="0.05" data-hint="Just under 8 km/s." data-ok="Right. About 7.9 km/s: falling and always missing."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Circular orbit speed at Earth's surface?</p><form class="cf" data-a="7.9" data-u="km/s" data-tol="0.05" data-hint="√(gR) with R = 6,371 km." data-ok="Right. About 7.9 km/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Escape speed at Earth's surface? (√2 × circular)</p><form class="cf" data-a="11.2" data-u="km/s" data-tol="0.03" data-hint="7.9 × 1.414." data-ok="Right. About 11.2 km/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Orbital period at the surface: 2πR/v with R = 6,371 km, v = 7.9 km/s. In minutes?</p><form class="cf" data-a="84" data-u="min" data-tol="0.04" data-hint="40,030 km ÷ 7.9 km/s ÷ 60." data-ok="Right. About 84 minutes."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Circular speed at r = 2R? (v ∝ 1/√r)</p><form class="cf" data-a="5.6" data-u="km/s" data-tol="0.04" data-hint="7.9 ÷ √2." data-ok="Right. About 5.6 km/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> explain an orbit as falling and missing, and read off circular and escape speed.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does the cannonball not fall down when it is moving fast enough?</li><li>Why is escape speed only about 40% more than orbit speed?</li><li>What keeps the Moon in orbit?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Complete: an orbit is falling and ___.</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch2">One Rule for Everything 2, Gravity is a dent</a></p>
+      <p class="links"><span class="unitbadge">Why things move · step 5</span></p>
+      <p class="links std"><b>Standards</b> MS-ESS1-2, HS-PS2-4, HS-ESS1-4</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch6">
+  <div class="text">
+    <p class="eyebrow">Chapter 6</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>What does a rocket push against in empty space?</p>
+    <div class="lv lv-k5"><h2>Rockets</h2><p>A rocket does not push on the air. It throws gas out the back as hard as it can, and the gas pushes the rocket forward. That works in empty space too, which is why rockets are the only way to get there.</p><p>Reach 1,000 metres with the fuel you have. Then try for more.</p></div>
+    <div class="lv lv-g8"><h2>Action and reaction</h2><p>Newton's third law: every push has an equal push back. The rocket pushes gas down; the gas pushes the rocket up. Thrust is how much gas per second times how fast it leaves. As fuel burns the rocket gets lighter, so it speeds up faster and faster.</p><p>Most of a rocket is fuel, and most of that fuel is spent lifting the rest of the fuel. Dropping empty tanks (staging) is the trick that makes orbit possible.</p></div>
+    <div class="lv lv-hs"><h2>The rocket equation</h2><p>Thrust F = ṁ v_e: mass flow rate times exhaust speed. Integrate over the burn and you get Tsiolkovsky's equation, Δv = v_e ln(m₀/m₁): the speed gained depends on the exhaust speed and the logarithm of the mass ratio. Gravity subtracts g per second of burn, so burn fast.</p><p>The logarithm is the whole problem of spaceflight. To gain 2v_e you need a mass ratio of e² ≈ 7.4; to gain 3v_e, e³ ≈ 20. Staging resets the ratio by discarding dead mass.</p></div>
+    <div class="lv lv-col"><h2>Optimising the climb</h2><p>Gravity loss and drag loss make the real Δv to orbit about 9.4 km/s against a 7.8 km/s orbital speed. Two stages with mass ratio e each give 2v_e with a structural fraction that a single stage of ratio e² could not achieve, since tanks and engines do not shrink to zero.</p><p>The lab integrates m(t)dv/dt = ṁ v_e − m(t)g with optional staging at burnout; try the same fuel in one stage and two, and compare altitude.</p></div>
+    <div class="lv lv-max"><h2>Exponential cost</h2><p>Because Δv enters the mass ratio exponentially, every additional kilometre per second roughly doubles the vehicle. That is why chemical rockets top out near 4.5 km/s exhaust speed (hydrogen–oxygen), why high-Isp electric propulsion accepts tiny thrust, and why the only way past the exponential is to leave the reaction mass behind (tethers, beamed propulsion) or refuel in orbit.</p><p>The Oberth effect, gaining more energy per unit fuel when burning at high speed deep in a gravity well, is the rocket equation meeting the vis-viva equation of the previous chapter.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>A balloon let go across the room is a rocket. Ask what it is pushing on. It is not the air.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-rocket" aria-label="A rocket launch with altitude and speed readouts. Sliders set fuel, exhaust speed, and burn rate; a toggle adds a second stage."></canvas></div>
+    <div class="controls"><button class="btn primary" id="rk-go">Launch</button><label class="slider">Fuel <input type="range" id="rk-fuel" min="0.5" max="10" step="0.5" value="3"><span class="val" id="rk-fuel-val">3 kg</span></label><label class="slider">Exhaust speed <input type="range" id="rk-ve" min="100" max="600" step="50" value="300"><span class="val" id="rk-ve-val">300 m/s</span></label><label class="slider">Burn rate <input type="range" id="rk-mdot" min="0.5" max="5" step="0.5" value="1"><span class="val" id="rk-mdot-val">1 kg/s</span></label><button class="btn" id="rk-stage" data-lv="hs col max" aria-pressed="false">Two stages: off</button></div>
+    <figcaption><b>Try this:</b> reach 1,000 m. Then find the fastest burn, then the highest flight the fuel allows. <span data-lv="hs col max">Then split the same fuel into two stages and compare.</span></figcaption>
+    <ul class="missions" data-ch="ch6"></ul>
+    <div class="check" data-ch="ch6"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">A rocket throws out 2 kg of gas every second at 100 m/s. Its thrust?</p><form class="cf" data-a="200" data-u="N" data-tol="0.02" data-hint="Thrust = kilograms per second × speed." data-ok="Right. 200 N."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">5 kg/s of gas at 400 m/s. Thrust?</p><form class="cf" data-a="2000" data-u="N" data-tol="0.02" data-hint="ṁ × v_e." data-ok="Right. 2,000 N."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Exhaust speed 2,000 m/s and mass ratio m₀/m₁ = e ≈ 2.718. Δv?</p><form class="cf" data-a="2000" data-u="m/s" data-tol="0.02" data-hint="ln(e) = 1." data-ok="Right. 2,000 m/s: one exhaust speed."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">v_e = 3,000 m/s, mass ratio 7.39. Δv?</p><form class="cf" data-a="6000" data-u="m/s" data-tol="0.02" data-hint="ln(7.39) = 2." data-ok="Right. 6,000 m/s."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Two stages of mass ratio e each versus one stage of ratio e², same v_e. Ratio of the Δv's?</p><form class="cf" data-a="1" data-u="n" data-tol="0.02" data-hint="ln adds: 1 + 1 = 2." data-ok="Right. Equal in the ideal case; staging wins only because real tanks have mass."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> explain thrust as action and reaction and say why rockets are mostly fuel.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>What is the rocket pushing on?</li><li>Why does the rocket speed up faster near the end of the burn?</li><li>Why does the same fuel go higher in two stages?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: why does dropping an empty tank help?</p>
+      
+      <p class="links"><span class="unitbadge">Why things move · step 6</span></p>
+      <p class="links std"><b>Standards</b> MS-PS2-1, HS-PS2-2, HS-ETS1-2</p>
+    </div>
+  </figure>
+</section>
+</main>
+<footer class="closing">
+  <p class="eyebrow">The end, for now</p>
+  <p>A push changes motion. Everything falls the same. Every push has a push back. Newton wrote them in 1687, and every game on this board is those sentences keeping score.</p>
+  <p class="big" style="margin-left:auto;margin-right:auto">Everything that moves obeys three sentences.</p>
+  <p class="teach"><a href="https://thedimension5.github.io/chalkboard/">More boards at The Chalkboard</a></p>
+</footer>
+</div>
+<div class="tray" aria-hidden="true"></div>
+<script>window.Chalk=(function(){
+'use strict';
+const C={chalk:'#F1ECDF',yellow:'#F6D46B',blue:'#8CC4EE',pink:'#F596A8',green:'#9DDBA3',board:'#1B2923'};
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>Number(v).toFixed(d);
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';const sup=n=>String(n).split('').map(c=>c==='-'?'⁻':(SUP[+c]||c)).join('');
+const pct=v=>Math.round(v*100)+'%';
+function text(ctx,str,x,y,o={}){const{size=20,color=C.chalk,align='center',fam='display',alpha=1,base='middle'}=o;ctx.save();ctx.globalAlpha=alpha;ctx.font=fam==='display'?`700 ${size}px Caveat, "Segoe Print", cursive`:fam==='mono'?`700 ${size}px "JetBrains Mono", Menlo, Consolas, monospace`:`900 ${size}px Nunito, system-ui, sans-serif`;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline=base;ctx.fillText(str,x,y);ctx.restore()}
+function circle(ctx,x,y,r,fill,stroke,lw=2){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function glow(ctx,x,y,r,color,a=.55){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(color,a));g.addColorStop(1,rgba(color,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function shade(ctx,x,y,r,a=.38){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function poly(ctx,pts,color,lw=1.2,alpha=1,close=false){if(pts.length<2)return;ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);if(close)ctx.closePath();ctx.stroke();ctx.restore()}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r)}else{ctx.rect(x,y,w,h)}}
+function box(ctx,x,y,w,h,fill,stroke,r=6,lw=2){rr(ctx,x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function marble(ctx,x,y,r,color){glow(ctx,x,y,r*2.6,color,.4);circle(ctx,x,y,r,color);circle(ctx,x-r*.3,y-r*.3,r*.3,'rgba(255,255,255,.55)')}
+function readout(ctx,lines,x,y,o={}){const{align='left',size=13,color=C.chalk,alpha=.94}=o;ctx.save();ctx.font=`700 ${size}px Nunito, system-ui, sans-serif`;let mw=0;for(const t of lines)mw=Math.max(mw,ctx.measureText(t).width);const bx=align==='right'?x-mw-8:align==='center'?x-mw/2-8:x-8;ctx.globalAlpha=.6;ctx.fillStyle=C.board;ctx.fillRect(bx,y-5,mw+16,lines.length*(size+5)+6);ctx.globalAlpha=alpha;ctx.textAlign=align;ctx.textBaseline='top';ctx.fillStyle=color;lines.forEach((t,i)=>ctx.fillText(t,x,y+i*(size+5)));ctx.restore()}
+function arrow(ctx,x,y,dx,dy,color,lw=2.2){const L=Math.hypot(dx,dy);if(L<3)return;ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();ctx.translate(x+dx,y+dy);ctx.rotate(Math.atan2(dy,dx));ctx.beginPath();ctx.moveTo(1,0);ctx.lineTo(-8,-4.5);ctx.lineTo(-8,4.5);ctx.closePath();ctx.fill();ctx.restore()}
+function rng(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let r=Math.imul(t^(t>>>15),1|t);r^=r+Math.imul(r^(r>>>7),61|r);return((r^(r>>>14))>>>0)/4294967296}}
+
+/* ---------- level ---------- */
+const LV=['k5','g8','hs','col','max'];const LR={k5:0,g8:1,hs:2,col:3,max:4};let LEVEL='k5';
+const at=l=>LR[LEVEL]>=LR[l];
+function keepPlace(fn){const secs=[...document.querySelectorAll('.hero,.chapter')];let ref=null;for(const s of secs){if(s.getBoundingClientRect().top<=90)ref=s}const before=ref?ref.getBoundingClientRect().top:0;fn();if(ref){const after=ref.getBoundingClientRect().top;window.scrollBy({top:after-before,left:0,behavior:'instant'})}}
+function setLevel(l,fromClick){if(!LV.includes(l))l='k5';LEVEL=l;keepPlace(()=>{document.documentElement.setAttribute('data-level',l);document.querySelectorAll('[data-lv]').forEach(el=>{el.hidden=!el.dataset.lv.split(' ').includes(l)})});
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.setAttribute('aria-selected',b.dataset.level===l?'true':'false'));
+  try{localStorage.setItem('one-rule-level',l)}catch(e){}
+  if(fromClick){try{const u=new URL(location.href);u.searchParams.set('level',l);history.replaceState(null,'',u)}catch(e){}}
+  stopSpeak();renderMissions()}
+
+/* ---------- sims ---------- */
+const sims=[];
+function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getContext('2d');const s=Object.assign({cv,ctx,w:0,h:0,visible:false,t:0,dt:0,pointer:null},def);
+  function resize(){const r=cv.getBoundingClientRect();if(r.width<2)return;const dpr=Math.min(window.devicePixelRatio||1,2);const first=s.w===0;s.w=r.width;s.h=r.height;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);if(first){s.init&&s.init(s)}else{s.onResize&&s.onResize(s)}s.draw(s)}
+  new ResizeObserver(resize).observe(cv);resize();
+  new IntersectionObserver(e=>{s.visible=e[0].isIntersecting},{rootMargin:'120px'}).observe(cv);
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);s.pointer=pos(e);s.down&&s.down(s.pointer,s,e)});
+  cv.addEventListener('pointermove',e=>{s.pointer=pos(e);s.move&&s.move(s.pointer,s,e)});
+  const up=e=>{s.up&&s.up(pos(e),s,e)};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('pointerleave',()=>{s.leave&&s.leave(s)});
+  sims.push(s);return s}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+function tick(dt){for(const s of sims){if(!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}}
+const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
+const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=()=>{const v=parseFloat(el.value);if(out)out.textContent=f?f(v):v;fn(v)};el.addEventListener('input',go);go()};
+
+/* ---------- missions ---------- */
+let DEFS=[],CHECKS={},KEY='chalk',mdone=new Set();
+const mApplies=m=>m.lv.includes(LEVEL);
+function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:''}
+function renderMissions(){document.querySelectorAll('.missions').forEach(ul=>{const ms=DEFS.filter(m=>m.ch===ul.dataset.ch&&mApplies(m));ul.hidden=!ms.length;ul.innerHTML='<li class="mh">Mission'+(ms.length>1?'s':'')+'</li>'+ms.map(m=>`<li class="m${mdone.has(m.id)?' done':''}" data-m="${m.id}"><span class="box">✓</span><span>${m.text}</span></li>`).join('')});mcount()}
+function checkMissions(){let changed=false;for(const m of DEFS){if(mdone.has(m.id)||!mApplies(m))continue;let ok=false;try{ok=!!(CHECKS[m.id]&&CHECKS[m.id]())}catch(e){ok=false}
+    if(ok){mdone.add(m.id);changed=true;const li=document.querySelector(`.missions li[data-m="${m.id}"]`);if(li)li.classList.add('done','just')}}
+  if(changed){try{localStorage.setItem('chalk:'+KEY+':missions',JSON.stringify([...mdone]))}catch(e){}mcount()}}
+
+/* ---------- read aloud ---------- */
+const canSpeak='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
+let speaking=null;
+function stopSpeak(){if(!canSpeak)return;const was=speaking;speaking=null;try{speechSynthesis.cancel()}catch(e){}if(was){was.btn.classList.remove('is-on');was.btn.querySelector('span').textContent='Read to me';was.block.classList.remove('reading')}}
+function pickVoice(){const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));return vs.find(v=>/Samantha|Google US English|Karen|Daniel|Natural|Premium/i.test(v.name))||vs[0]||null}
+function wireRead(){if(!canSpeak){document.querySelectorAll('.read').forEach(b=>b.remove());return}
+  document.querySelectorAll('.read').forEach(btn=>btn.addEventListener('click',()=>{const sec=btn.closest('.text');const block=[...sec.querySelectorAll('.lv')].find(b=>b.offsetParent!==null);if(!block)return;
+    if(speaking&&speaking.btn===btn){stopSpeak();return}stopSpeak();
+    const parts=[];const h1=sec.querySelector('h1');if(h1)parts.push(h1.textContent.trim());[...block.querySelectorAll('h2,p')].forEach(e=>{const t=e.textContent.trim();if(t)parts.push(t)});
+    const cap=sec.parentElement.querySelector('figcaption');if(cap)parts.push(cap.textContent.replace(/\s+/g,' ').trim());
+    const voice=pickVoice();speaking={btn,block};btn.classList.add('is-on');btn.querySelector('span').textContent='Stop';block.classList.add('reading');
+    parts.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.rate=.95;u.pitch=1.05;if(voice)u.voice=voice;if(i===parts.length-1)u.onend=()=>{if(speaking&&speaking.btn===btn)stopSpeak()};speechSynthesis.speak(u)})}));
+  try{speechSynthesis.getVoices()}catch(e){}window.addEventListener('pagehide',()=>stopSpeak())}
+
+
+/* ---------- teach-back checks ---------- */
+let passed=new Set(),UNITWHY={};
+const uname=u=>{const o=document.querySelector(`form.cf select option[value="${u}"]`);return o?o.textContent:u};
+function checkPassed(ch){return passed.has(ch+':'+LEVEL)}
+function wireChecks(){document.querySelectorAll('form.cf').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const box=f.closest('.check');const fb=box.querySelector('.fb');
+    if(f.dataset.type==='choice'){const c=f.querySelector('input[type=radio]:checked');if(!c){fb.textContent='Pick one.';fb.className='fb bad';return}if(c.value!==f.dataset.a){fb.textContent='Not that one. Hint: '+f.dataset.hint;fb.className='fb bad';return}fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}return}
+    const v=parseFloat(String(f.querySelector('input').value).replace(/,/g,''));const u=f.querySelector('select').value;const a=parseFloat(f.dataset.a),want=f.dataset.u,tol=parseFloat(f.dataset.tol||'.02');
+    if(isNaN(v)){fb.textContent='Type a number first.';fb.className='fb bad';return}
+    if(!u){fb.textContent='Pick a unit. A number without a unit is not an answer.';fb.className='fb bad';return}
+    if(u!==want){fb.textContent=`Units first. You answered in ${uname(u)}, but this question wants ${uname(want)}: ${UNITWHY[want]||''}. Try again in ${want}.`;fb.className='fb bad';return}
+    const err=a===0?Math.abs(v):Math.abs(v-a)/Math.abs(a);
+    if(err>tol){fb.textContent='Right unit, wrong number. Hint: '+f.dataset.hint;fb.className='fb bad';return}
+    fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}}))}
+
+/* ---------- start ---------- */
+function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
+  try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();
+  try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
+  wireRead();
+  let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
+  setLevel(lv0||'k5',false);setInterval(checkMissions,300);
+  const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
+return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions()};
+})();
+</script>
+<script>
+const MISSION_DEFS=[{"id": "l1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Stop the car inside the box."}, {"id": "l1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Make the floor icy (roughness under 0.05) and stop it in the box anyway."}, {"id": "l2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Turn the air off and drop both: they land together."}, {"id": "l2b", "ch": "ch2", "lv": ["g8", "hs", "col", "max"], "text": "Drop on the Moon and read the fall time."}, {"id": "l3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Hit the target."}, {"id": "l3b", "ch": "ch3", "lv": ["g8", "hs", "col", "max"], "text": "Hit three targets in a row."}, {"id": "l3c", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Predict the landing spot within 5% before launching."}, {"id": "l3d", "ch": "ch3", "lv": ["col", "max"], "text": "Turn the air on and hit a target with a mass of 3 kg or more."}, {"id": "l4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make the moving cart stop dead."}, {"id": "l4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Make the carts stick and read the shared speed."}, {"id": "l5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Put the cannonball into orbit."}, {"id": "l5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Fire it fast enough to escape."}, {"id": "l6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Reach 1,000 m."}, {"id": "l6b", "ch": "ch6", "lv": ["g8", "hs", "col", "max"], "text": "Reach 3,000 m."}, {"id": "l6c", "ch": "ch6", "lv": ["hs", "col", "max"], "text": "Stage the rocket and beat your best single-stage altitude."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}];
+const UNIT_WHY={"m": "metres measure a distance", "cm": "centimetres measure a distance", "km": "kilometres measure a distance", "s": "seconds measure a time", "min": "minutes measure a time", "m/s": "metres per second is a speed", "km/s": "kilometres per second is a speed", "m/s²": "metres per second squared is how fast speed changes", "N": "newtons measure a force, a push or pull", "kg": "kilograms measure mass", "kg·m/s": "kilogram-metres per second is momentum: mass times speed", "J": "joules measure energy", "n": "a ratio, no unit"};
+const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
+const G=9.8;
+const group=(attr,fn)=>document.querySelectorAll(`[${attr}]`).forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll(`[${attr}]`).forEach(x=>x.classList.toggle('is-on',x===b));fn(parseFloat(b.getAttribute(attr)))}));
+const toggle=(id,get,set,label)=>hook(id,()=>{set(!get());const b=$(id);b.classList.toggle('is-on',get());b.setAttribute('aria-pressed',String(get()));b.textContent=label(get())});
+function car(ctx,x,y,w,h,color){box(ctx,x-w/2,y-h,w,h*.62,color,null,4);box(ctx,x-w*.3,y-h*1.05,w*.55,h*.45,rgba(color,.7),null,3);circle(ctx,x-w*.3,y,h*.28,C.board,C.chalk,2);circle(ctx,x+w*.3,y,h*.28,C.board,C.chalk,2)}
+
+/* ---------- CH1: pushes and pulls ---------- */
+const ps=makeSim('cv-push',{
+  init(s){s.F=80;s.m=5;s.mu=.2;s.reset(s)},
+  reset(s){s.x=2;s.v=0;s.dir=0;s.hit=false;s.box=[7+Math.random()*5,0];s.box[1]=s.box[0]+1.4;s.push=false},
+  ppm(s){return s.w/14},
+  down(p,s){s.push=true;s.dir=Math.sign(s.x*s.ppm(s)-p.x)||1},move(p,s){if(s.push)s.dir=Math.sign(s.x*s.ppm(s)-p.x)||s.dir},up(p,s){s.push=false},leave(s){s.push=false},
+  step(dt,s){const sub=4,h=dt/sub;for(let k=0;k<sub;k++){const Fp=s.push?s.F*s.dir:0;let fr=0;if(Math.abs(s.v)>1e-3)fr=-Math.sign(s.v)*s.mu*s.m*G;else if(Math.abs(Fp)<=s.mu*s.m*G){s.v=0;continue}const a=(Fp+fr)/s.m;const v0=s.v;s.v+=a*h;if(!s.push&&Math.sign(s.v)!==Math.sign(v0)&&v0!==0)s.v=0;s.x+=s.v*h;if(s.x<.5){s.x=.5;s.v=-s.v*.3}if(s.x>13.5){s.x=13.5;s.v=-s.v*.3}}
+    if(!s.push&&Math.abs(s.v)<1e-3&&s.x>s.box[0]&&s.x<s.box[1])s.hit=true},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const P=s.ppm(s),gy=h*.72;
+    ctx.save();ctx.globalAlpha=.25+s.mu*.9;ctx.strokeStyle=C.chalk;ctx.lineWidth=3;ctx.setLineDash(s.mu<.08?[]:[2,Math.max(2,10-s.mu*14)]);ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();ctx.restore();
+    box(ctx,s.box[0]*P,gy-6,(s.box[1]-s.box[0])*P,10,rgba(s.hit?C.green:C.yellow,.35),s.hit?C.green:C.yellow,2,2);text(ctx,s.hit?'stopped in the box!':'the box',(s.box[0]+s.box[1])/2*P,gy+22,{size:17,color:s.hit?C.green:C.yellow});
+    for(let m=0;m<=14;m+=2)text(ctx,m+' m',m*P,h*.9,{size:13,alpha:.5});
+    car(ctx,s.x*P,gy,44,26,C.blue);
+    if(s.push)arrow(ctx,s.x*P-s.dir*60,gy-16,s.dir*40,0,C.pink,3);
+    const fr=Math.abs(s.v)>1e-3?s.mu*s.m*G:0;
+    const lines=at('g8')?[`push ${s.push?s.F+' N':'off'}   friction ${fr.toFixed(1)} N   speed ${Math.abs(s.v).toFixed(2)} m/s`]:[`push: ${s.push?'ON':'off'}    speed: ${Math.abs(s.v).toFixed(1)} m/s`];
+    if(at('g8'))lines.push(`a = (push − friction) ÷ mass = ${(((s.push?s.F:0)-fr)/s.m).toFixed(1)} m/s²`);if(at('hs'))lines.push(`friction = μ m g = ${s.mu} × ${s.m} × 9.8;  after you let go, a = −μg = −${(s.mu*G).toFixed(1)} m/s² for any mass`);if(at('col'))lines.push(`stopping distance from here: v²/(2μg) = ${(s.v*s.v/(2*s.mu*G)).toFixed(2)} m`);
+    readout(ctx,lines,16,12,{size:12});if(!s.push&&s.v===0&&!s.hit)text(ctx,'press and hold on the floor: the car is pushed away from your finger',w/2,h*.16+ (at('col')?40:at('hs')?22:at('g8')?4:-10),{size:17,alpha:.6})}
+});
+slide('ps-f',v=>{if(ps)ps.F=v},v=>v+' N');slide('ps-m',v=>{if(ps)ps.m=v},v=>v+' kg');slide('ps-mu',v=>{if(ps)ps.mu=v},v=>v.toFixed(2));hook('ps-reset',()=>ps&&ps.reset(ps));
+
+/* ---------- CH2: everything falls the same ---------- */
+const fl=makeSim('cv-fall',{
+  init(s){s.g=9.8;s.air=true;s.H=6;s.reset(s)},
+  reset(s){s.obj=[{n:'hammer',m:1.3,k:.02,y:s.H,v:0,t:0,down:false,c:C.chalk},{n:'feather',m:.008,k:.03,y:s.H,v:0,t:0,down:false,c:C.pink}];s.going=false},
+  drop(s){s.reset(s);s.going=true},
+  step(dt,s){if(!s.going)return;for(const o of s.obj){if(o.down)continue;const sub=4,h=dt/sub;for(let k=0;k<sub;k++){const a=s.g-(s.air?o.k*o.v*o.v/o.m:0);o.v+=a*h;o.y-=o.v*h;o.t+=h;if(o.y<=0){o.y=0;o.down=true;break}}}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const P=h*.72/s.H,gy=h*.86,x0=w*.38,x1=w*.62;
+    poly(ctx,[[w*.1,gy],[w*.9,gy]],C.chalk,2,.6);for(let m=0;m<=s.H;m+=2){poly(ctx,[[w*.2,gy-m*P],[w*.24,gy-m*P]],C.chalk,1,.5);text(ctx,m+' m',w*.17,gy-m*P,{size:13,alpha:.6})}
+    poly(ctx,[[w*.24,gy],[w*.24,gy-s.H*P]],C.chalk,2,.5);
+    const hm=s.obj[0],ft=s.obj[1];box(ctx,x0-14,gy-hm.y*P-30,28,18,C.chalk,null,3);box(ctx,x0-3,gy-hm.y*P-14,6,16,rgba(C.chalk,.7),null,2);
+    ctx.save();ctx.strokeStyle=C.pink;ctx.lineWidth=2;ctx.beginPath();const fy=gy-ft.y*P;ctx.moveTo(x1,fy);ctx.quadraticCurveTo(x1+14,fy-14,x1+2,fy-30);ctx.stroke();for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(x1+i*1.5,fy-4-i*4);ctx.lineTo(x1+10+i,fy-8-i*4);ctx.stroke()}ctx.restore();
+    const name={9.8:'Earth',1.62:'the Moon',3.71:'Mars',24.8:'Jupiter'}[s.g]||'this world';
+    const lines=[`${name}, g = ${s.g} m/s², air ${s.air?'on':'off'}`,`hammer: ${hm.down?hm.t.toFixed(2)+' s':s.going?'falling':'ready'}     feather: ${ft.down?ft.t.toFixed(2)+' s':s.going?'falling':'ready'}`];
+    if(hm.down&&ft.down)lines.push(Math.abs(hm.t-ft.t)<.05?'they landed together!':`the feather took ${(ft.t/hm.t).toFixed(1)}× longer: that is the air, not gravity`);
+    if(at('hs'))lines.push(`no air: t = √(2h/g) = √(12/${s.g}) = ${Math.sqrt(2*s.H/s.g).toFixed(2)} s`);if(at('col'))lines.push(`terminal speeds: hammer ${Math.sqrt(hm.m*s.g/hm.k).toFixed(0)} m/s, feather ${Math.sqrt(ft.m*s.g/ft.k).toFixed(1)} m/s`);readout(ctx,lines,16,12,{size:12})}
+});
+hook('fl-drop',()=>fl&&fl.drop(fl));toggle('fl-air',()=>fl.air,v=>{fl.air=v},v=>'Air: '+(v?'on':'off'));group('data-g',v=>{if(fl){fl.g=v;fl.reset(fl)}});
+
+/* ---------- CH3: the launch ---------- */
+const ln=makeSim('cv-launch',{
+  init(s){s.hr=4;s.ang=20;s.m=1;s.air=false;s.mu=0;s.phase='ready';s.D=8;s.bw=1.2;s.streak=0;s.hits=0;s.best=0;s.trail=[];s.pred=null;s.predErr=null;s.hitAir=false;s.res=''},
+  ppm(s){return s.w/30},
+  lip(s){return{x:4,y:1+Math.sin(s.ang*Math.PI/180)*.5}},
+  v0(s){const L=s.lip(s);const Lr=Math.hypot(3,s.hr-1);const v2=2*G*(s.hr-L.y)-2*s.mu*G*Lr*(3/Lr);return v2>0?Math.sqrt(v2):0},
+  predict(s){const v=s.v0(s),L=s.lip(s),th=s.ang*Math.PI/180;const vy=v*Math.sin(th),vx=v*Math.cos(th);const t=(vy+Math.sqrt(vy*vy+2*G*L.y))/G;const pts=[];for(let k=0;k<=30;k++){const tt=t*k/30;pts.push([L.x+vx*tt,L.y+vy*tt-.5*G*tt*tt])}return{range:L.x+vx*t,t,pts}},
+  go(s){if(s.phase!=='ready')return;const pv=parseFloat(($('ln-pred')||{}).value);s.pred=isNaN(pv)?null:pv;s.phase='ramp';s.sp=0;s.trail=[];s.res=''},
+  newTarget(s){s.D=5+Math.random()*10;s.bw=1.2;s.streak=0},
+  step(dt,s){if(s.phase==='ramp'){const v=s.v0(s);if(v<=0){s.phase='ready';s.res='not enough height: the car stopped on the ramp';return}const Lr=Math.hypot(3,s.hr-1);s.sp+=dt*(v/2+1)/Lr;if(s.sp>=1){s.sp=1;const L=s.lip(s),th=s.ang*Math.PI/180;s.px=L.x;s.py=L.y;s.vx=v*Math.cos(th);s.vy=v*Math.sin(th);s.phase='flight';s.ft=0}}
+    else if(s.phase==='flight'){const sub=6,h=dt/sub;for(let k=0;k<sub;k++){const sp=Math.hypot(s.vx,s.vy);const kd=s.air?.03:0;s.vx+=-(kd/s.m)*sp*s.vx*h;s.vy+=(-G-(kd/s.m)*sp*s.vy)*h;s.px+=s.vx*h;s.py+=s.vy*h;s.ft+=h;if(s.py<=0){s.py=0;s.land(s);break}}s.trail.push([s.px,s.py])}
+    else if(s.phase==='landed'){s.wait-=dt;if(s.wait<=0)s.phase='ready'}},
+  land(s){s.phase='landed';s.wait=1.8;const x=s.px;const hit=Math.abs(x-s.D)<s.bw/2;s.best=Math.max(s.best,x);
+    if(s.pred!=null){s.predErr=Math.abs(x-s.pred)/x;s.res=`you predicted ${s.pred.toFixed(1)} m, it landed at ${x.toFixed(1)} m: ${(s.predErr*100).toFixed(0)}% off. `}else s.res=`landed at ${x.toFixed(1)} m. `;
+    if(hit){s.hits++;s.streak++;if(s.air&&s.m>=3)s.hitAir=true;s.res+=`HIT! streak ${s.streak}. The box moves farther.`;s.D=Math.min(27,s.D*1.25+1);s.bw=Math.max(.7,s.bw*.93)}else{s.streak=0;s.res+=x<s.D?'short.':'too far.'}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const P=s.ppm(s),gy=h*.82;const X=x=>x*P,Y=y=>gy-y*P;
+    poly(ctx,[[0,gy],[w,gy]],C.chalk,2,.6);for(let m=0;m<=30;m+=5)text(ctx,m+' m',X(m),gy+16,{size:12,alpha:.5});
+    const L=s.lip(s);const ramp=[[X(1),Y(s.hr)],[X(3),Y(1)],[X(L.x),Y(L.y)]];poly(ctx,[[X(1),gy],[X(1),Y(s.hr)]],C.chalk,2,.4);poly(ctx,ramp,C.yellow,4,.9);poly(ctx,[[X(3),Y(1)],[X(3),gy]],C.chalk,2,.4);
+    text(ctx,`${s.hr.toFixed(1)} m`,X(1)-6,Y(s.hr/2),{size:14,align:'right',alpha:.7});
+    box(ctx,X(s.D-s.bw/2),gy-8,s.bw*P,12,rgba(C.green,.3),C.green,2,2);text(ctx,`${s.D.toFixed(1)} m`,X(s.D),gy+32,{size:15,color:C.green});
+    if(at('hs')&&s.phase==='ready'){const pr=s.predict(s);ctx.save();ctx.setLineDash([3,6]);poly(ctx,pr.pts.map(p=>[X(p[0]),Y(p[1])]),C.chalk,1.2,.5);ctx.restore()}
+    if(s.trail.length)poly(ctx,s.trail.map(p=>[X(p[0]),Y(p[1])]),C.blue,2,.8);
+    let cx,cy;if(s.phase==='ramp'){const t=s.sp;const a=[1,s.hr],b=[3,1],c=[L.x,L.y];const seg1=Math.hypot(2,s.hr-1),seg2=Math.hypot(1,L.y-1);const tot=seg1+seg2;const d=t*tot;if(d<seg1){const u=d/seg1;cx=a[0]+(b[0]-a[0])*u;cy=a[1]+(b[1]-a[1])*u}else{const u=(d-seg1)/seg2;cx=b[0]+(c[0]-b[0])*u;cy=b[1]+(c[1]-b[1])*u}}else if(s.phase==='flight'||s.phase==='landed'){cx=s.px;cy=s.py}else{cx=1;cy=s.hr}
+    car(ctx,X(cx),Y(cy)-2,26,15,C.pink);
+    const v=s.v0(s),pr=s.predict(s);
+    const lines=[`streak ${s.streak}   hits ${s.hits}   best ${s.best.toFixed(1)} m`];if(s.res)lines.push(s.res);
+    if(at('g8'))lines.push(`speed at the lip ≈ ${v.toFixed(1)} m/s${s.air?'':'   (mass does nothing without air)'}`);if(at('hs'))lines.push(`v = √(2g·Δh) = ${v.toFixed(2)} m/s;  no-drag range ${pr.range.toFixed(1)} m, flight ${pr.t.toFixed(2)} s`);if(at('col')&&s.air)lines.push(`drag on: a = −(k/m)|v|v with k = 0.03 kg/m, m = ${s.m} kg`);readout(ctx,lines,16,12,{size:12})}
+});
+hook('ln-go',()=>ln&&ln.go(ln));hook('ln-newt',()=>ln&&ln.newTarget(ln));slide('ln-h',v=>{if(ln)ln.hr=v},v=>v.toFixed(1)+' m');slide('ln-a',v=>{if(ln)ln.ang=v},v=>v+'°');slide('ln-m',v=>{if(ln)ln.m=v},v=>v.toFixed(1)+' kg');slide('ln-mu',v=>{if(ln)ln.mu=v},v=>v.toFixed(2));toggle('ln-air',()=>ln.air,v=>{ln.air=v},v=>'Air: '+(v?'on':'off'));
+
+/* ---------- CH4: the crash lab ---------- */
+const cr=makeSim('cv-crash',{
+  init(s){s.m1=2;s.v1=3;s.m2=2;s.v2=0;s.elastic=true;s.reset(s)},
+  reset(s){s.x1=2;s.x2=8;s.u1=s.v1;s.u2=s.v2;s.going=false;s.hit=false;s.stopped=false;s.stuckDone=false},
+  go(s){s.reset(s);s.going=true},
+  step(dt,s){if(!s.going)return;const sub=4,h=dt/sub;for(let k=0;k<sub;k++){s.x1+=s.u1*h;s.x2+=s.u2*h;if(!s.hit&&s.x2-s.x1<=.9){s.hit=true;const{m1,m2}=s,a=s.u1,b=s.u2;if(s.elastic){s.u1=((m1-m2)*a+2*m2*b)/(m1+m2);s.u2=((m2-m1)*b+2*m1*a)/(m1+m2)}else{s.u1=s.u2=(m1*a+m2*b)/(m1+m2);s.stuckDone=true}if(Math.abs(s.u1)<.05&&s.v1>0)s.stopped=true}}
+    if(s.x1<-1||s.x1>13||s.x2>13||s.x2<-1||(s.hit&&Math.abs(s.u1)<1e-3&&Math.abs(s.u2)<1e-3))s.going=false},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const P=w/12,gy=h*.6;poly(ctx,[[0,gy],[w,gy]],C.chalk,2,.6);
+    const w1=20+s.m1*4,w2=20+s.m2*4;car(ctx,s.x1*P,gy,w1,14+s.m1*1.5,C.blue);car(ctx,s.x2*P,gy,w2,14+s.m2*1.5,C.pink);
+    text(ctx,`${s.m1} kg`,s.x1*P,gy+22,{size:14,color:C.blue});text(ctx,`${s.m2} kg`,s.x2*P,gy+22,{size:14,color:C.pink});
+    if(s.u1)arrow(ctx,s.x1*P,gy-40,s.u1*14,0,C.blue,2.5);if(s.u2)arrow(ctx,s.x2*P,gy-40,s.u2*14,0,C.pink,2.5);
+    const pB=s.m1*s.v1+s.m2*s.v2,kB=.5*s.m1*s.v1*s.v1+.5*s.m2*s.v2*s.v2,pA=s.m1*s.u1+s.m2*s.u2,kA=.5*s.m1*s.u1*s.u1+.5*s.m2*s.u2*s.u2;
+    const lines=[`${s.elastic?'bouncy':'sticky'}:  cart 1 ${s.u1.toFixed(2)} m/s,  cart 2 ${s.u2.toFixed(2)} m/s${s.stopped?'   → cart 1 stopped dead!':''}`];
+    if(at('g8'))lines.push(`momentum before ${pB.toFixed(1)}, after ${pA.toFixed(1)} kg·m/s: the same, always`);if(at('hs'))lines.push(`kinetic energy before ${kB.toFixed(1)} J, after ${kA.toFixed(1)} J${s.hit&&!s.elastic?': the rest became heat and sound':''}`);if(at('col'))lines.push(`centre-of-mass speed ${(pB/(s.m1+s.m2)).toFixed(2)} m/s, unchanged by the collision`);readout(ctx,lines,16,12,{size:12})}
+});
+hook('cr-go',()=>cr&&cr.go(cr));slide('cr-m1',v=>{if(cr){cr.m1=v;cr.reset(cr)}},v=>v+' kg');slide('cr-v1',v=>{if(cr){cr.v1=v;cr.reset(cr)}},v=>v+' m/s');slide('cr-m2',v=>{if(cr){cr.m2=v;cr.reset(cr)}},v=>v+' kg');slide('cr-v2',v=>{if(cr){cr.v2=v;cr.reset(cr)}},v=>v+' m/s');
+toggle('cr-type',()=>cr.elastic,v=>{cr.elastic=v;cr.reset(cr)},v=>v?'Bouncy':'Sticky');
+
+/* ---------- CH5: Newton's cannon ---------- */
+const cn=makeSim('cv-cannon',{
+  init(s){s.R=6371;s.GM=.0098*s.R*s.R;s.v=5;s.shots=[];s.orbited=false;s.escaped=false},
+  fire(s){const r0=s.R+300;s.shots.push({x:0,y:r0,vx:s.v,vy:0,pts:[],ang:0,pa:null,t:0,state:'flying'});if(s.shots.length>6)s.shots.shift()},
+  step(dt,s){for(const sh of s.shots){if(sh.state!=='flying')continue;const sub=8,h=dt*400/sub;for(let k=0;k<sub;k++){const r=Math.hypot(sh.x,sh.y);const a=-s.GM/(r*r*r);sh.vx+=a*sh.x*h;sh.vy+=a*sh.y*h;sh.x+=sh.vx*h;sh.y+=sh.vy*h;sh.t+=h;const an=Math.atan2(sh.y,sh.x);if(sh.pa!==null){let d=an-sh.pa;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;sh.ang+=d}sh.pa=an;
+      const rr=Math.hypot(sh.x,sh.y);if(rr<s.R){sh.state='crashed';break}if(Math.abs(sh.ang)>=2*Math.PI*1.02){sh.state='orbit';s.orbited=true;break}const E=.5*(sh.vx*sh.vx+sh.vy*sh.vy)-s.GM/rr;if(E>=0&&rr>3*s.R){sh.state='escaped';s.escaped=true;break}if(sh.t>4e4){sh.state='ellipse';break}}
+      sh.pts.push([sh.x,sh.y]);if(sh.pts.length>1400)sh.pts.shift()}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const cx=w/2,cy=h*.55,K=Math.min(w,h)*.2/s.R;const X=x=>cx+x*K,Y=y=>cy-y*K;
+    glow(ctx,cx,cy,s.R*K*1.6,C.blue,.25);circle(ctx,cx,cy,s.R*K,rgba(C.blue,.25),C.blue,2);poly(ctx,[[X(-200),Y(s.R)],[X(0),Y(s.R+300)],[X(200),Y(s.R)]],C.chalk,2,.8);
+    s.shots.forEach((sh,i)=>{const last=i===s.shots.length-1;poly(ctx,sh.pts.map(p=>[X(p[0]),Y(p[1])]),sh.state==='orbit'?C.green:sh.state==='escaped'?C.pink:last?C.yellow:C.chalk,last?2:1.2,last?.95:.45);if(sh.state==='flying')circle(ctx,X(sh.x),Y(sh.y),3,C.yellow)});
+    const vc=Math.sqrt(s.GM/(s.R+300)),ve=vc*Math.SQRT2;const last=s.shots[s.shots.length-1];
+    const lines=[`launch ${s.v.toFixed(1)} km/s${last?'   →   '+{flying:'flying',crashed:'came down',orbit:'ORBIT! it came back round',escaped:'escaped for good',ellipse:'looping in a long ellipse'}[last.state]:''}`];
+    if(at('g8'))lines.push(`falling and missing: circular speed here is ${vc.toFixed(1)} km/s, escape ${ve.toFixed(1)} km/s`);if(at('hs'))lines.push('v = √(GM/r) for a circle;  √(2GM/r) to escape');if(at('col')&&last)lines.push(`energy per kg: ${(.5*(last.vx*last.vx+last.vy*last.vy)-s.GM/Math.hypot(last.x,last.y)).toFixed(1)} km²/s² (negative = bound)`);readout(ctx,lines,16,12,{size:12})}
+});
+hook('cn-fire',()=>cn&&cn.fire(cn));hook('cn-clear',()=>{if(cn)cn.shots=[]});slide('cn-v',v=>{if(cn)cn.v=v},v=>v.toFixed(1)+' km/s');
+
+/* ---------- CH6: rockets ---------- */
+const rk=makeSim('cv-rocket',{
+  init(s){s.fuel=3;s.ve=300;s.mdot=1;s.stage=false;s.reset(s);s.bestSingle=0;s.bestStaged=0},
+  reset(s){s.y=0;s.v=0;s.t=0;s.going=false;s.left=s.fuel;s.dry=2+(s.stage?.7:0);s.stagesLeft=s.stage?2:1;s.apex=0;s.done=false;s.log=[]},
+  go(s){s.reset(s);s.going=true},
+  step(dt,s){if(!s.going)return;const sub=6,h=dt*3/sub;for(let k=0;k<sub;k++){const m=s.dry+s.left;let thrust=0;if(s.left>0){const burn=Math.min(s.mdot*h,s.left);s.left-=burn;thrust=s.mdot*s.ve;if(s.stage&&s.stagesLeft===2&&s.left<=s.fuel/2){s.stagesLeft=1;s.dry-=.7}}
+      const a=thrust/m-G;s.v+=a*h;s.y+=s.v*h;s.t+=h;s.apex=Math.max(s.apex,s.y);if(s.y<0){s.y=0;s.going=false;s.done=true;if(s.stage)s.bestStaged=Math.max(s.bestStaged,s.apex);else s.bestSingle=Math.max(s.bestSingle,s.apex);break}}
+    if(s.log.length===0||s.t-s.log[s.log.length-1][0]>.2)s.log.push([s.t,s.y])},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const top=Math.max(1200,s.apex*1.15,s.y*1.15);const gy=h*.9,K=(gy-30)/top;
+    for(let a=0;a<=top;a+=top>10000?5000:top>4000?1000:500){poly(ctx,[[w*.08,gy-a*K],[w*.12,gy-a*K]],C.chalk,1,.5);text(ctx,a>=1000?(a/1000)+' km':a+' m',w*.07,gy-a*K,{size:12,align:'right',alpha:.6})}
+    poly(ctx,[[w*.12,gy],[w*.12,30]],C.chalk,1.5,.4);poly(ctx,[[w*.05,gy],[w*.95,gy]],C.chalk,2,.6);
+    if(s.log.length>1)poly(ctx,s.log.map(p=>[w*.2+p[0]*(w*.6/40),gy-p[1]*K]),C.blue,1.5,.6);
+    const rx=w*.2+s.t*(w*.6/40),ry=gy-s.y*K;box(ctx,rx-8,ry-36,16,30,C.chalk,null,4);poly(ctx,[[rx-8,ry-36],[rx,ry-50],[rx+8,ry-36]],C.chalk,2,.9);if(s.going&&s.left>0){glow(ctx,rx,ry,18,C.yellow,.8);poly(ctx,[[rx-5,ry-6],[rx,ry+14+Math.random()*8],[rx+5,ry-6]],C.pink,3)}
+    const m=s.dry+s.left,thrust=s.left>0&&s.going?s.mdot*s.ve:0;const dv=s.ve*Math.log((2+(s.stage?.7:0)+s.fuel)/2);
+    const lines=[`altitude ${s.y.toFixed(0)} m   speed ${s.v.toFixed(0)} m/s   fuel ${s.left.toFixed(1)} kg${s.done?'   →   apex '+s.apex.toFixed(0)+' m':''}`];
+    if(at('g8'))lines.push(`thrust = ${s.mdot} kg/s × ${s.ve} m/s = ${(s.mdot*s.ve).toFixed(0)} N,  mass now ${m.toFixed(1)} kg`);if(at('hs'))lines.push(`Δv = v_e ln(m₀/m₁) = ${dv.toFixed(0)} m/s before gravity loss (${(G*s.fuel/s.mdot).toFixed(0)} m/s spent fighting gravity)`);if(at('hs'))lines.push(`best single stage ${s.bestSingle.toFixed(0)} m   best two-stage ${s.bestStaged.toFixed(0)} m`);readout(ctx,lines,16,12,{size:12})}
+});
+hook('rk-go',()=>rk&&rk.go(rk));slide('rk-fuel',v=>{if(rk){rk.fuel=v;rk.reset(rk)}},v=>v+' kg');slide('rk-ve',v=>{if(rk)rk.ve=v},v=>v.toLocaleString('en-US')+' m/s');slide('rk-mdot',v=>{if(rk)rk.mdot=v},v=>v+' kg/s');toggle('rk-stage',()=>rk.stage,v=>{rk.stage=v;rk.reset(rk)},v=>'Two stages: '+(v?'on':'off'));
+
+Chalk.start({key:'launch',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
+  l1:()=>ps&&ps.hit,l1b:()=>ps&&ps.hit&&ps.mu<.05,
+  l2:()=>fl&&!fl.air&&fl.obj[0].down&&fl.obj[1].down&&Math.abs(fl.obj[0].t-fl.obj[1].t)<.05,l2b:()=>fl&&fl.g===1.62&&fl.obj[0].down,
+  l3:()=>ln&&ln.hits>0,l3b:()=>ln&&ln.streak>=3,l3c:()=>ln&&ln.predErr!=null&&ln.predErr<=.05,l3d:()=>ln&&ln.hitAir,
+  l4:()=>cr&&cr.stopped,l4b:()=>cr&&cr.stuckDone,
+  l5:()=>cn&&cn.orbited,l5b:()=>cn&&cn.escaped,
+  l6:()=>rk&&rk.apex>=1000,l6b:()=>rk&&rk.apex>=3000,l6c:()=>rk&&rk.bestStaged>0&&rk.bestSingle>0&&rk.bestStaged>rk.bestSingle
+},Object.fromEntries(Array.from({length:6},(_,i)=>[`tb${i+1}`,()=>Chalk.checkPassed(`ch${i+1}`)])))});
+
+</script>
+</body>
+</html>
