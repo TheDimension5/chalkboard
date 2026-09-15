@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>Hot Side, Cold Side</title>
+<meta name="description" content="Heat differences into electricity: heat flowing between blocks, boiling a pot, stoking a wood stove, pulling a temperature difference off anything from a campfire to your hand, the Carnot limit, matching the load, and building a whole heat-power system.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;700;900&display=swap">
+<style>
+:root{
+  --board:#1B2923;--board-2:#1F2F28;--board-3:#2A3B33;
+  --chalk:#F1ECDF;--chalk-dim:rgba(241,236,223,.66);--chalk-faint:rgba(241,236,223,.32);--chalk-line:rgba(241,236,223,.15);
+  --yellow:#F6D46B;--blue:#8CC4EE;--pink:#F596A8;--green:#9DDBA3;
+  --tray:#5C3D27;--tray-2:#3B2718;
+  --display:'Caveat','Segoe Print','Bradley Hand',cursive;
+  --body:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{margin:0;background:var(--board);color:var(--chalk);font-family:var(--body);font-size:1.0625rem;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background-color:var(--board);background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E"),radial-gradient(ellipse at 12% 0%,rgba(255,255,255,.05),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(255,255,255,.045),transparent 50%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.28));background-attachment:scroll,fixed,fixed,fixed;background-size:240px 240px,auto,auto,auto;background-repeat:repeat,no-repeat,no-repeat,no-repeat}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem);position:relative;z-index:1}
+.skip{position:absolute;left:-999px;top:0;background:var(--yellow);color:var(--board);padding:.5rem 1rem;z-index:10;font-weight:900}
+.skip:focus{left:1rem;top:1rem}
+
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:clamp(3.2rem,7.5vw,6rem)}
+h2{font-size:clamp(2.3rem,4.6vw,3.5rem)}
+h3{font-size:1.75rem}
+p{margin:0}
+a{color:var(--yellow)}
+.eyebrow{font-weight:900;font-size:.76rem;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem}
+.eyebrow.dim{color:var(--chalk-dim)}
+.lede{font-size:1.28rem;max-width:34ch;margin-top:1.1rem}
+.text{max-width:60ch}
+.text h2{margin-bottom:1rem}
+.text p+p{margin-top:.95em}
+.text em{font-style:normal;color:var(--yellow)}
+.text .when{font-family:var(--display);font-size:1.45rem;color:var(--chalk-dim);margin-top:-.4rem;margin-bottom:1rem}
+.chalkword{font-family:var(--display);font-size:1.25em;line-height:1;color:var(--yellow)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;padding:clamp(2.5rem,6vw,5rem) 0 clamp(2rem,5vw,4rem)}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.4rem;margin-top:1.8rem}
+.hint{font-family:var(--display);font-size:1.3rem;color:var(--chalk-dim)}
+.chapter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:start;padding:clamp(3rem,7vw,6rem) 0;border-top:1px solid var(--chalk-line);scroll-margin-top:.5rem}
+.chapter.wide{grid-template-columns:1fr}
+.chapter.wide .text{max-width:70ch}
+@media (max-width:860px){.hero,.chapter{grid-template-columns:1fr}}
+
+.panel{position:relative;border:2px solid var(--chalk-faint);border-radius:10px;background:rgba(0,0,0,.16);box-shadow:inset 0 0 70px rgba(0,0,0,.28);overflow:hidden}
+.panel canvas{display:block;width:100%;aspect-ratio:4/3;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.panel canvas.short{aspect-ratio:16/10}
+.panel .doodle{position:absolute;right:1.1rem;bottom:.6rem;font-family:var(--display);font-size:1.6rem;color:var(--chalk-faint);transform:rotate(-5deg);pointer-events:none}
+.lab{margin:0;display:flex;flex-direction:column;gap:.85rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem .9rem;align-items:center}
+.controls .sep{width:1px;height:1.6rem;background:var(--chalk-line)}
+.btn{font:900 .88rem/1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-dim);border-radius:999px;padding:.66rem 1.05rem;cursor:pointer;transition:background .15s,color .15s,transform .15s,border-color .15s}
+.btn:hover{background:var(--chalk);color:var(--board);border-color:var(--chalk)}
+.btn:active{transform:scale(.97)}
+.btn.is-on{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--board);font-size:1rem;padding:.85rem 1.5rem}
+.btn.primary:hover{background:var(--chalk);border-color:var(--chalk)}
+.btn.blue{border-color:var(--blue);color:var(--blue)}.btn.blue:hover,.btn.blue.is-on{background:var(--blue);color:var(--board)}
+.btn.pink{border-color:var(--pink);color:var(--pink)}.btn.pink:hover,.btn.pink.is-on{background:var(--pink);color:var(--board)}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.slider{display:flex;align-items:center;gap:.6rem;font-weight:900;font-size:.85rem;letter-spacing:.03em}
+.slider input{accent-color:var(--yellow);width:150px;margin:0}
+.slider .val{font-family:var(--display);font-size:1.25rem;font-weight:700;min-width:3.2ch;color:var(--yellow);font-variant-numeric:tabular-nums}
+figcaption{font-size:.95rem;color:var(--chalk-dim)}
+figcaption b{color:var(--chalk);font-weight:900}
+
+.grownups{margin-top:1.5rem;border-left:3px solid var(--chalk-faint);padding:.2rem 0 .2rem 1rem;font-size:.95rem;color:var(--chalk-dim)}
+.grownups summary{cursor:pointer;font-weight:900;color:var(--chalk);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:.55rem}
+.grownups summary::-webkit-details-marker{display:none}
+.grownups summary::before{content:"+";font-family:var(--display);font-size:1.5rem;line-height:1;color:var(--yellow)}
+.grownups[open] summary::before{content:"–"}
+.grownups p{margin-top:.6rem;max-width:62ch}
+
+.trail{position:fixed;left:1rem;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:.6rem;margin:0;padding:0;list-style:none}
+.trail a{display:block;width:11px;height:11px;border-radius:50%;border:2px solid var(--chalk-faint);position:relative;transition:background .2s,border-color .2s}
+.trail a.is-active{background:var(--yellow);border-color:var(--yellow)}
+.trail a span{position:absolute;left:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font:700 .8rem var(--body);color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .15s;background:var(--board-3);padding:.2rem .55rem;border-radius:4px}
+.trail a:hover span,.trail a:focus-visible span{opacity:1}
+@media (max-width:1320px){.trail{display:none}}
+
+.forces{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;position:relative;margin-top:1.5rem}
+.force{border:2px solid var(--chalk-faint);border-radius:12px;padding:1.1rem 1.1rem 1.2rem;background:var(--board-2);transition:transform .8s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:.45rem;position:relative}
+.force h3{font-size:1.9rem}
+.force p{font-size:.92rem;color:var(--chalk-dim)}
+.force .tag{font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.force .tag.later{color:var(--pink)}
+.force svg{width:60px;height:60px;display:block}
+.forces.united .force[data-f="em"]{transform:translateX(calc(100% + 1rem)) rotate(-4deg)}
+.forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+.forces.united .force[data-f="weak"]{transform:scale(1.03)}
+.forces.united .force[data-f="gravity"]{animation:wobble 1.3s ease-in-out 1}
+.united-label{position:absolute;left:0;right:0;bottom:-2.6rem;text-align:center;font-family:var(--display);font-size:1.7rem;color:var(--yellow);opacity:0;transition:opacity .5s .5s;pointer-events:none}
+.forces.united .united-label{opacity:1}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(2deg)}}
+@media (max-width:760px){
+  .forces{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forces.united .force[data-f="em"]{transform:translate(calc(-100% - 1rem),calc(100% + 1rem)) rotate(-4deg)}
+  .forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.force{transition:none}.forces.united .force[data-f="gravity"]{animation:none}}
+
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2.5rem;margin-top:2.5rem;align-items:start}
+.timeline{list-style:none;margin:.5rem 0 0;padding:0}
+.timeline li{display:grid;grid-template-columns:5.2rem 1fr;gap:1rem;align-items:baseline;padding:.5rem 0;border-bottom:1px dashed var(--chalk-line)}
+.timeline .year{font-family:var(--display);font-size:1.6rem;font-weight:700;color:var(--yellow);font-variant-numeric:tabular-nums}
+.timeline .what{font-size:.95rem}
+.timeline .what b{font-weight:900}
+
+.checks{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.85rem}
+.checks li{display:grid;grid-template-columns:2rem 1fr;gap:.8rem;align-items:start}
+.checks .box{width:1.55rem;height:1.55rem;border:2px solid var(--chalk-dim);border-radius:5px;display:grid;place-items:center;font-family:var(--display);font-size:1.5rem;line-height:1;margin-top:.1rem}
+.checks .box.ok{color:var(--green)}.checks .box.q{color:var(--yellow)}
+.checks small{display:block;color:var(--chalk-dim);font-size:.9rem}
+
+.note{border:2px dashed var(--chalk-faint);border-radius:12px;padding:1.2rem 1.3rem;margin-top:1.8rem;font-size:.97rem}
+.note h3{font-size:1.6rem;margin-bottom:.4rem}
+.note ul{margin:.4rem 0 0;padding-left:1.2rem}
+.note li+li{margin-top:.35rem}
+
+.closing{text-align:center;padding:clamp(3rem,7vw,6rem) 0 3rem;border-top:1px solid var(--chalk-line)}
+.closing p{max-width:52ch;margin:1rem auto 0;font-size:1.15rem}
+.closing .big{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.1;color:var(--yellow);max-width:20ch;margin-top:1.5rem}
+.tray{height:20px;background:linear-gradient(var(--tray),var(--tray-2));border-top:2px solid rgba(255,255,255,.14);position:relative;z-index:1}
+.tray::before,.tray::after{content:"";position:absolute;top:-8px;height:8px;width:54px;border-radius:3px;background:var(--chalk);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tray::before{left:12%}
+.tray::after{left:calc(12% + 70px);width:38px;background:var(--pink)}
+
+.levels{position:sticky;top:0;z-index:6;background:rgba(27,41,35,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--chalk-line)}
+.levels-in{display:flex;align-items:center;gap:1rem;padding-top:.5rem;padding-bottom:.5rem}
+.levels-label{font-family:var(--display);font-size:1.4rem;color:var(--chalk-dim);white-space:nowrap}
+.levels-btns{display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;padding:3px}
+.levels-btns::-webkit-scrollbar{display:none}
+.levels-btns button{font:900 .82rem/1.1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.4rem .9rem;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:.12rem;transition:background .15s,color .15s,border-color .15s}
+.levels-btns button small{font-weight:700;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.levels-btns button:hover{border-color:var(--chalk)}
+.levels-btns button[aria-selected="true"]{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+@media (max-width:560px){.levels-label{display:none}}
+.lv{display:none}
+html:not([data-level]) .lv-k5,html[data-level="k5"] .lv-k5,html[data-level="g8"] .lv-g8,html[data-level="hs"] .lv-hs,html[data-level="col"] .lv-col,html[data-level="max"] .lv-max{display:block}
+.eq{font-family:Georgia,'Times New Roman',serif;font-style:italic;white-space:nowrap;color:var(--yellow)}
+.text sub,.text sup{font-size:.72em;line-height:0}
+.chapter,.hero{scroll-margin-top:4.6rem}
+.note p+p{margin-top:0}
+[hidden]{display:none!important}
+
+.labs{display:grid;gap:2.4rem}
+.missions{list-style:none;margin:.1rem 0 0;padding:.7rem .95rem .8rem;border:2px dashed var(--chalk-faint);border-radius:10px;display:grid;gap:.45rem}
+.missions .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.missions li.m{display:grid;grid-template-columns:1.45rem 1fr;gap:.6rem;align-items:start;font-size:.95rem}
+.missions .box{width:1.35rem;height:1.35rem;border:2px solid var(--chalk-dim);border-radius:4px;display:grid;place-items:center;font-family:var(--display);font-size:1.3rem;line-height:1;color:transparent;margin-top:.05rem}
+.missions li.done .box{color:var(--green);border-color:var(--green)}
+.missions li.done span:last-child{color:var(--chalk-dim)}
+.missions li.just .box{animation:pop .7s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.7) rotate(-8deg)}100%{transform:scale(1)}}
+.mcount{margin-left:auto;font-family:var(--display);font-size:1.35rem;color:var(--yellow);white-space:nowrap}
+.btn.read{display:inline-flex;align-items:center;gap:.45rem;margin:.1rem 0 1rem;padding:.5rem .9rem;font-size:.8rem}
+.btn.read svg{width:16px;height:16px}
+.lv.reading{border-left:3px solid var(--yellow);padding-left:.9rem;margin-left:-1.1rem}
+.teach{margin-top:2.2rem;font-size:1rem}
+@media (prefers-reduced-motion:reduce){.missions li.just .box{animation:none}}
+.panel canvas.short{aspect-ratio:16/9}
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+.keys{display:flex;flex-wrap:wrap;gap:.3rem}
+.key{width:2.15rem;height:2.15rem;border:2px solid var(--chalk-faint);border-radius:6px;background:transparent;color:var(--chalk);font:900 .9rem var(--body);cursor:pointer}
+.key:hover{background:var(--chalk);color:var(--board)}
+.controls .lbl{font-weight:900;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+input[type=number]{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.4rem .5rem;font:700 .95rem var(--body)}
+.hero-art{padding:1.2rem}
+.hero-art svg{width:100%;height:auto;display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.4rem;margin-top:2.2rem}
+.card{display:flex;flex-direction:column;gap:.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.4rem 1.5rem;background:var(--board-2);text-decoration:none;color:var(--chalk);transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:var(--yellow)}
+.card svg{width:72px;height:72px;display:block}
+.card h2{font-size:2.2rem;color:var(--chalk)}
+.card .subj{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.card p{color:var(--chalk-dim);font-size:.98rem}
+.card .meta{margin-top:auto;font-family:var(--display);font-size:1.2rem;color:var(--chalk-dim)}
+.card .go{font-weight:900;font-size:.85rem;letter-spacing:.05em;color:var(--yellow)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.6rem;margin-top:3.5rem;padding-top:2.2rem;border-top:1px solid var(--chalk-line)}
+.how h3{font-size:1.7rem;margin-bottom:.3rem}
+.how p{color:var(--chalk-dim);font-size:.97rem}
+.next{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--chalk-faint);border-radius:12px;color:var(--chalk-dim);font-size:.97rem}
+.next b{color:var(--chalk)}
+.check{margin-top:.1rem;padding:.8rem 1rem .9rem;border:2px solid var(--chalk-faint);border-radius:10px;display:grid;gap:.5rem}
+.check .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.check .q{font-weight:700;margin-bottom:.5rem}
+.cf{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.cf input{width:7.5rem;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .6rem;font:700 1rem var(--body)}
+.cf select,.controls select{background:var(--board-2);color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .5rem;font:700 .9rem var(--body)}
+.fb{margin:0;font-size:.95rem;min-height:1.2em}
+.fb.ok{color:var(--green)}.fb.bad{color:var(--pink)}
+.warmup{margin:0 0 1.1rem;padding:.6rem .9rem;border-left:3px solid var(--blue);font-size:.98rem}
+.warmup b{color:var(--blue);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.15rem}
+.lesson-end{display:grid;gap:.6rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--green);border-radius:10px}
+.lesson-end p{margin:0}
+.lesson-end .skill b{color:var(--green)}
+.lesson-end .exit b{color:var(--yellow);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.1rem}
+.discuss summary{cursor:pointer;font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);list-style:none}
+.discuss summary::-webkit-details-marker{display:none}
+.discuss summary::before{content:"+ ";color:var(--yellow)}
+.discuss[open] summary::before{content:"– "}
+.discuss ol{margin:.5rem 0 0;padding-left:1.3rem;display:grid;gap:.35rem;font-size:.95rem}
+.discuss ol.lv{display:none}
+html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5,html[data-level="g8"] .discuss ol.lv-g8,html[data-level="hs"] .discuss ol.lv-hs,html[data-level="col"] .discuss ol.lv-col,html[data-level="max"] .discuss ol.lv-max{display:grid}
+.links{font-size:.9rem;color:var(--chalk-dim)}
+.links a{color:var(--yellow)}
+.unitbadge{display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.18rem .6rem;margin:0 .35rem .3rem 0}
+.cf.choice{flex-direction:column;align-items:flex-start;gap:.35rem}
+.cf label.opt{display:flex;gap:.55rem;align-items:center;font-weight:700;font-size:.95rem;cursor:pointer}
+.cf input[type=radio]{accent-color:var(--yellow);width:1.1rem;height:1.1rem;margin:0}
+.grade{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-top:1.3rem}
+.grade .lbl,.mapbar .lbl{font-weight:900;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-right:.3rem}
+.grade .hint{font-size:1.05rem}
+.mapwrap{margin-top:1.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1rem 1rem .6rem;background:var(--board-2)}
+.mapbar{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-bottom:.6rem}
+.mapbar .hint{font-family:var(--body);font-size:.88rem;color:var(--chalk-dim)}
+.map{position:relative}
+.map canvas{display:block;width:100%;height:auto;cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--board);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .75rem;font-size:.85rem;max-width:300px;display:none;z-index:2;color:var(--chalk)}
+.tip b{display:block;font-family:var(--display);font-size:1.25rem;color:var(--yellow);line-height:1.1}
+.tip small{color:var(--chalk-dim)}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.4rem}
+.unit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.2rem}
+.unit h3{font-size:1.8rem}
+.unit p{color:var(--chalk-dim);font-size:.95rem;margin:.3rem 0 .7rem}
+.unit ol{margin:0;padding-left:1.3rem;display:grid;gap:.3rem;font-size:.95rem}
+.unit ol a{color:var(--chalk);text-decoration:none;border-bottom:1px dotted var(--chalk-faint)}
+.unit ol a:hover{color:var(--yellow)}
+.unit ol small{color:var(--chalk-dim);display:block}
+.qsearch{margin-top:2.8rem}
+.qsearch input{width:100%;max-width:520px;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:999px;padding:.6rem 1rem;font:700 1rem var(--body);margin-top:.6rem}
+.qlist{list-style:none;padding:0;margin:.9rem 0 0;display:grid;gap:.35rem;max-height:18rem;overflow:auto}
+.qlist a{color:var(--chalk);text-decoration:none}
+.qlist a:hover{color:var(--yellow)}
+.qlist small{color:var(--chalk-dim);margin-left:.45rem}
+
+.links.std{font-size:.82rem}.links.std b{color:var(--chalk-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.68rem;margin-right:.3rem}
+.baselist{list-style:none;margin:1.2rem 0 0;padding:0;display:grid;gap:.4rem}
+.baselist li{display:grid;grid-template-columns:4.2rem 1fr;gap:.2rem .8rem;align-items:baseline;padding:.55rem .2rem;border-bottom:1px dashed var(--chalk-line)}
+.baselist .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.2rem .5rem;text-align:center;color:var(--board);background:var(--chalk-dim)}
+.baselist li.built .pill{background:var(--green)}
+.baselist a,.baselist b{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--chalk);text-decoration:none}
+.baselist a{color:var(--yellow)}
+.baselist .what{grid-column:2;color:var(--chalk-dim);font-size:.92rem}
+.baselist .ngss{grid-column:2;font-size:.78rem;color:var(--chalk-dim);letter-spacing:.04em}
+@media (min-width:700px){.baselist li{grid-template-columns:4.2rem 14rem 1fr 14rem}.baselist .what,.baselist .ngss{grid-column:auto}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#ch1">Skip to the story</a>
+<ul class="trail" aria-label="Chapters"><li><a href="#top" data-for="top"><span>Start</span></a></li><li><a href="#ch1" data-for="ch1"><span>1 · Heat flows downhill</span></a></li><li><a href="#ch2" data-for="ch2"><span>2 · Boiling water</span></a></li><li><a href="#ch3" data-for="ch3"><span>3 · The wood fire</span></a></li><li><a href="#ch4" data-for="ch4"><span>4 · Hot side, cold side</span></a></li><li><a href="#ch5" data-for="ch5"><span>5 · Why only five percent</span></a></li><li><a href="#ch6" data-for="ch6"><span>6 · Match the load</span></a></li><li><a href="#ch7" data-for="ch7"><span>7 · Build a heat-power system</span></a></li></ul>
+<nav class="levels" aria-label="Reading level">
+  <div class="wrap levels-in">
+    <a class="home" href="https://thedimension5.github.io/chalkboard/">The Chalkboard</a>
+    <span class="levels-label">Who's reading?</span>
+    <div class="levels-btns" role="tablist">
+      <button role="tab" data-level="k5" aria-selected="true">Kids<small>K to 5th</small></button>
+      <button role="tab" data-level="g8" aria-selected="false">8th grade<small>middle school</small></button>
+      <button role="tab" data-level="hs" aria-selected="false">High school<small>physics class</small></button>
+      <button role="tab" data-level="col" aria-selected="false">College<small>major</small></button>
+      <button role="tab" data-level="max" aria-selected="false">Max<small>no limits</small></button>
+    </div>
+    <span class="mcount" id="mcount"></span>
+  </div>
+</nav>
+<div class="wrap" id="top">
+<header class="hero">
+  <div class="text">
+    <p class="eyebrow">Thermoelectric power, K to 12</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <h1>Hot Side, Cold Side</h1>
+    <div class="lv lv-k5"><p class="lede">A fire is warm. A snowbank is cold. Put something between them that likes a difference, and you get electricity, with no moving parts at all. This board is about that trick: where heat goes, what it takes to boil a pot, how to keep a fire just right, and how to squeeze watts out of a hot side and a cold side.</p></div><div class="lv lv-g8"><p class="lede">Heat always flows from hot to cold. A thermoelectric module is a slab that turns some of that flow into electricity while it passes through, which is why a wood stove, a camp fire, a pot of water, or even your hand can power something. Seven games: from heat flowing between two blocks to a full system that charges a phone from a stove and warms your water with the leftover.</p></div><div class="lv lv-hs"><p class="lede">Conduction, specific and latent heat, combustion power, the Seebeck effect, the Carnot limit and the thermoelectric figure of merit ZT, maximum power transfer, and a system design that budgets watts, temperatures and time. Every game is scored by the real equations, and every number comes with its unit.</p></div><div class="lv lv-col"><p class="lede">Thermal resistance networks from source to sink, energy balances on stoves and pots, the coupled Seebeck–Fourier description of a module, efficiency as Carnot times a ZT-dependent factor, impedance matching to a load and to a boost converter, and combined heat and power as a design problem rather than a gadget.</p></div><div class="lv lv-max"><p class="lede">Thermoelectrics as coupled transport: Onsager symmetry between the Seebeck and Peltier coefficients, ZT as the single dimensionless number that bounds efficiency, why ZT ≈ 1 has been the wall for seventy years, and what the phonon-glass electron-crystal idea does about it. Plus the engineering that decides real output: interface resistance, sink design, and cold-side runaway.</p></div>
+    <div class="hero-cta"><a class="btn primary" href="#ch1">Start the story</a></div>
+  </div>
+  <div class="panel hero-art"><svg viewBox="0 0 400 300" fill="none" stroke="#F1ECDF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="110" y="150" width="180" height="60" rx="8" fill="#F596A8" fill-opacity=".35"/><rect x="110" y="128" width="180" height="22" rx="4" fill="#F6D46B"/><rect x="110" y="68" width="180" height="60" rx="8" fill="#8CC4EE" fill-opacity=".35"/><path d="M150 236c-14-20 10-28 4-46 18 8 22 30 10 46M200 240c-16-22 12-30 6-50 20 10 24 34 10 50M250 236c-14-20 10-28 4-46 18 8 22 30 10 46" fill="#F6D46B" stroke="#F596A8"/><path d="M120 50h160M120 40h160" stroke="#8CC4EE" opacity=".7"/><text x="200" y="98" text-anchor="middle" font-family="Caveat,cursive" font-size="26" fill="#F1ECDF" stroke="none">cold side</text><text x="200" y="186" text-anchor="middle" font-family="Caveat,cursive" font-size="26" fill="#F1ECDF" stroke="none">hot side</text><path d="M300 139h60" stroke="#F6D46B"/><text x="365" y="146" font-family="Caveat,cursive" font-size="30" fill="#F6D46B" stroke="none">W</text><text x="200" y="285" text-anchor="middle" font-family="Caveat,cursive" font-size="28" fill="#F6D46B" stroke="none">P ∝ ΔT²</text></svg></div>
+</header>
+<main>
+<section class="chapter" id="ch1">
+  <div class="text">
+    <p class="eyebrow">Chapter 1</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Touch a warm cup. Which way is the heat going, and when does it stop?</p>
+    <div class="lv lv-k5"><h2>Heat flows downhill</h2><p>Touch a hot cup and your hand warms up. Heat moves from the hot thing to the cold thing, always, until they match. Hot and cold together is what a difference looks like, and a difference never lasts on its own.</p><p>Join a hot block and a cold block with a bar and watch them meet in the middle. Then keep one side hot and the other cold and watch the difference stay.</p></div>
+    <div class="lv lv-g8"><h2>Heat moves from hot to cold</h2><p>Heat is energy on the move, and it moves one way: from the hotter thing to the colder one. How fast depends on the difference, the material (copper carries heat fast, wood barely at all), and the shape of the path. A thick, short copper bar moves heat quickly; a thin, long wooden one hardly moves it.</p><p>Left alone, the two blocks end up at the same temperature and the flow stops. To keep heat flowing you must keep the hot side hot and the cold side cold, which is the whole job of a stove on one side and water or fins on the other.</p></div>
+    <div class="lv lv-hs"><h2>Conduction</h2><p>Fourier's law: the rate of heat flow through a bar is Q̇ = kA(T_hot − T_cold)/L, with k the thermal conductivity (copper 400, steel 50, wood 0.15 W/m·K), A the cross-section and L the length. Each block changes temperature at a rate dT/dt = ±Q̇/(mc), where c is its specific heat.</p><p>Without a source and a sink the difference decays exponentially. The time constant is the product of the bar's thermal resistance and the blocks' heat capacity, the same form as an RC circuit.</p></div>
+    <div class="lv lv-col"><h2>Thermal resistance networks</h2><p>Everything on this board is a series of thermal resistances, R = L/(kA) in K/W, between a source and a sink. A temperature difference divides across them like voltage across resistors in series, and the heat flow is the current. A thermoelectric module is one resistor in that chain, and it only sees the share of the difference that falls across it.</p><p>Contact resistance at every interface is usually the largest term and the least advertised: a dry, rough joint can cost more difference than the module itself.</p></div>
+    <div class="lv lv-max"><h2>The heat equation and its limits</h2><p>Fourier's law is the linear-response, local-equilibrium limit of transport; it fails at nanoscale (ballistic phonons, Kapitza resistance at interfaces) and at very short times (hyperbolic corrections). For a stove and a slab it is exact enough, and the lumped model here is its one-node discretisation.</p><p>Entropy production in conduction is Q̇(1/T_c − 1/T_h): the difference is being spent whether or not anything useful is extracted. A thermoelectric module intercepts part of that spending, which is the second-law view of chapter 4.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The one-sentence version: heat is a difference being spent. Everything on the board is about making that difference and keeping it.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-flow" aria-label="A hot block and a cold block joined by a bar. Heat flows until they match, unless a source and a sink keep them apart."></canvas></div>
+    <div class="controls"><span class="lbl">Bar</span><button class="btn is-on" data-mat="400">copper</button><button class="btn" data-mat="50">steel</button><button class="btn" data-mat="0.15">wood</button><button class="btn" id="fw-src" aria-pressed="false">Heater under hot block: off</button><button class="btn" id="fw-sink" aria-pressed="false">Water on cold block: off</button><button class="btn" id="fw-reset">Reset blocks</button></div>
+    <figcaption><b>Try this:</b> watch the two temperatures meet. Then switch on the heater and the water and watch the difference hold.</figcaption>
+    <ul class="missions" data-ch="ch1"></ul>
+    <div class="check" data-ch="ch1"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">One block is 100 °C and the other 20 °C. When they finish sharing, roughly what temperature are they both?</p><form class="cf" data-a="60" data-u="°C" data-tol="0.05" data-hint="Halfway between." data-ok="Right. About 60 °C, and the flow stops."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Hot block 100 °C, cold block 20 °C. What is the temperature difference?</p><form class="cf" data-a="80" data-u="K" data-tol="0.02" data-hint="Subtract. A difference is measured in kelvin (or degrees)." data-ok="Right. 80 K of difference, and that is what drives the flow."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">A copper bar, k = 400 W/m·K, A = 0.0004 m², L = 0.1 m, with 80 K across it. Heat flow?</p><form class="cf" data-a="128" data-u="W" data-tol="0.03" data-hint="Q̇ = kAΔT/L." data-ok="Right. 400 × 0.0004 × 80 ÷ 0.1 = 128 W."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Thermal resistance of that bar, L/(kA)?</p><form class="cf" data-a="0.625" data-u="n" data-tol="0.03" data-hint="0.1 ÷ (400 × 0.0004). Enter the number only." data-ok="Right. 0.625 K per watt."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Entropy production rate for 100 W flowing from 400 K to 300 K, in W/K? Enter the number.</p><form class="cf" data-a="0.083" data-u="n" data-tol="0.05" data-hint="Q̇(1/T_c − 1/T_h)." data-ok="Right. About 0.083 W/K, spent whether or not you harvest any of it."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> say which way heat flows, how fast, and what it takes to keep a difference.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does the flow stop when the blocks match?</li><li>Which bar moves heat fastest, and why does the material matter?</li><li>What are the heater and the water each doing for the difference?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: why does a difference never last on its own?</p>
+      
+      <p class="links"><span class="unitbadge">Fire into watts · step 2</span></p>
+      <p class="links std"><b>Standards</b> K-PS3-1, 4-PS3-2, MS-PS3-4, HS-PS3-4</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch2">
+  <div class="text">
+    <p class="eyebrow">Chapter 2</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Why does a big pot take longer to boil than a small one?</p>
+    <div class="lv lv-k5"><h2>Boiling water</h2><p>To make water hot you have to give it energy, and a lot of it. Warming a litre of water by one degree takes about as much energy as lifting a bag of sugar up to the roof of a house. Boiling it takes a hundred of those. Turning it into steam takes five hundred more.</p><p>Put a pot on the fire and watch the numbers. A bigger fire boils it faster. More water takes longer.</p></div>
+    <div class="lv lv-g8"><h2>Specific heat and boiling</h2><p>Every kilogram of water needs 4,186 joules to warm by one degree. Warming 1 kg from 20 °C to 100 °C takes 80 × 4,186 ≈ 335,000 J. A 500 W fire delivers 500 J every second, so that is about 670 seconds, eleven minutes, if every joule reaches the water.</p><p>Then it boils, and the temperature stops rising. All the fire's energy now goes into turning water into steam, 2,260,000 J per kilogram, which is why a pot boils dry slowly and why steam burns are so bad.</p></div>
+    <div class="lv lv-hs"><h2>Q = mcΔT, then latent heat</h2><p>Sensible heating: Q = m c ΔT with c = 4,186 J/(kg·K). Boiling: Q = m L with L = 2.26 MJ/kg. Time at power P is t = Q/P, and a real fire under a real pot delivers only 20 to 40% of its heat to the water; the rest warms the air.</p><p>Predict before you boil: 1 L from 20 °C at 800 W of delivered power is 335 kJ ÷ 800 W = 419 s, seven minutes. Then check your error.</p></div>
+    <div class="lv lv-col"><h2>Energy balance on a pot</h2><p>The pot is a control volume: P_in − losses = mc dT/dt below boiling and P_in − losses = L dm/dt at the boil. Losses grow with temperature (convection and radiation from the pot and the free surface), so the last ten degrees take longer than the first ten. A lid cuts evaporative loss, which dominates near the boil.</p><p>Efficiency of heat transfer from flame to water is the ratio of the water's energy gain to the fuel's energy release; for an open fire it is often below 10%, for a good stove 30%, for a kettle element over 90%.</p></div>
+    <div class="lv lv-max"><h2>Phase change as a heat sink</h2><p>At the boil the water is an isothermal reservoir: it absorbs energy at 100 °C without changing temperature, which is exactly what a thermoelectric cold side wants. Boiling-water cooling of the cold face is one of the oldest camp-stove generator designs, and a thermosiphon with a phase-change loop needs no pump.</p><p>The latent heat of vaporisation falls to zero at the critical point (374 °C, 22 MPa); near it, small heat inputs produce large volume changes, the operating regime of supercritical steam plants.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Time a real kettle with a stopwatch and a measuring jug; the lab's numbers should be within a minute of it.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-boil" aria-label="A pot of water on a fire. Sliders set fire power and water amount; the temperature climbs and then boils."></canvas></div>
+    <div class="controls"><button class="btn primary" id="bl-go">Light the fire</button><label class="slider">Heat into the pot <input type="range" id="bl-p" min="100" max="3000" step="100" value="800"><span class="val" id="bl-p-val">800 W</span></label><label class="slider">Water <input type="range" id="bl-m" min="0.25" max="3" step="0.25" value="1"><span class="val" id="bl-m-val">1 L</span></label><label class="slider" data-lv="hs col max">I predict <input type="number" id="bl-pred" step="1" min="0" placeholder="s" style="width:5rem"> s to boil</label></div>
+    <figcaption><b>Try this:</b> boil a litre. Double the fire and see what happens to the time. <span data-lv="hs col max">Predict the seconds to the boil first; the lab scores you.</span></figcaption>
+    <ul class="missions" data-ch="ch2"></ul>
+    <div class="check" data-ch="ch2"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">A fire gives the pot 500 joules every second. In 10 seconds, how many joules?</p><form class="cf" data-a="5000" data-u="J" data-tol="0.02" data-hint="Rate × time." data-ok="Right. 5,000 J."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Warm 1 kg of water from 20 °C to 100 °C: 80 × 4,186 joules. How many kilojoules?</p><form class="cf" data-a="335" data-u="kJ" data-tol="0.03" data-hint="Multiply, then divide by 1,000." data-ok="Right. About 335 kJ."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">335 kJ delivered at 800 W. How many seconds?</p><form class="cf" data-a="419" data-u="s" data-tol="0.03" data-hint="t = Q/P." data-ok="Right. About 419 s, seven minutes."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Boil away 0.5 kg of water at 100 °C (L = 2.26 MJ/kg). Energy?</p><form class="cf" data-a="1.13" data-u="MJ" data-tol="0.03" data-hint="Q = mL." data-ok="Right. 1.13 MJ, three times what it took to heat it."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">A 1,500 W element with 92% transfer heats 1.5 L from 15 °C to 100 °C. Minutes?</p><form class="cf" data-a="6.4" data-u="min" data-tol="0.05" data-hint="Q = 1.5 × 4,186 × 85; t = Q/(0.92 × 1,500)." data-ok="Right. About 6.4 minutes."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> work out the energy and time to heat and boil water.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Where does the fire's energy go once the water is boiling?</li><li>Why does doubling the fire not exactly halve the time?</li><li>Why are steam burns worse than boiling-water burns?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Write the energy to warm 1 kg of water by 1 degree, with its unit.</p>
+      <p class="links">Before this: <a href="https://thedimension5.github.io/chalkboard/electricity/#ch1">Electricity From Zero 1, Watts and watt-hours</a></p>
+      <p class="links"><span class="unitbadge">Fire into watts · step 3</span></p>
+      <p class="links std"><b>Standards</b> 4-PS3-2, MS-PS3-4, HS-PS3-1</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch3">
+  <div class="text">
+    <p class="eyebrow">Chapter 3</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>What is a log made of, and where did its energy come from?</p>
+    <div class="lv lv-k5"><h2>The wood fire</h2><p>A log is stored sunshine. Burn it and the energy comes out as heat: a lot of heat, more than a thousand light bulbs' worth from one log while it burns. The trick with a stove is not making it hot but keeping it <em>just right</em>: hot enough to be useful, not so hot that things break.</p><p>Feed the stove. Keep the top in the green zone. Too many logs and it runs away.</p></div>
+    <div class="lv lv-g8"><h2>Fuel energy and burn rate</h2><p>Dry wood holds about 16 million joules per kilogram. Burn a kilogram in an hour and the fire is running at 16,000,000 ÷ 3,600 ≈ 4,400 W of heat. A hot camp fire can burn ten times that. A thermoelectric module on top can only use a tiny part of it, and it must not get above about 170 °C or it is damaged.</p><p>So a stove for making electricity is throttled: enough fire to hold the surface in a band, with the rest of the heat going into the room or into water.</p></div>
+    <div class="lv lv-hs"><h2>A stove as a thermal system</h2><p>Heat release P_fire = ṁ_fuel × H, with H ≈ 16 MJ/kg for dry wood. The stove's surface temperature settles where heat in equals heat out: losses to the room, to the flue, and into whatever sits on top. The lab models the stove as one thermal mass with a loss rate proportional to (T − T_room).</p><p>Hold the top between 150 and 170 °C, the sweet spot for a bismuth-telluride module. Overshoot and the module's solder and semiconductor degrade; undershoot and the output falls with the square of the difference.</p></div>
+    <div class="lv lv-col"><h2>Combustion and control</h2><p>Wood burns in stages: drying, pyrolysis (volatiles), char oxidation. Real heating value depends on moisture: 20% moisture wood delivers about 20% less than dry, since water must be boiled off first. Excess air, flue temperature and draft set how much of the release reaches the stove body rather than the chimney.</p><p>Holding a temperature band with a fuel that arrives in lumps is a control problem with delay; the lab's stove has a time constant of minutes, so stoking is a matter of anticipation, not reaction.</p></div>
+    <div class="lv lv-max"><h2>Exergy of a fire</h2><p>A flame at 900 °C carries high-exergy heat; spending it to hold a 170 °C plate is a large irreversibility before any electricity is made. Combined heat and power is a rational answer: take the small electric share at the top of the temperature ladder and use the large remainder for space or water heating that would have been needed anyway.</p><p>That is the design logic of the commercial kits this board is built around: a controlled hot side, a water-cooled cold side, and the water going on to a heating loop.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>If you have a wood stove, an infrared thermometer on the top plate makes this chapter real. 150 to 170 °C is the band.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-stove" aria-label="A wood stove with a temperature gauge on its top plate. Add logs to hold the plate in the green band without overshooting."></canvas></div>
+    <div class="controls"><button class="btn primary" id="st-log">Add a log</button><label class="slider">Air (burn rate) <input type="range" id="st-air" min="0.2" max="1.5" step="0.1" value="0.6"><span class="val" id="st-air-val">0.6 kg/h</span></label><button class="btn" id="st-reset">Cold stove</button></div>
+    <figcaption><b>Try this:</b> hold the top plate between 150 and 170 °C for half a minute. Then find out what too many logs does.</figcaption>
+    <ul class="missions" data-ch="ch3"></ul>
+    <div class="check" data-ch="ch3"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">One log makes 16 million joules. Two logs?</p><form class="cf" data-a="32" data-u="MJ" data-tol="0.02" data-hint="Double it." data-ok="Right. 32 MJ."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Burn 1 kg of wood (16 MJ) in one hour. Average heat power?</p><form class="cf" data-a="4444" data-u="W" data-tol="0.03" data-hint="16,000,000 ÷ 3,600." data-ok="Right. About 4,400 W."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">A stove burns 0.5 kg/h of wood at 16 MJ/kg. Heat release in kW?</p><form class="cf" data-a="2.22" data-u="kW" data-tol="0.03" data-hint="ṁ × H, then per second." data-ok="Right. About 2.2 kW."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Wood at 20% moisture, 16 MJ/kg dry basis. Roughly how much less energy per kg of wet wood, as a percent?</p><form class="cf" data-a="20" data-u="%" data-tol="0.15" data-hint="The water is dead weight plus a boiling cost." data-ok="Right. About 20% less, a bit more once you count boiling the water off."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Flame at 900 °C (1,173 K), room at 300 K. Carnot fraction of that heat that could ever become work?</p><form class="cf" data-a="74" data-u="%" data-tol="0.03" data-hint="1 − 300/1,173." data-ok="Right. About 74%, almost all of it thrown away when you only need a 170 °C plate."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> relate burn rate to heat power and hold a stove in a temperature band.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does the plate keep rising after you stop adding logs?</li><li>What happens to a module above 170 °C?</li><li>Where does the rest of the fire's heat go?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: why is a stove for electricity throttled rather than roaring?</p>
+      
+      <p class="links"><span class="unitbadge">Fire into watts · step 4</span></p>
+      <p class="links std"><b>Standards</b> MS-PS1-6, MS-PS3-3, HS-PS1-4</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch4">
+  <div class="text">
+    <p class="eyebrow">Chapter 4</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Could you get electricity out of a cup of coffee? Out of your hand?</p>
+    <div class="lv lv-k5"><h2>Hot side, cold side</h2><p>A thermoelectric module is a flat square. Make one face hot and the other cold and it makes electricity. Bigger difference, more electricity. No difference, nothing at all.</p><p>Put it on a stove, a camp fire, a cup of coffee, a sunny rock, or your own hand. Cool the other side with air, a fan, water, or ice. Find the biggest difference you can.</p></div>
+    <div class="lv lv-g8"><h2>The Seebeck effect</h2><p>Inside the module are dozens of tiny pairs of two different materials. When one end of a pair is hotter than the other, electrons drift toward the cold end and a voltage appears. Stack a hundred pairs in a row and you get a few volts from a difference of a hundred degrees. This is the Seebeck effect, found in 1821.</p><p>The difference across the module is never the difference between the source and the sink. The hot side has to get heat in and the cold side has to get heat out, and every joint costs some degrees. A good water-cooled cold side is worth more than a hotter fire.</p></div>
+    <div class="lv lv-hs"><h2>V = S·ΔT and P ∝ ΔT²</h2><p>Open-circuit voltage V = S ΔT, where S for a typical 40 mm module is about 0.04 V per degree. Into a matched load the power is P = V²/(4r) with r the internal resistance, about 2.5 Ω, so P ≈ 1.6 × 10⁻⁴ ΔT² W: 1.6 W at 100 °C of difference, 3.6 W at 150 °C. Power goes with the square of the difference.</p><p>The lab computes the module's share of the source-to-sink difference through a chain of thermal resistances, hot-side coupling, module, cold-side sink, so you can see why a fan or a water block changes the watts more than a hotter fire.</p></div>
+    <div class="lv lv-col"><h2>The thermal circuit of a module</h2><p>ΔT_module = (T_source − T_sink) × R_m/(R_h + R_m + R_c), with R_m ≈ 1.5 K/W for a 40 mm Bi₂Te₃ module, R_h from 0.2 K/W (a clamped stove plate) to 10 K/W (a hand), and R_c from 0.05 K/W (ice bath) to 2 K/W (fins in still air). The heat through the module is that difference over R_m, and the electrical output is a few percent of it.</p><p>Everything scales together: a source that is hotter than the module's limit needs a spacer, which adds R_h; a sink that warms up loses its difference. The lab enforces the 170 °C hot-face limit that manufacturers quote for this class of module.</p></div>
+    <div class="lv lv-max"><h2>Coupled transport</h2><p>The module obeys Q̇_h = S T_h I − ½I²r + K ΔT and Q̇_c = S T_c I + ½I²r + K ΔT: Peltier heat carried by the current, Joule heating split both ways, and Fourier conduction K ΔT that does no work. The Onsager relation ties the Peltier coefficient to the Seebeck coefficient, Π = S T, so the same material property governs both directions.</p><p>Interface resistances (electrical and thermal contact) and the temperature dependence of S, ρ and κ set real output below the textbook curve; the 0.04 V/K and 2.5 Ω used here are typical measured module values, not material constants.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>A single module on a candle can light an LED. The hand as a heat source gives about a tenth of a watt with a good sink, which is enough for a watch.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-teg" aria-label="A thermoelectric module between a chosen heat source and a chosen cold sink, with the temperature difference and watts shown."></canvas></div>
+    <div class="controls"><span class="lbl">Hot side</span><select id="tg-src"><option value="stove">stove top 170 °C</option><option value="fire">camp fire 400 °C</option><option value="exhaust">exhaust pipe 220 °C</option><option value="coffee">cup of coffee 70 °C</option><option value="rock">sun-warmed rock 45 °C</option><option value="hand">your hand 33 °C</option><option value="candle">candle 250 °C, tiny</option></select><span class="lbl">Cold side</span><select id="tg-sink"><option value="air">bare in still air</option><option value="fins">fins in still air</option><option value="fan">fins and a fan</option><option value="water" selected>water block, pumped</option><option value="ice">ice water</option></select><button class="btn" id="tg-spacer" data-lv="g8 hs col max" aria-pressed="false">Spacer: off</button></div>
+    <figcaption><b>Try this:</b> try every hot side with every cold side. Find the biggest watts. <span data-lv="g8 hs col max">The camp fire is too hot for the module: add the spacer and watch what it costs.</span></figcaption>
+    <ul class="missions" data-ch="ch4"></ul>
+    <div class="check" data-ch="ch4"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">The hot side is 150 °C and the cold side is 50 °C. What is the difference?</p><form class="cf" data-a="100" data-u="K" data-tol="0.02" data-hint="Subtract." data-ok="Right. 100 degrees of difference."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A module makes 0.04 V for every degree of difference. At 100 degrees, volts?</p><form class="cf" data-a="4" data-u="V" data-tol="0.02" data-hint="0.04 × 100." data-ok="Right. 4 V, open circuit."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">P = 1.6 × 10⁻⁴ × ΔT². Power at ΔT = 150 K?</p><form class="cf" data-a="3.6" data-u="W" data-tol="0.03" data-hint="150² = 22,500." data-ok="Right. 3.6 W into a matched load."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Source 170 °C, sink 20 °C, R_h = 0.2, R_m = 1.5, R_c = 0.3 K/W. ΔT across the module?</p><form class="cf" data-a="112.5" data-u="K" data-tol="0.03" data-hint="150 × 1.5 ÷ 2.0." data-ok="Right. 112.5 K: the couplings ate a quarter of the difference."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Same chain but a passive sink, R_c = 2.0 K/W. ΔT across the module?</p><form class="cf" data-a="60.8" data-u="K" data-tol="0.03" data-hint="150 × 1.5 ÷ 3.7." data-ok="Right. About 61 K, and power falls by a factor of 3.4."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> predict a module's watts from its hot side, cold side, and the couplings between.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why is the difference across the module smaller than source minus sink?</li><li>Why does the camp fire need a spacer?</li><li>What did your hand produce, and what could that run?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Which changed the watts more: a hotter fire or a better cold side?</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/electricity/#ch6">Electricity From Zero 6, Kirchhoff</a></p>
+      <p class="links"><span class="unitbadge">Fire into watts · step 5</span></p>
+      <p class="links std"><b>Standards</b> 4-PS3-4, MS-PS3-3, HS-PS3-3</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch5">
+  <div class="text">
+    <p class="eyebrow">Chapter 5</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>If a fire makes 100 W of heat, why can't a machine turn all 100 W into electricity?</p>
+    <div class="lv lv-k5"><h2>Why only five percent</h2><p>A fire makes a great deal of heat, but a module turns only a tiny slice of it into electricity, about one part in twenty. The rest goes straight through as heat. That is not a mistake in the module. It is a rule about heat itself: you can only ever turn part of it into work, and the part depends on how big the difference is.</p><p>The good news: heat that goes through is still heat. Use it to warm water and nothing is wasted.</p></div>
+    <div class="lv lv-g8"><h2>The Carnot limit</h2><p>No machine can turn heat into work at better than a certain fraction, and the fraction depends only on the temperatures: 1 − T_cold/T_hot with both measured from absolute zero (add 273 to degrees Celsius). For a 170 °C hot side and a 0 °C cold side that limit is 1 − 273/443 = 38%. A thermoelectric module gets about a fifth of that, around 5 to 7%.</p><p>Why so far below the limit? Because the same material has to carry electricity well and heat badly, and almost nothing does both. That trade-off has a number, called ZT, and for the best everyday materials it is about 1.</p></div>
+    <div class="lv lv-hs"><h2>Carnot times a ZT factor</h2><p>Carnot: η_C = 1 − T_c/T_h. A thermoelectric generator at its best reaches η = η_C · (√(1+ZT) − 1)/(√(1+ZT) + T_c/T_h), where ZT = S²T/(ρκ) is the figure of merit. With ZT = 1, T_h = 443 K and T_c = 273 K: η_C = 0.38, the factor is 0.20, so η ≈ 7.8% ideal, and real modules land near 5%.</p><p>Move the sliders: a hotter hot side helps, a colder cold side helps more per degree, and ZT is the only lever that changes the factor.</p></div>
+    <div class="lv lv-col"><h2>The figure of merit</h2><p>ZT = S²σT/κ bundles the three properties in tension: high Seebeck coefficient, high electrical conductivity, low thermal conductivity. Metals have high σ but tiny S; insulators the reverse; heavily doped semiconductors sit at the optimum. Bi₂Te₃ alloys reach ZT ≈ 1 near room temperature; skutterudites, half-Heuslers and PbTe-based alloys reach 1 to 1.5 at higher temperatures.</p><p>Combined heat and power changes the accounting: the exergy efficiency of electricity plus useful hot water can exceed 80% even though the electric share is 5%.</p></div>
+    <div class="lv lv-max"><h2>Seventy years at ZT ≈ 1</h2><p>Ioffe's 1950s analysis set the framework; the wall has held because S, σ and κ_electronic are linked by the Wiedemann–Franz law and the Mott relation. Progress comes from cutting lattice thermal conductivity without hurting electrons: the phonon-glass electron-crystal idea (Slack), nanostructuring, hierarchical scattering, and band convergence, giving reported ZT of 2 to 2.5 in SnSe and PbTe systems at high temperature.</p><p>Module ZT lags material ZT because of contacts and the temperature spread across the legs; segmented legs and cascaded stages recover some of the difference at a cost in complexity.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Kids accept the 5% readily; the surprising part is that it is a law, not a flaw. Carnot is the first equation most people meet that is a limit rather than a recipe.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-carnot" aria-label="Sliders for hot and cold temperature and ZT, with the Carnot limit and the thermoelectric efficiency drawn as a bar of heat in, electricity out, heat through."></canvas></div>
+    <div class="controls"><label class="slider">Hot side <input type="range" id="cn-th" min="40" max="600" step="5" value="170"><span class="val" id="cn-th-val">170 °C</span></label><label class="slider">Cold side <input type="range" id="cn-tc" min="-20" max="100" step="5" value="0"><span class="val" id="cn-tc-val">0 °C</span></label><label class="slider" data-lv="g8 hs col max">ZT <input type="range" id="cn-zt" min="0.2" max="3" step="0.1" value="1"><span class="val" id="cn-zt-val">1.0</span></label></div>
+    <figcaption><b>Try this:</b> set 170 °C over 0 °C and read the limit. Then try to reach 10% real efficiency. <span data-lv="g8 hs col max">Only ZT moves the factor; temperatures only move the Carnot limit.</span></figcaption>
+    <ul class="missions" data-ch="ch5"></ul>
+    <div class="check" data-ch="ch5"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">A fire makes 100 watts of heat. The module turns 5 percent into electricity. Watts of electricity?</p><form class="cf" data-a="5" data-u="W" data-tol="0.02" data-hint="5% of 100." data-ok="Right. 5 W. The other 95 W is still heat."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Hot side 170 °C, cold side 0 °C. Carnot limit = 1 − 273/443, as a percent?</p><form class="cf" data-a="38" data-u="%" data-tol="0.04" data-hint="Add 273 to each, then divide." data-ok="Right. About 38%: no machine can beat it."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Same temperatures, ZT = 1. Ideal thermoelectric efficiency, percent?</p><form class="cf" data-a="7.8" data-u="%" data-tol="0.06" data-hint="0.384 × (1.414 − 1)/(1.414 + 0.616)." data-ok="Right. About 7.8% ideal; real modules near 5%."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Hot 500 K, cold 300 K, ZT = 2. Ideal efficiency, percent?</p><form class="cf" data-a="13.1" data-u="%" data-tol="0.06" data-hint="η_C = 0.4; factor = (√3 − 1)/(√3 + 0.6)." data-ok="Right. About 13%."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Material with S = 200 μV/K, σ = 10⁵ S/m, κ = 1.5 W/m·K at 300 K. ZT?</p><form class="cf" data-a="0.8" data-u="n" data-tol="0.06" data-hint="S²σT/κ = (2e-4)² × 1e5 × 300 ÷ 1.5." data-ok="Right. 0.8, a respectable everyday thermoelectric."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> compute the Carnot limit and explain what ZT does to the real efficiency.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why is 5% a law and not a flaw?</li><li>Which slider moved the factor, and which only moved the limit?</li><li>Is the heat that goes through wasted? When is it not?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Write the Carnot limit for 170 °C over 0 °C.</p>
+      
+      <p class="links"><span class="unitbadge">Fire into watts · step 6</span></p>
+      <p class="links std"><b>Standards</b> MS-PS3-5, HS-PS3-4</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch6">
+  <div class="text">
+    <p class="eyebrow">Chapter 6</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Why would plugging in the wrong thing make a generator produce less?</p>
+    <div class="lv lv-k5"><h2>Match the load</h2><p>The module makes electricity, but how much you get out depends on what you plug into it. Plug in something that lets too much through and the voltage collapses. Plug in something that lets too little through and hardly any flows. There is a sweet spot in the middle.</p><p>Slide the load until the watts peak. Then let the little box turn it into steady USB power.</p></div>
+    <div class="lv lv-g8"><h2>Maximum power transfer</h2><p>A module behaves like a battery with a resistor hidden inside, about 2.5 ohms. The most power comes out when the thing you connect has the same resistance as the hidden one. Bigger and the current starves; smaller and the voltage sags. Either way you lose.</p><p>Real devices do not want 3 volts that wobble. A boost converter takes whatever the module gives, holds the module at its sweet spot, and puts out a steady 5 V for USB, at the cost of a small slice of the power.</p></div>
+    <div class="lv lv-hs"><h2>R_load = r</h2><p>With open-circuit voltage V and internal resistance r, a load R draws current I = V/(R + r) and receives P = I²R = V²R/(R + r)². Differentiate and the maximum is at R = r, where P = V²/(4r) and the module's terminal voltage is exactly half of V. That is the number quoted in chapter 4.</p><p>A maximum-power-point tracker is a converter that adjusts its effective input resistance to stay at R = r as the temperature difference drifts. Modules in series add voltage; in parallel they add current; a kit rated 18 to 20 V under load is a series string.</p></div>
+    <div class="lv lv-col"><h2>Converters and tracking</h2><p>A boost converter with efficiency η delivers P_out = η P_in at a fixed output voltage; its input impedance is set by duty cycle, which is the control variable for MPPT (perturb-and-observe or fractional open-circuit voltage, since V_mpp = V_oc/2 for a resistive source). Converter losses at low input voltage are the usual reason a 3 W module yields 2 W at USB.</p><p>Series strings are sensitive to one cold module: a module with a smaller ΔT limits the string's current, the same weak-cell problem as in battery packs.</p></div>
+    <div class="lv lv-max"><h2>Impedance matching as thermodynamics</h2><p>Maximum power and maximum efficiency are different operating points: efficiency peaks at R/r = √(1+ZT) > 1, power at R/r = 1. A generator sized by fuel cost runs near maximum efficiency; one sized by module cost runs near maximum power. The lab lets you see both.</p><p>Electrical loading also changes the thermal circuit: drawing current moves Peltier heat across the module, lowering ΔT slightly, which is why the open-circuit ΔT overestimates the working one.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The sweet spot exists for solar panels and batteries too. The idea transfers.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-load" aria-label="A module with a hidden internal resistance feeding an adjustable load. The power curve and the sweet spot are drawn."></canvas></div>
+    <div class="controls"><label class="slider">Load resistance <input type="range" id="ld-r" min="0.2" max="12" step="0.1" value="6"><span class="val" id="ld-r-val">6.0 Ω</span></label><label class="slider">Difference <input type="range" id="ld-dt" min="20" max="170" step="5" value="120"><span class="val" id="ld-dt-val">120 K</span></label><label class="slider" data-lv="hs col max">Modules in series <input type="range" id="ld-n" min="1" max="8" step="1" value="1"><span class="val" id="ld-n-val">1</span></label><button class="btn" id="ld-boost" aria-pressed="false">Boost to 5 V USB: off</button></div>
+    <figcaption><b>Try this:</b> slide the load until the watts peak. Switch on the converter and read the USB watts.</figcaption>
+    <ul class="missions" data-ch="ch6"></ul>
+    <div class="check" data-ch="ch6"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">The module pushes with 4 volts. Into the best load, only half shows up at the plug. Volts at the plug?</p><form class="cf" data-a="2" data-u="V" data-tol="0.02" data-hint="Half of 4." data-ok="Right. 2 V at maximum power."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Module: 4 V, 2.5 Ω inside. Best load resistance?</p><form class="cf" data-a="2.5" data-u="Ω" data-tol="0.02" data-hint="Match the hidden resistance." data-ok="Right. 2.5 Ω."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">V = 4 V, r = 2.5 Ω, matched load. Power?</p><form class="cf" data-a="1.6" data-u="W" data-tol="0.03" data-hint="V²/(4r)." data-ok="Right. 16 ÷ 10 = 1.6 W."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">8 modules in series at 2 V each (matched). String voltage?</p><form class="cf" data-a="16" data-u="V" data-tol="0.02" data-hint="Series adds volts." data-ok="Right. 16 V, the range a kit quotes under load."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">ZT = 1. Load ratio R/r for maximum efficiency?</p><form class="cf" data-a="1.41" data-u="n" data-tol="0.03" data-hint="√(1 + ZT)." data-ok="Right. About 1.41, above the maximum-power point at 1."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> find the load that draws maximum power and explain what a boost converter does.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>What happens to the voltage when the load is too small?</li><li>Why do real devices want a converter in between?</li><li>Why do modules go in series to reach 18 V?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Where is the sweet spot, in terms of the module's hidden resistance?</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/electricity/#ch2">Electricity From Zero 2, Push, flow, opposition</a></p>
+      <p class="links"><span class="unitbadge">Fire into watts · step 7</span></p>
+      <p class="links std"><b>Standards</b> HS-PS3-3, HS-ETS1-3</p>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch7">
+  <div class="text">
+    <p class="eyebrow">Chapter 7</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>What would it take to charge a phone from a candle?</p>
+    <div class="lv lv-k5"><h2>Build a heat-power system</h2><p>Pick a fire, pick how many modules, pick how to keep the cold side cold, and see what you can run: a phone, a light, a radio. The leftover heat warms a tank of water, so nothing is thrown away.</p><p>Then try the candle and see why it cannot charge a phone. And watch the water: if it gets hot, the difference disappears.</p></div>
+    <div class="lv lv-g8"><h2>From stove to phone</h2><p>The sequence: what is the hot side temperature, what is the cold side, how many modules, what does each make, subtract the converter's slice, subtract the pump if there is one, and compare with the load. A phone charge is about 10 Wh; a 5 W USB output fills it in two hours. A power bank is 74 Wh.</p><p>The cold side is the whole game. Water carries heat away fast, but a small tank warms up; the difference shrinks and the watts fall. A bigger tank, or a loop that dumps the heat into a room, keeps it going. A commercial kit does exactly this and calls it combined heat and power.</p></div>
+    <div class="lv lv-hs"><h2>Sizing the system</h2><p>Per module P = 1.6 × 10⁻⁴ ΔT_module². Series string voltage is N × 0.02 × ΔT at the maximum power point. Converter efficiency ~85%, pump draw 1 to 3 W. Water tank heating: the module passes roughly 20 × its electrical output as heat, so 40 W electric means about 800 W into the water, warming 20 L by 34 °C per hour and collapsing the difference unless the heat is moved on.</p><p>The manufacturer rating this board uses as a worked example: 40 W peak with a 0 °C cold side and a 170 °C hot side, 18 to 20 V under load, active water cooling required. Reproduce that operating point in the lab and then see what a 20 °C cold side does to it.</p></div>
+    <div class="lv lv-col"><h2>Combined heat and power</h2><p>Write the energy balance: fire → stove → module hot face (limit 170 °C) → module → cold block → water → tank or heating loop. Electric output is a few percent of the flow; the loop must reject the other 95% at a temperature useful for heating but low enough to keep the module's ΔT. A thermosiphon loop removes the pump's parasitic draw at the cost of flow control.</p><p>Warnings the lab raises are the real failure modes: hot face over limit, cold water over 60 °C, converter input below its start-up voltage, and a load larger than the output.</p></div>
+    <div class="lv lv-max"><h2>Where the numbers break</h2><p>Peak ratings assume an ice-water cold side and a fully coupled hot side; a typical stove-top installation with fins and room air yields a third of nameplate. Long-term, thermal cycling fatigues solder joints and diffuses contacts; the tens-of-thousands-of-hours lifetime claims hold under steady thermal management, not repeated overshoot.</p><p>The honest design envelope: a well-built stove system delivers 10 to 40 W of electricity and hundreds of watts of hot water. That is enough for lights, radios, sensors and phones through a winter, and not enough for a refrigerator. The system checker on the Electricity board takes it from here.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Try the candle first. Watching a phone need three days to charge is a better lesson than any sentence.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-sys" class="short" aria-label="A report for a heat-power system: source, sink, modules, watts, charge times, water temperature over time, warnings."></canvas></div>
+    <div class="controls"><span class="lbl">Fire</span><select id="sy-src"><option value="candle">candle</option><option value="camp">camp stove</option><option value="wood" selected>wood stove</option><option value="propane">propane burner</option></select><label class="slider">Modules <input type="range" id="sy-n" min="1" max="16" step="1" value="8"><span class="val" id="sy-n-val">8</span></label><span class="lbl">Cooling</span><select id="sy-cool"><option value="fins">fins, no fan</option><option value="fan">fins and fan</option><option value="tank" selected>water, 20 L tank</option><option value="loop">water loop to a radiator</option></select><span class="lbl">Run</span><select id="sy-load"><option value="phone" selected>phone (10 Wh)</option><option value="bank">power bank (74 Wh)</option><option value="led">5 W lamp all night</option><option value="fridge">fridge (60 W)</option></select><button class="btn primary" id="sy-run">Run for 3 hours</button></div>
+    <figcaption><b>Try this:</b> charge a phone from the wood stove. Then try the candle. Then watch the 20 L tank warm up and the watts fall, and fix it with the loop.</figcaption>
+    <ul class="missions" data-ch="ch7"></ul>
+    <div class="check" data-ch="ch7"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">A phone needs 10 watt-hours. The stove makes 5 watts for the phone. Hours to charge?</p><form class="cf" data-a="2" data-u="h" data-tol="0.02" data-hint="Amount ÷ rate." data-ok="Right. 2 hours."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A candle gives the module 0.1 W. Hours to charge the same 10 Wh phone?</p><form class="cf" data-a="100" data-u="h" data-tol="0.03" data-hint="10 ÷ 0.1." data-ok="Right. 100 hours, four days. Candles are for light."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">40 W electric at 5% efficiency. How much heat is passing into the water?</p><form class="cf" data-a="760" data-u="W" data-tol="0.05" data-hint="Heat through = electric × (1 − 0.05)/0.05." data-ok="Right. About 760 W, which is why the water warms fast."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">760 W into a 20 L tank, no loop. Temperature rise per hour? (c = 4,186 J/kg·K)</p><form class="cf" data-a="32.7" data-u="K" data-tol="0.05" data-hint="760 × 3,600 ÷ (20 × 4,186)." data-ok="Right. About 33 K per hour; the difference collapses within two hours."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Nameplate 40 W at 0 °C cold side (ΔT 170). Same hot side, cold side 20 °C. Output, assuming P ∝ ΔT²?</p><form class="cf" data-a="31" data-u="W" data-tol="0.05" data-hint="(150/170)² × 40." data-ok="Right. About 31 W, and less again once the sink warms."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> size a heat-power system and read its warnings.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>What killed the output when the tank warmed up?</li><li>Which load could this system never run, and why?</li><li>Where does the 95% go, and is that a problem?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: why does the water tank matter as much as the fire?</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/electricity/#ch10">Electricity From Zero 10, The system checker</a></p>
+      <p class="links"><span class="unitbadge">Fire into watts · step 8</span></p>
+      <p class="links std"><b>Standards</b> 4-PS3-4, MS-ETS1-2, HS-ETS1-2, HS-ETS1-3</p>
+    </div>
+  </figure>
+</section>
+</main>
+<footer class="closing">
+  <p class="eyebrow">The end, for now</p>
+  <p>Make the difference, keep the difference, and take a small slice on the way through. Everything else is plumbing.</p>
+  <p class="big" style="margin-left:auto;margin-right:auto">Heat is a difference being spent.</p>
+  <p class="teach"><a href="https://thedimension5.github.io/chalkboard/">More boards at The Chalkboard</a></p>
+</footer>
+</div>
+<div class="tray" aria-hidden="true"></div>
+<script>window.Chalk=(function(){
+'use strict';
+const C={chalk:'#F1ECDF',yellow:'#F6D46B',blue:'#8CC4EE',pink:'#F596A8',green:'#9DDBA3',board:'#1B2923'};
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>Number(v).toFixed(d);
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';const sup=n=>String(n).split('').map(c=>c==='-'?'⁻':(SUP[+c]||c)).join('');
+const pct=v=>Math.round(v*100)+'%';
+function text(ctx,str,x,y,o={}){const{size=20,color=C.chalk,align='center',fam='display',alpha=1,base='middle'}=o;ctx.save();ctx.globalAlpha=alpha;ctx.font=fam==='display'?`700 ${size}px Caveat, "Segoe Print", cursive`:fam==='mono'?`700 ${size}px "JetBrains Mono", Menlo, Consolas, monospace`:`900 ${size}px Nunito, system-ui, sans-serif`;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline=base;ctx.fillText(str,x,y);ctx.restore()}
+function circle(ctx,x,y,r,fill,stroke,lw=2){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function glow(ctx,x,y,r,color,a=.55){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(color,a));g.addColorStop(1,rgba(color,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function shade(ctx,x,y,r,a=.38){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function poly(ctx,pts,color,lw=1.2,alpha=1,close=false){if(pts.length<2)return;ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);if(close)ctx.closePath();ctx.stroke();ctx.restore()}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r)}else{ctx.rect(x,y,w,h)}}
+function box(ctx,x,y,w,h,fill,stroke,r=6,lw=2){rr(ctx,x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function marble(ctx,x,y,r,color){glow(ctx,x,y,r*2.6,color,.4);circle(ctx,x,y,r,color);circle(ctx,x-r*.3,y-r*.3,r*.3,'rgba(255,255,255,.55)')}
+function readout(ctx,lines,x,y,o={}){const{align='left',size=13,color=C.chalk,alpha=.94}=o;ctx.save();ctx.font=`700 ${size}px Nunito, system-ui, sans-serif`;let mw=0;for(const t of lines)mw=Math.max(mw,ctx.measureText(t).width);const bx=align==='right'?x-mw-8:align==='center'?x-mw/2-8:x-8;ctx.globalAlpha=.6;ctx.fillStyle=C.board;ctx.fillRect(bx,y-5,mw+16,lines.length*(size+5)+6);ctx.globalAlpha=alpha;ctx.textAlign=align;ctx.textBaseline='top';ctx.fillStyle=color;lines.forEach((t,i)=>ctx.fillText(t,x,y+i*(size+5)));ctx.restore()}
+function arrow(ctx,x,y,dx,dy,color,lw=2.2){const L=Math.hypot(dx,dy);if(L<3)return;ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();ctx.translate(x+dx,y+dy);ctx.rotate(Math.atan2(dy,dx));ctx.beginPath();ctx.moveTo(1,0);ctx.lineTo(-8,-4.5);ctx.lineTo(-8,4.5);ctx.closePath();ctx.fill();ctx.restore()}
+function rng(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let r=Math.imul(t^(t>>>15),1|t);r^=r+Math.imul(r^(r>>>7),61|r);return((r^(r>>>14))>>>0)/4294967296}}
+
+/* ---------- level ---------- */
+const LV=['k5','g8','hs','col','max'];const LR={k5:0,g8:1,hs:2,col:3,max:4};let LEVEL='k5';
+const at=l=>LR[LEVEL]>=LR[l];
+function keepPlace(fn){const secs=[...document.querySelectorAll('.hero,.chapter')];let ref=null;for(const s of secs){if(s.getBoundingClientRect().top<=90)ref=s}const before=ref?ref.getBoundingClientRect().top:0;fn();if(ref){const after=ref.getBoundingClientRect().top;window.scrollBy({top:after-before,left:0,behavior:'instant'})}}
+function setLevel(l,fromClick){if(!LV.includes(l))l='k5';LEVEL=l;keepPlace(()=>{document.documentElement.setAttribute('data-level',l);document.querySelectorAll('[data-lv]').forEach(el=>{el.hidden=!el.dataset.lv.split(' ').includes(l)})});
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.setAttribute('aria-selected',b.dataset.level===l?'true':'false'));
+  try{localStorage.setItem('one-rule-level',l)}catch(e){}
+  if(fromClick){try{const u=new URL(location.href);u.searchParams.set('level',l);history.replaceState(null,'',u)}catch(e){}}
+  stopSpeak();renderMissions()}
+
+/* ---------- sims ---------- */
+const sims=[];
+function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getContext('2d');const s=Object.assign({cv,ctx,w:0,h:0,visible:false,t:0,dt:0,pointer:null},def);
+  function resize(){const r=cv.getBoundingClientRect();if(r.width<2)return;const dpr=Math.min(window.devicePixelRatio||1,2);const first=s.w===0;s.w=r.width;s.h=r.height;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);if(first){s.init&&s.init(s)}else{s.onResize&&s.onResize(s)}s.draw(s)}
+  new ResizeObserver(resize).observe(cv);resize();
+  new IntersectionObserver(e=>{s.visible=e[0].isIntersecting},{rootMargin:'120px'}).observe(cv);
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);s.pointer=pos(e);s.down&&s.down(s.pointer,s,e)});
+  cv.addEventListener('pointermove',e=>{s.pointer=pos(e);s.move&&s.move(s.pointer,s,e)});
+  const up=e=>{s.up&&s.up(pos(e),s,e)};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('pointerleave',()=>{s.leave&&s.leave(s)});
+  sims.push(s);return s}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+function tick(dt){for(const s of sims){if(!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}}
+const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
+const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=()=>{const v=parseFloat(el.value);if(out)out.textContent=f?f(v):v;fn(v)};el.addEventListener('input',go);go()};
+
+/* ---------- missions ---------- */
+let DEFS=[],CHECKS={},KEY='chalk',mdone=new Set();
+const mApplies=m=>m.lv.includes(LEVEL);
+function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:''}
+function renderMissions(){document.querySelectorAll('.missions').forEach(ul=>{const ms=DEFS.filter(m=>m.ch===ul.dataset.ch&&mApplies(m));ul.hidden=!ms.length;ul.innerHTML='<li class="mh">Mission'+(ms.length>1?'s':'')+'</li>'+ms.map(m=>`<li class="m${mdone.has(m.id)?' done':''}" data-m="${m.id}"><span class="box">✓</span><span>${m.text}</span></li>`).join('')});mcount()}
+function checkMissions(){let changed=false;for(const m of DEFS){if(mdone.has(m.id)||!mApplies(m))continue;let ok=false;try{ok=!!(CHECKS[m.id]&&CHECKS[m.id]())}catch(e){ok=false}
+    if(ok){mdone.add(m.id);changed=true;const li=document.querySelector(`.missions li[data-m="${m.id}"]`);if(li)li.classList.add('done','just')}}
+  if(changed){try{localStorage.setItem('chalk:'+KEY+':missions',JSON.stringify([...mdone]))}catch(e){}mcount()}}
+
+/* ---------- read aloud ---------- */
+const canSpeak='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
+let speaking=null;
+function stopSpeak(){if(!canSpeak)return;const was=speaking;speaking=null;try{speechSynthesis.cancel()}catch(e){}if(was){was.btn.classList.remove('is-on');was.btn.querySelector('span').textContent='Read to me';was.block.classList.remove('reading')}}
+function pickVoice(){const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));return vs.find(v=>/Samantha|Google US English|Karen|Daniel|Natural|Premium/i.test(v.name))||vs[0]||null}
+function wireRead(){if(!canSpeak){document.querySelectorAll('.read').forEach(b=>b.remove());return}
+  document.querySelectorAll('.read').forEach(btn=>btn.addEventListener('click',()=>{const sec=btn.closest('.text');const block=[...sec.querySelectorAll('.lv')].find(b=>b.offsetParent!==null);if(!block)return;
+    if(speaking&&speaking.btn===btn){stopSpeak();return}stopSpeak();
+    const parts=[];const h1=sec.querySelector('h1');if(h1)parts.push(h1.textContent.trim());[...block.querySelectorAll('h2,p')].forEach(e=>{const t=e.textContent.trim();if(t)parts.push(t)});
+    const cap=sec.parentElement.querySelector('figcaption');if(cap)parts.push(cap.textContent.replace(/\s+/g,' ').trim());
+    const voice=pickVoice();speaking={btn,block};btn.classList.add('is-on');btn.querySelector('span').textContent='Stop';block.classList.add('reading');
+    parts.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.rate=.95;u.pitch=1.05;if(voice)u.voice=voice;if(i===parts.length-1)u.onend=()=>{if(speaking&&speaking.btn===btn)stopSpeak()};speechSynthesis.speak(u)})}));
+  try{speechSynthesis.getVoices()}catch(e){}window.addEventListener('pagehide',()=>stopSpeak())}
+
+
+/* ---------- teach-back checks ---------- */
+let passed=new Set(),UNITWHY={};
+const uname=u=>{const o=document.querySelector(`form.cf select option[value="${u}"]`);return o?o.textContent:u};
+function checkPassed(ch){return passed.has(ch+':'+LEVEL)}
+function wireChecks(){document.querySelectorAll('form.cf').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const box=f.closest('.check');const fb=box.querySelector('.fb');
+    if(f.dataset.type==='choice'){const c=f.querySelector('input[type=radio]:checked');if(!c){fb.textContent='Pick one.';fb.className='fb bad';return}if(c.value!==f.dataset.a){fb.textContent='Not that one. Hint: '+f.dataset.hint;fb.className='fb bad';return}fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}return}
+    const v=parseFloat(String(f.querySelector('input').value).replace(/,/g,''));const u=f.querySelector('select').value;const a=parseFloat(f.dataset.a),want=f.dataset.u,tol=parseFloat(f.dataset.tol||'.02');
+    if(isNaN(v)){fb.textContent='Type a number first.';fb.className='fb bad';return}
+    if(!u){fb.textContent='Pick a unit. A number without a unit is not an answer.';fb.className='fb bad';return}
+    if(u!==want){fb.textContent=`Units first. You answered in ${uname(u)}, but this question wants ${uname(want)}: ${UNITWHY[want]||''}. Try again in ${want}.`;fb.className='fb bad';return}
+    const err=a===0?Math.abs(v):Math.abs(v-a)/Math.abs(a);
+    if(err>tol){fb.textContent='Right unit, wrong number. Hint: '+f.dataset.hint;fb.className='fb bad';return}
+    fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}}))}
+
+/* ---------- start ---------- */
+function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
+  try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();
+  try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
+  wireRead();
+  let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
+  setLevel(lv0||'k5',false);setInterval(checkMissions,300);
+  const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
+return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions()};
+})();
+</script>
+<script>
+const MISSION_DEFS=[{"id": "ht1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Watch the two blocks reach the same temperature."}, {"id": "ht1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Hold a difference of at least 50 degrees for 30 seconds using the heater and the water."}, {"id": "ht2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Boil one litre."}, {"id": "ht2b", "ch": "ch2", "lv": ["hs", "col", "max"], "text": "Predict the seconds to the boil within 10%."}, {"id": "ht3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Hold the stove top between 150 and 170 °C for 30 seconds."}, {"id": "ht3b", "ch": "ch3", "lv": ["g8", "hs", "col", "max"], "text": "Overshoot 170 °C on purpose and read the warning."}, {"id": "ht4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make one watt."}, {"id": "ht4b", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make three watts from one module without going over 170 °C."}, {"id": "ht4c", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Use your hand as the heat source and read how little you get."}, {"id": "ht5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Set 170 °C over 0 °C and read the Carnot limit."}, {"id": "ht5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Reach 10% real efficiency."}, {"id": "ht6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Find the load that gives the most watts."}, {"id": "ht6b", "ch": "ch6", "lv": ["hs", "col", "max"], "text": "Get at least 2 W out of the USB converter."}, {"id": "ht7", "ch": "ch7", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Charge the phone in under 4 hours."}, {"id": "ht7b", "ch": "ch7", "lv": ["g8", "hs", "col", "max"], "text": "Try the candle and read how long the phone would take."}, {"id": "ht7c", "ch": "ch7", "lv": ["hs", "col", "max"], "text": "Run three hours on the water tank without the water passing 60 °C."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb7", "ch": "ch7", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}];
+const UNIT_WHY={"°C": "degrees measure a temperature", "K": "kelvin measures a temperature or a difference between two", "W": "watts are a rate: energy per second", "kW": "kilowatts are a rate: energy per second", "Wh": "watt-hours are an amount of energy", "J": "joules are an amount of energy", "kJ": "kilojoules are an amount of energy", "MJ": "megajoules are an amount of energy", "V": "volts measure the push", "A": "amps measure the flow", "Ω": "ohms measure opposition", "s": "seconds measure a time", "min": "minutes measure a time", "h": "hours measure a time", "kg": "kilograms measure mass", "L": "litres measure volume", "%": "percent is a share, no unit", "n": "a ratio, no unit"};
+const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
+const toggle=(id,get,set,label)=>hook(id,()=>{set(!get());const b=$(id);b.classList.toggle('is-on',get());b.setAttribute('aria-pressed',String(get()));b.textContent=label(get())});
+const group=(attr,fn)=>document.querySelectorAll(`[${attr}]`).forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll(`[${attr}]`).forEach(x=>x.classList.toggle('is-on',x===b));fn(parseFloat(b.getAttribute(attr)))}));
+const tcol=T=>{const k=clamp((T-20)/180,0,1);return `rgb(${Math.round(120+135*k)},${Math.round(160-80*k)},${Math.round(220-180*k)})`};
+function flame(ctx,x,y,s,t){for(let i=0;i<3;i++){const ph=t*6+i*2;ctx.beginPath();ctx.fillStyle=rgba(i?C.yellow:C.pink,.7);ctx.ellipse(x+(i-1)*s*.35+Math.sin(ph)*s*.1,y-s*.6,s*.28,s*(.7+.15*Math.sin(ph*1.3)),0,0,Math.PI*2);ctx.fill()}}
+const MOD={S:.04,r:2.5,Rm:1.5,Tmax:170};
+const modP=dT=>dT>0?(MOD.S*dT)**2/(4*MOD.r):0;
+
+/* ---------- CH1: heat flows downhill ---------- */
+const fw=makeSim('cv-flow',{
+  init(s){s.k=400;s.src=false;s.sink=false;s.reset(s)},
+  reset(s){s.Th=100;s.Tc=20;s.hold=0;s.met=false},
+  step(dt,s){const A=.0004,L=.1,Cb=2000;const sub=4,h=dt*8/sub;for(let i=0;i<sub;i++){const Q=s.k*A*(s.Th-s.Tc)/L;s.Th-=Q/Cb*h;s.Tc+=Q/Cb*h;if(s.src)s.Th+=(100-s.Th)*.5*h;if(s.sink)s.Tc+=(20-s.Tc)*.8*h}
+    if(Math.abs(s.Th-s.Tc)<2)s.met=true;if(s.src&&s.sink&&s.Th-s.Tc>=50)s.hold+=dt;else s.hold=0},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const bx=w*.18,cx=w*.82,y=h*.5,bw=w*.18,bh=h*.34;
+    box(ctx,bx-bw/2,y-bh/2,bw,bh,tcol(s.Th),C.chalk,8,2);box(ctx,cx-bw/2,y-bh/2,bw,bh,tcol(s.Tc),C.chalk,8,2);
+    const th=s.k>100?14:s.k>1?9:6;poly(ctx,[[bx+bw/2,y],[cx-bw/2,y]],s.k>100?'#d9a066':s.k>1?'#9aa0a6':'#a0733a',th,.95);
+    const Q=s.k*.0004*(s.Th-s.Tc)/.1;const n=clamp(Math.round(Q/8),0,20);for(let i=0;i<n;i++){const u=((s.t*.25*(1+s.k/400))+i/n)%1;circle(ctx,bx+bw/2+(cx-bw/2-bx-bw/2)*u,y-th/2-6,3,C.pink)}
+    text(ctx,`${s.Th.toFixed(0)} °C`,bx,y,{size:28,color:C.board});text(ctx,`${s.Tc.toFixed(0)} °C`,cx,y,{size:28,color:C.board});text(ctx,'hot block',bx,y+bh/2+22,{size:16,alpha:.8});text(ctx,'cold block',cx,y+bh/2+22,{size:16,alpha:.8});
+    if(s.src)flame(ctx,bx,y+bh/2+40,26,s.t);if(s.sink){ctx.save();ctx.strokeStyle=C.blue;ctx.lineWidth=2.5;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(cx-30,y+bh/2+18+i*9);for(let x=-30;x<=30;x+=6)ctx.lineTo(cx+x,y+bh/2+18+i*9+Math.sin(x/5+s.t*4)*3);ctx.stroke()}ctx.restore()}
+    const lines=[`difference ${(s.Th-s.Tc).toFixed(0)} K   heat flow ${Q.toFixed(0)} W`];if(s.met&&!s.src)lines.push('they met: no difference, no flow');if(s.src&&s.sink)lines.push(`difference held for ${s.hold.toFixed(0)} s`);
+    if(at('hs'))lines.push(`Q̇ = kA ΔT / L = ${s.k} × 0.0004 × ${(s.Th-s.Tc).toFixed(0)} ÷ 0.1`);if(at('col'))lines.push(`bar resistance L/(kA) = ${(0.1/(s.k*.0004)).toFixed(2)} K/W`);readout(ctx,lines,16,12,{size:12})}
+});
+group('data-mat',v=>{if(fw)fw.k=v});toggle('fw-src',()=>fw.src,v=>{fw.src=v},v=>'Heater under hot block: '+(v?'on':'off'));toggle('fw-sink',()=>fw.sink,v=>{fw.sink=v},v=>'Water on cold block: '+(v?'on':'off'));hook('fw-reset',()=>fw&&fw.reset(fw));
+
+/* ---------- CH2: boiling water ---------- */
+const bl=makeSim('cv-boil',{
+  init(s){s.P=800;s.m=1;s.reset(s)},
+  reset(s){s.T=20;s.steam=0;s.t=0;s.on=false;s.boiledAt=null;s.pred=null;s.err=null},
+  go(s){s.reset(s);s.on=true;const pv=parseFloat(($('bl-pred')||{}).value);s.pred=isNaN(pv)?null:pv},
+  step(dt,s){if(!s.on)return;const h=dt*10;s.t+=h;const loss=1.5*(s.T-20);const P=Math.max(0,s.P-loss);if(s.T<100){s.T+=P*h/(s.m*4186);if(s.T>=100){s.T=100;s.boiledAt=s.t;if(s.pred!=null)s.err=Math.abs(s.t-s.pred)/s.t}}else{s.steam+=P*h/2.26e6;if(s.steam>=s.m)s.on=false}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const px=w*.5,py=h*.62,pw=w*.28,ph=h*.3;
+    if(s.on)flame(ctx,px,py+ph/2+38,26+s.P/80,s.t);
+    box(ctx,px-pw/2,py-ph/2,pw,ph,rgba(C.chalk,.06),C.chalk,6,2.5);const lvl=clamp((s.m-s.steam)/3,0,1)*.9;box(ctx,px-pw/2+3,py+ph/2-3-lvl*(ph-6),pw-6,lvl*(ph-6),rgba(C.blue,.35+.4*clamp((s.T-20)/80,0,1)),null,3);
+    if(s.T>=100&&s.on){for(let i=0;i<5;i++){const u=(s.t*.4+i/5)%1;circle(ctx,px-pw/4+i*pw/8,py-ph/2-10-u*50,4+u*6,rgba(C.chalk,.5*(1-u)))}}
+    text(ctx,`${s.T.toFixed(0)} °C`,px,py-ph/2-40-(s.T>=100?40:0),{size:30,color:s.T>=100?C.pink:C.chalk});
+    const Qh=s.m*4186*80,tIdeal=Qh/s.P;const lines=[`${s.m} L, ${s.P} W into the pot, clock ${s.t.toFixed(0)} s (10× speed)`];
+    if(s.boiledAt)lines.push(`boiled at ${s.boiledAt.toFixed(0)} s${s.err!=null?`, you predicted ${s.pred} s: ${(s.err*100).toFixed(0)}% off`:''}`);if(s.steam>0)lines.push(`${(s.steam*1000).toFixed(0)} mL boiled away`);
+    if(at('g8'))lines.push(`to 100 °C needs ${s.m} × 4,186 × 80 = ${(Qh/1000).toFixed(0)} kJ`);if(at('hs'))lines.push(`t = Q/P = ${tIdeal.toFixed(0)} s with no losses; the pot loses heat as it warms`);if(at('col'))lines.push('then 2.26 MJ per kg to boil it away, at a fixed 100 °C');readout(ctx,lines,16,12,{size:12})}
+});
+hook('bl-go',()=>bl&&bl.go(bl));slide('bl-p',v=>{if(bl)bl.P=v},v=>v+' W');slide('bl-m',v=>{if(bl)bl.m=v},v=>v+' L');
+
+/* ---------- CH3: the wood fire ---------- */
+const st=makeSim('cv-stove',{
+  init(s){s.air=.6;s.reset(s)},
+  reset(s){s.T=20;s.fuel=0;s.hold=0;s.over=false;s.log=0},
+  addLog(s){s.fuel+=1;s.log++},
+  step(dt,s){const h=dt*30;const burn=s.fuel>0?Math.min(s.fuel,s.air/3600*h):0;s.fuel-=burn;const P=burn*16e6/h;const loss=15*(s.T-20);s.T+=(P*.5-loss)*h/12000;s.T=Math.max(20,s.T);
+    if(s.T>=150&&s.T<=170)s.hold+=dt;else s.hold=0;if(s.T>170)s.over=true;s.P=P},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const sx=w*.35,sy=h*.55,sw=w*.3,sh=h*.4;
+    box(ctx,sx-sw/2,sy-sh/2,sw,sh,rgba(C.chalk,.08),C.chalk,6,2.5);box(ctx,sx-sw/2-8,sy-sh/2-8,sw+16,10,tcol(s.T),C.chalk,3,1.5);box(ctx,sx+sw/2-10,sy-sh/2-60,14,60,rgba(C.chalk,.15),C.chalk,2,1.5);
+    box(ctx,sx-sw*.3,sy-sh*.15,sw*.6,sh*.35,C.board,C.chalk,4,1.5);if(s.fuel>0)flame(ctx,sx,sy+sh*.2,16+s.air*14+Math.min(s.fuel,3)*4,s.t);
+    for(let i=0;i<Math.min(Math.ceil(s.fuel),6);i++)box(ctx,sx-sw*.25+i*sw*.09,sy+sh*.12,sw*.08,10,'#a0733a',null,3);
+    const gx=w*.8,gy=h*.5,gr=Math.min(w,h)*.18;circle(ctx,gx,gy,gr,rgba(C.board,.6),C.chalk,2);const a0=Math.PI*.8,a1=Math.PI*2.2;const ang=T=>a0+(a1-a0)*clamp(T/300,0,1);
+    ctx.save();ctx.lineWidth=8;ctx.strokeStyle=rgba(C.green,.7);ctx.beginPath();ctx.arc(gx,gy,gr-8,ang(150),ang(170));ctx.stroke();ctx.strokeStyle=rgba(C.pink,.7);ctx.beginPath();ctx.arc(gx,gy,gr-8,ang(170),ang(300));ctx.stroke();ctx.restore();
+    const a=ang(s.T);poly(ctx,[[gx,gy],[gx+Math.cos(a)*(gr-14),gy+Math.sin(a)*(gr-14)]],C.chalk,3);circle(ctx,gx,gy,4,C.chalk);text(ctx,`${s.T.toFixed(0)} °C`,gx,gy+gr+22,{size:22,color:s.T>170?C.pink:s.T>=150?C.green:C.chalk});text(ctx,'top plate',gx,gy+gr+42,{size:14,alpha:.7});
+    const lines=[`fuel in the box ${s.fuel.toFixed(2)} kg   burning ${s.air} kg/h   fire ${((s.P||0)/1000).toFixed(1)} kW`,s.T>170?'TOO HOT: over 170 °C, a module up here is being damaged':s.T>=150?`in the band: ${s.hold.toFixed(0)} s`:'below the band: add a log or more air'];
+    if(at('g8'))lines.push(`16 MJ per kg: ${s.air} kg/h is ${(s.air*16e6/3600/1000).toFixed(1)} kW of heat`);if(at('hs'))lines.push('plate settles where heat in = heat out; about half of the fire reaches the plate here');readout(ctx,lines,16,12,{size:12})}
+});
+hook('st-log',()=>st&&st.addLog(st));hook('st-reset',()=>st&&st.reset(st));slide('st-air',v=>{if(st)st.air=v},v=>v.toFixed(1)+' kg/h');
+
+/* ---------- CH4: hot side, cold side ---------- */
+const SRC={stove:{T:170,Rh:.2,n:'stove top'},fire:{T:400,Rh:.3,n:'camp fire'},exhaust:{T:220,Rh:.3,n:'exhaust pipe'},coffee:{T:70,Rh:3,n:'cup of coffee'},rock:{T:45,Rh:2,n:'sun-warmed rock'},hand:{T:33,Rh:10,n:'your hand'},candle:{T:250,Rh:6,n:'candle'}};
+const SNK={air:{T:20,Rc:6,n:'bare in still air'},fins:{T:20,Rc:2,n:'fins in still air'},fan:{T:20,Rc:.5,n:'fins and a fan'},water:{T:15,Rc:.15,n:'pumped water'},ice:{T:0,Rc:.05,n:'ice water'}};
+function tegState(srcK,snkK,spacer){const S=SRC[srcK],K=SNK[snkK];const Rh=S.Rh+(spacer?1.2:0);const tot=Rh+MOD.Rm+K.Rc;const Q=(S.T-K.T)/tot;const Th=S.T-Q*Rh,Tc=K.T+Q*K.Rc;const dT=Th-Tc;return{Q,Th,Tc,dT,P:modP(dT),over:Th>MOD.Tmax}}
+const tg=makeSim('cv-teg',{
+  init(s){s.src='stove';s.snk='water';s.spacer=false;s.best=0;s.handTried=false},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const st=tegState(s.src,s.snk,s.spacer);if(s.src==='hand')s.handTried=true;s.P=st.P;s.over=st.over;if(!st.over)s.best=Math.max(s.best,st.P);
+    const cx=w*.5,cy=h*.5,mw=w*.36;box(ctx,cx-mw/2,cy+18,mw,h*.22,tcol(SRC[s.src].T),C.chalk,6,2);text(ctx,SRC[s.src].n+` ${SRC[s.src].T} °C`,cx,cy+18+h*.11,{size:18,color:C.board});
+    if(s.spacer)box(ctx,cx-mw/2,cy+4,mw,14,rgba(C.chalk,.3),C.chalk,2,1);
+    box(ctx,cx-mw/2,cy-18,mw,22,st.over?C.pink:rgba(C.yellow,.85),C.chalk,3,2);text(ctx,'module',cx,cy-7,{size:16,color:C.board});
+    box(ctx,cx-mw/2,cy-18-h*.22,mw,h*.22,tcol(st.Tc),C.chalk,6,2);text(ctx,SNK[s.snk].n+` ${SNK[s.snk].T} °C`,cx,cy-18-h*.11,{size:18,color:C.board});
+    text(ctx,`hot face ${st.Th.toFixed(0)} °C`,cx+mw/2+12,cy+2,{size:15,align:'left',color:st.over?C.pink:C.chalk});text(ctx,`cold face ${st.Tc.toFixed(0)} °C`,cx+mw/2+12,cy-22,{size:15,align:'left'});text(ctx,`ΔT ${st.dT.toFixed(0)} K`,cx-mw/2-12,cy-10,{size:18,align:'right',color:C.yellow});
+    glow(ctx,w*.12,h*.5,30+st.P*6,C.yellow,clamp(st.P/6,.1,.9));text(ctx,`${st.P.toFixed(st.P<1?2:1)} W`,w*.12,h*.5,{size:30,color:C.yellow});
+    const lines=[st.over?`hot face over ${MOD.Tmax} °C: this module would be damaged. Add the spacer or use a cooler source`:`open-circuit ${(MOD.S*st.dT).toFixed(1)} V, matched load ${st.P.toFixed(2)} W, best so far ${s.best.toFixed(2)} W`];
+    if(at('g8'))lines.push(`heat through the module ${st.Q.toFixed(0)} W; electricity is ${pct(st.P/Math.max(st.Q,1e-6))} of it`);if(at('hs'))lines.push(`P = (0.04 × ΔT)² / (4 × 2.5) = 1.6e-4 × ΔT²`);if(at('col'))lines.push(`ΔT = ${(SRC[s.src].T-SNK[s.snk].T)} × R_m/(R_h + R_m + R_c) = ${(SRC[s.src].T-SNK[s.snk].T)} × 1.5/(${(SRC[s.src].Rh+(s.spacer?1.2:0)).toFixed(1)} + 1.5 + ${SNK[s.snk].Rc})`);readout(ctx,lines,16,12,{size:12})}
+});
+['tg-src','tg-sink'].forEach(id=>{const el=$(id);if(el)el.addEventListener('change',()=>{if(tg){tg.src=$('tg-src').value;tg.snk=$('tg-sink').value}})});
+toggle('tg-spacer',()=>tg.spacer,v=>{tg.spacer=v},v=>'Spacer: '+(v?'on':'off'));
+
+/* ---------- CH5: Carnot and ZT ---------- */
+const cn=makeSim('cv-carnot',{
+  init(s){s.th=170;s.tc=0;s.zt=1},
+  eff(s){const Th=s.th+273,Tc=s.tc+273;const c=Math.max(0,1-Tc/Th);const g=Math.sqrt(1+s.zt);const f=(g-1)/(g+Tc/Th);return{c,ideal:c*f,real:c*f*.7}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const e=s.eff(s);s.carnot=e.c;s.real=e.real;const x0=w*.1,x1=w*.9,y=h*.5,bh=h*.22;
+    box(ctx,x0,y-bh/2,(x1-x0),bh,rgba(C.pink,.25),C.chalk,6,2);box(ctx,x0,y-bh/2,(x1-x0)*e.c,bh,rgba(C.yellow,.35),null,6);box(ctx,x0,y-bh/2,(x1-x0)*e.real,bh,C.green,null,6);
+    text(ctx,'heat in: 100%',x0,y-bh/2-14,{size:15,align:'left',alpha:.8});text(ctx,`Carnot limit ${pct(e.c)}`,x0+(x1-x0)*e.c,y+bh/2+18,{size:16,color:C.yellow,align:e.c>.5?'right':'left'});text(ctx,`electricity ${pct(e.real)}`,x0+2,y,{size:17,color:C.board,align:'left'});text(ctx,'heat through to the water',x1-6,y,{size:16,align:'right',alpha:.9});
+    const lines=[`hot ${s.th} °C (${s.th+273} K), cold ${s.tc} °C (${s.tc+273} K): Carnot 1 − ${s.tc+273}/${s.th+273} = ${pct(e.c)}`];
+    if(at('g8'))lines.push(`ZT ${s.zt.toFixed(1)}: ideal thermoelectric ${(e.ideal*100).toFixed(1)}%, a real module about ${(e.real*100).toFixed(1)}%`);if(at('hs'))lines.push('η = η_C · (√(1+ZT) − 1)/(√(1+ZT) + T_c/T_h)');if(at('col'))lines.push('ZT = S²σT/κ: only a better material moves the factor');readout(ctx,lines,16,12,{size:12})}
+});
+slide('cn-th',v=>{if(cn)cn.th=v},v=>v+' °C');slide('cn-tc',v=>{if(cn)cn.tc=v},v=>v+' °C');slide('cn-zt',v=>{if(cn)cn.zt=v},v=>v.toFixed(1));
+
+/* ---------- CH6: match the load ---------- */
+const ld=makeSim('cv-load',{
+  init(s){s.R=6;s.dT=120;s.n=1;s.boost=false},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const V=s.n*MOD.S*s.dT,r=s.n*MOD.r;const P=R=>V*V*R/((R+r)*(R+r));const Pm=V*V/(4*r);const x0=50,x1=w*.62,y0=h*.15,y1=h*.78;const Rmax=Math.max(12,r*4);const X=R=>x0+R/Rmax*(x1-x0),Y=p=>y1-(p/Pm)*(y1-y0)*.9;
+    poly(ctx,[[x0,y0],[x0,y1],[x1,y1]],C.chalk,1.5,.7);const pts=[];for(let R=.05;R<=Rmax;R+=Rmax/200)pts.push([X(R),Y(P(R))]);poly(ctx,pts,C.chalk,2,.9);
+    ctx.save();ctx.setLineDash([3,6]);poly(ctx,[[X(r),y0],[X(r),y1]],C.green,1.5,.8);ctx.restore();text(ctx,`sweet spot ${r.toFixed(1)} Ω`,X(r)+6,y0+12,{size:14,align:'left',color:C.green});
+    const p=P(s.R);circle(ctx,X(s.R),Y(p),7,C.yellow);text(ctx,`${p.toFixed(2)} W`,X(s.R),Y(p)-18,{size:17,color:C.yellow});text(ctx,'load resistance →',(x0+x1)/2,y1+22,{size:15,alpha:.8});text(ctx,'watts',x0-8,y0-10,{size:14,align:'right',alpha:.8});
+    const term=V*s.R/(s.R+r),I=V/(s.R+r);s.P=p;s.usb=s.boost?p*.85:0;s.near=Math.abs(s.R-r)/r<.1;
+    const bx=w*.8;box(ctx,bx-60,h*.3,120,h*.3,rgba(C.blue,.15),C.chalk,8,2);text(ctx,s.boost?'boost → 5 V':'plug',bx,h*.38,{size:18});text(ctx,s.boost?`${s.usb.toFixed(2)} W USB`:`${term.toFixed(2)} V   ${I.toFixed(2)} A`,bx,h*.5,{size:20,color:C.yellow});if(s.boost)text(ctx,'85% efficient',bx,h*.57,{size:13,alpha:.7});
+    const lines=[`${s.n} module${s.n>1?'s':''} in series at ΔT ${s.dT} K: ${V.toFixed(1)} V open circuit, ${r.toFixed(1)} Ω inside`];if(at('g8'))lines.push(`load ${s.R.toFixed(1)} Ω → terminal ${term.toFixed(2)} V, ${I.toFixed(2)} A, ${p.toFixed(2)} W (max ${Pm.toFixed(2)} W at ${r.toFixed(1)} Ω)`);if(at('hs'))lines.push('P = V²R/(R + r)², maximum at R = r where terminal voltage = V/2');if(at('max'))lines.push(`max efficiency instead at R/r = √(1+ZT) = 1.41 → ${(r*1.41).toFixed(1)} Ω`);readout(ctx,lines,16,12,{size:12})}
+});
+slide('ld-r',v=>{if(ld)ld.R=v},v=>v.toFixed(1)+' Ω');slide('ld-dt',v=>{if(ld)ld.dT=v},v=>v+' K');slide('ld-n',v=>{if(ld)ld.n=v},v=>String(v));toggle('ld-boost',()=>ld.boost,v=>{ld.boost=v},v=>'Boost to 5 V USB: '+(v?'on':'off'));
+
+/* ---------- CH7: build a heat-power system ---------- */
+const SY_SRC={candle:{T:250,Rh:6,n:'candle',fireW:80},camp:{T:170,Rh:.4,n:'camp stove',fireW:1500},wood:{T:170,Rh:.2,n:'wood stove',fireW:5000},propane:{T:170,Rh:.25,n:'propane burner',fireW:3000}};
+const SY_COOL={fins:{Rc:2,T:20,n:'fins, no fan',pump:0,tank:0},fan:{Rc:.5,T:20,n:'fins and fan',pump:2,tank:0},tank:{Rc:.15,T:15,n:'20 L tank',pump:2,tank:20},loop:{Rc:.15,T:20,n:'water loop to a radiator',pump:3,tank:1e9}};
+const SY_LOAD={phone:{Wh:10,n:'phone',W:0},bank:{Wh:74,n:'power bank',W:0},led:{Wh:50,n:'5 W lamp, 10 h',W:5},fridge:{Wh:0,n:'fridge',W:60}};
+const sy=makeSim('cv-sys',{
+  init(s){s.rep=null},
+  run(s){const S=SY_SRC[$('sy-src').value],Cc=SY_COOL[$('sy-cool').value],L=SY_LOAD[$('sy-load').value],N=parseInt($('sy-n').value,10);
+    let Tw=Cc.T,tankJ=0,Wh=0,tOK=null,tankHot=false;const hist=[];const Rh=S.Rh/Math.min(N,4),Rc=Cc.Rc/Math.min(N,4);let over=false,warn=[];
+    for(let t=0;t<180;t++){const tot=Rh+MOD.Rm/N+Rc;const Q=(S.T-Tw)/tot;const Th=S.T-Q*Rh,Tc=Tw+Q*Rc;const dT=Math.max(0,Th-Tc);if(Th>MOD.Tmax)over=true;const Pe=Math.min(N*modP(dT),S.fireW*.06);const usb=Math.max(0,Pe*.85-Cc.pump);
+      if(Cc.tank&&Cc.tank<1e8){tankJ+=Q*60;Tw=Cc.T+tankJ/(Cc.tank*4186);if(Tw>60)tankHot=true}
+      Wh+=usb/60;if(tOK==null&&L.Wh&&Wh>=L.Wh)tOK=t+1;if(t%10===0)hist.push({t,usb,Tw,dT})}
+    const last=hist[hist.length-1];const Pmax=Math.max(...hist.map(x=>x.usb));
+    if(over)warn.push(`hot face over ${MOD.Tmax} °C: throttle the fire or add a spacer`);if(tankHot)warn.push('tank passed 60 °C: the difference collapsed; use the loop');if(L.W&&Pmax<L.W)warn.push(`${L.n} needs ${L.W} W continuous; you have ${Pmax.toFixed(1)} W`);if(Pmax<.5)warn.push('under half a watt: this heat source is for light, not power');if(Pmax>0&&Pmax<2.5&&L.Wh)warn.push('under 2.5 W: a phone will charge, slowly');
+    s.rep={S,Cc,L,N,hist,Wh,tOK,Pmax,warn,tankHot,candle:$('sy-src').value==='candle',hours:L.Wh?L.Wh/Math.max(Pmax,1e-6):null};if(L.n==='phone'&&tOK&&tOK<=240)s.phoneOK=true;if(Cc.tank===20&&!tankHot&&Pmax>=1)s.tankOK=true;if(s.rep.candle)s.candleTried=true},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);if(!s.rep){text(ctx,'choose a fire, modules, cooling and a load, then run',w/2,h/2,{size:22,alpha:.7});return}const R=s.rep;
+    const x0=50,x1=w*.55,y0=30,y1=h*.7;const X=t=>x0+t/180*(x1-x0);poly(ctx,[[x0,y0],[x0,y1],[x1,y1]],C.chalk,1.5,.7);const Pm=Math.max(1,R.Pmax*1.15);
+    poly(ctx,R.hist.map(p=>[X(p.t),y1-(p.usb/Pm)*(y1-y0)]),C.yellow,2.2,.95);poly(ctx,R.hist.map(p=>[X(p.t),y1-(clamp(p.Tw,0,100)/100)*(y1-y0)]),C.blue,1.6,.8);
+    text(ctx,'usable watts',x0+6,y0-10,{size:14,align:'left',color:C.yellow});text(ctx,'water °C',x0+110,y0-10,{size:14,align:'left',color:C.blue});for(const t of [0,60,120,180])text(ctx,t+' min',X(t),y1+16,{size:12,alpha:.7});
+    const lines=[`${R.S.n} · ${R.N} modules · ${R.Cc.n}`,`peak ${R.Pmax.toFixed(1)} W usable, ${R.Wh.toFixed(1)} Wh in 3 hours`,R.L.Wh?(R.tOK?`${R.L.n} charged in ${(R.tOK/60).toFixed(1)} h`:`${R.L.n} not charged in 3 h (needs ${R.hours>1e5?'forever':R.hours.toFixed(0)+' h'})`):(R.Pmax>=R.L.W?`${R.L.n} runs`:`${R.L.n} does not run`)];
+    if(at('g8'))lines.push(`water ended at ${R.hist[R.hist.length-1].Tw.toFixed(0)} °C`);for(const wv of R.warn)lines.push('⚠ '+wv);readout(ctx,lines,w*.6,y0,{size:12})}
+});
+hook('sy-run',()=>sy&&sy.run(sy));slide('sy-n',v=>{},v=>String(v));
+
+Chalk.start({key:'heat',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
+  ht1:()=>fw&&fw.met,ht1b:()=>fw&&fw.hold>=30,
+  ht2:()=>bl&&bl.boiledAt!=null&&bl.m===1,ht2b:()=>bl&&bl.err!=null&&bl.err<=.1,
+  ht3:()=>st&&st.hold>=30,ht3b:()=>st&&st.over,
+  ht4:()=>tg&&tg.best>=1,ht4b:()=>tg&&tg.best>=3,ht4c:()=>tg&&tg.handTried,
+  ht5:()=>cn&&cn.th===170&&cn.tc===0,ht5b:()=>cn&&cn.real>=.10,
+  ht6:()=>ld&&ld.near,ht6b:()=>ld&&ld.boost&&ld.usb>=2,
+  ht7:()=>sy&&sy.phoneOK,ht7b:()=>sy&&sy.candleTried,ht7c:()=>sy&&sy.tankOK
+},Object.fromEntries(Array.from({length:7},(_,i)=>[`tb${i+1}`,()=>Chalk.checkPassed(`ch${i+1}`)])))});
+
+</script>
+</body>
+</html>
