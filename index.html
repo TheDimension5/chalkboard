@@ -44,7 +44,24 @@ canvas#write{position:absolute;inset:0;width:100%;height:100%;pointer-events:non
 .done .doodles *,.done .door *,.done .tag,.done .skip{animation-duration:0s!important;animation-delay:0s!important}
 .done .skip{opacity:0!important}
 @media (prefers-reduced-motion:reduce){.doodles *,.door *,.tag{animation-duration:0s!important;animation-delay:0s!important}.skip{display:none}}
-@media (max-width:600px){.doodles{opacity:.6}.center{transform:translateY(-4%)}}
+@media (max-width:700px),(max-height:560px){
+  .doodles .lower,.doodles text{display:none}
+  .doodles{opacity:.7}
+  .center{top:38%;transform:none;gap:.9rem;padding:0 .8rem}
+  .tag{font-size:1.5rem}
+  .doors{gap:.8rem;margin-top:.1rem;width:100%}
+  .door{padding:.75rem 1rem .85rem;min-width:0;width:min(360px,100%)}
+  .door .big{font-size:1.55rem}
+  .door .small{font-size:.66rem;letter-spacing:.05em}
+  .skip{bottom:2rem;font-size:.95rem}
+  .tray{left:6%;right:6%}
+  .eraser{width:52px}
+}
+@media (max-height:560px) and (min-width:560px){
+  .center{top:30%}
+  .doors{flex-direction:row;flex-wrap:nowrap}
+  .door{width:auto;min-width:min(280px,44vw)}
+}
 </style>
 </head>
 <body>
@@ -54,12 +71,12 @@ canvas#write{position:absolute;inset:0;width:100%;height:100%;pointer-events:non
   <svg class="doodles" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <g class="y" style="--d:1.0s"><path pathLength="1" d="M150 100 l28 58 v66 h-56 v-66 z"/><path pathLength="1" d="M122 224 l-22 26 h24 M178 224 l22 26 h-24"/><path pathLength="1" class="p" d="M138 226 q12 40 24 0"/></g>
     <g class="b" style="--d:1.25s"><circle pathLength="1" cx="1030" cy="150" r="42"/><ellipse pathLength="1" cx="1030" cy="150" rx="86" ry="22" transform="rotate(-18 1030 150)"/><circle pathLength="1" class="y" cx="1108" cy="128" r="4"/></g>
-    <g class="p" style="--d:1.5s"><path pathLength="1" d="M92 470 v64 a34 34 0 0 0 68 0 v-64"/><path pathLength="1" d="M84 470 h26 M150 470 h26"/><path pathLength="1" class="b" d="M100 448 v-14 M160 448 v-14"/></g>
-    <g class="y" style="--d:1.7s"><path pathLength="1" d="M960 540 C960 496 1030 496 1040 540 C1050 584 1120 584 1120 540 C1120 496 1050 496 1040 540 C1030 584 960 584 960 540Z"/></g>
+    <g class="p lower" style="--d:1.5s"><path pathLength="1" d="M92 470 v64 a34 34 0 0 0 68 0 v-64"/><path pathLength="1" d="M84 470 h26 M150 470 h26"/><path pathLength="1" class="b" d="M100 448 v-14 M160 448 v-14"/></g>
+    <g class="y lower" style="--d:1.7s"><path pathLength="1" d="M960 540 C960 496 1030 496 1040 540 C1050 584 1120 584 1120 540 C1120 496 1050 496 1040 540 C1030 584 960 584 960 540Z"/></g>
     <g style="--d:1.9s"><circle pathLength="1" cx="600" cy="72" r="30"/><path pathLength="1" d="M584 100 h32 v14 h-32z"/><path pathLength="1" class="y" d="M590 88 l8-16 4 16 4-16 4 16"/></g>
-    <g class="p" style="--d:2.1s"><path pathLength="1" d="M330 560 c-34 36 -34 80 0 92 c34 -12 34 -56 0 -92"/><path pathLength="1" class="y" d="M330 604 c-12 14 -12 30 0 36 c12 -6 12 -22 0 -36"/></g>
-    <g style="--d:2.3s"><circle pathLength="1" class="p" cx="880" cy="610" r="26"/><path pathLength="1" d="M880 584 v-14 M880 580 q16-16 26-6"/></g>
-    <g class="g" style="--d:2.5s"><path pathLength="1" d="M420 640 h80 M420 654 h80 M420 668 h80"/><path pathLength="1" d="M760 120 q40 0 40 40 q0 40 -40 40"/></g>
+    <g class="p lower" style="--d:2.1s"><path pathLength="1" d="M330 560 c-34 36 -34 80 0 92 c34 -12 34 -56 0 -92"/><path pathLength="1" class="y" d="M330 604 c-12 14 -12 30 0 36 c12 -6 12 -22 0 -36"/></g>
+    <g class="lower" style="--d:2.3s"><circle pathLength="1" class="p" cx="880" cy="610" r="26"/><path pathLength="1" d="M880 584 v-14 M880 580 q16-16 26-6"/></g>
+    <g class="g lower" style="--d:2.5s"><path pathLength="1" d="M420 640 h80 M420 654 h80 M420 668 h80"/></g><g class="g" style="--d:2.5s"><path pathLength="1" d="M760 120 q40 0 40 40 q0 40 -40 40"/></g>
     <text x="905" y="92" style="--d:2.6s">E = mc²</text>
     <text x="150" y="640" style="--d:2.8s">P ∝ ΔT²</text>
     <text x="700" y="640" style="--d:3.0s">v = √(2gh)</text>
@@ -80,11 +97,11 @@ canvas#write{position:absolute;inset:0;width:100%;height:100%;pointer-events:non
 (function(){
 const cv=document.getElementById('write'),ctx=cv.getContext('2d'),board=document.getElementById('board');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let W=0,H=0;function size(){const r=board.getBoundingClientRect();const dpr=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+let W=0,H=0;const svg=document.querySelector('.doodles');function size(){const r=board.getBoundingClientRect();const dpr=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);svg.setAttribute('preserveAspectRatio',(W<700||H<560)?'xMidYMin meet':'xMidYMid slice')}
 size();addEventListener('resize',()=>{size();if(finished)paint(1,0,0)});
 const title='The Chalkboard';let start=null,last=0,done=reduce,finished=false;const dust=[];
 function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)}
-function paint(p,t,dt){ctx.clearRect(0,0,W,H);const fs=Math.min(W*.115,128);ctx.font=`700 ${fs}px Caveat, "Segoe Print", cursive`;ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(title).width;const x0=W/2-tw/2,y=H*.34;
+function paint(p,t,dt){ctx.clearRect(0,0,W,H);const fs=Math.min(W*.115,128,W<700?W*.13:999);ctx.font=`700 ${fs}px Caveat, "Segoe Print", cursive`;ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(title).width;const x0=W/2-tw/2,y=H<560?H*.17:(W<700?H*.27:H*.34);
   ctx.save();ctx.beginPath();ctx.rect(0,0,x0+tw*p+8,H);ctx.clip();ctx.fillStyle='rgba(241,236,223,.94)';ctx.fillText(title,W/2,y);ctx.fillStyle='rgba(241,236,223,.28)';ctx.fillText(title,W/2+1.6,y+1.2);ctx.restore();
   if(p<1){const tipX=x0+tw*p,tipY=y+Math.sin(t/55)*fs*.22+fs*.1;ctx.save();ctx.translate(tipX,tipY);ctx.rotate(-.75);ctx.fillStyle='#F1ECDF';rr(-4,-2,9,44,3);ctx.fill();ctx.fillStyle='rgba(0,0,0,.15)';rr(-4,-2,9,6,2);ctx.fill();ctx.restore();
     for(let i=0;i<3;i++)dust.push({x:tipX+(Math.random()-.5)*6,y:tipY+6,vx:(Math.random()-.5)*26,vy:14+Math.random()*30,age:0,dur:.7+Math.random()*.7,s:1+Math.random()*1.6})}
