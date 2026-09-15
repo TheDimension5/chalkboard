@@ -201,6 +201,50 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
 .cf select,.controls select{background:var(--board-2);color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .5rem;font:700 .9rem var(--body)}
 .fb{margin:0;font-size:.95rem;min-height:1.2em}
 .fb.ok{color:var(--green)}.fb.bad{color:var(--pink)}
+.warmup{margin:0 0 1.1rem;padding:.6rem .9rem;border-left:3px solid var(--blue);font-size:.98rem}
+.warmup b{color:var(--blue);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.15rem}
+.lesson-end{display:grid;gap:.6rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--green);border-radius:10px}
+.lesson-end p{margin:0}
+.lesson-end .skill b{color:var(--green)}
+.lesson-end .exit b{color:var(--yellow);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.1rem}
+.discuss summary{cursor:pointer;font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);list-style:none}
+.discuss summary::-webkit-details-marker{display:none}
+.discuss summary::before{content:"+ ";color:var(--yellow)}
+.discuss[open] summary::before{content:"– "}
+.discuss ol{margin:.5rem 0 0;padding-left:1.3rem;display:grid;gap:.35rem;font-size:.95rem}
+.discuss ol.lv{display:none}
+html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5,html[data-level="g8"] .discuss ol.lv-g8,html[data-level="hs"] .discuss ol.lv-hs,html[data-level="col"] .discuss ol.lv-col,html[data-level="max"] .discuss ol.lv-max{display:grid}
+.links{font-size:.9rem;color:var(--chalk-dim)}
+.links a{color:var(--yellow)}
+.unitbadge{display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.18rem .6rem;margin:0 .35rem .3rem 0}
+.cf.choice{flex-direction:column;align-items:flex-start;gap:.35rem}
+.cf label.opt{display:flex;gap:.55rem;align-items:center;font-weight:700;font-size:.95rem;cursor:pointer}
+.cf input[type=radio]{accent-color:var(--yellow);width:1.1rem;height:1.1rem;margin:0}
+.grade{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-top:1.3rem}
+.grade .lbl,.mapbar .lbl{font-weight:900;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-right:.3rem}
+.grade .hint{font-size:1.05rem}
+.mapwrap{margin-top:1.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1rem 1rem .6rem;background:var(--board-2)}
+.mapbar{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-bottom:.6rem}
+.mapbar .hint{font-family:var(--body);font-size:.88rem;color:var(--chalk-dim)}
+.map{position:relative}
+.map canvas{display:block;width:100%;height:auto;cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--board);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .75rem;font-size:.85rem;max-width:300px;display:none;z-index:2;color:var(--chalk)}
+.tip b{display:block;font-family:var(--display);font-size:1.25rem;color:var(--yellow);line-height:1.1}
+.tip small{color:var(--chalk-dim)}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.4rem}
+.unit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.2rem}
+.unit h3{font-size:1.8rem}
+.unit p{color:var(--chalk-dim);font-size:.95rem;margin:.3rem 0 .7rem}
+.unit ol{margin:0;padding-left:1.3rem;display:grid;gap:.3rem;font-size:.95rem}
+.unit ol a{color:var(--chalk);text-decoration:none;border-bottom:1px dotted var(--chalk-faint)}
+.unit ol a:hover{color:var(--yellow)}
+.unit ol small{color:var(--chalk-dim);display:block}
+.qsearch{margin-top:2.8rem}
+.qsearch input{width:100%;max-width:520px;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:999px;padding:.6rem 1rem;font:700 1rem var(--body);margin-top:.6rem}
+.qlist{list-style:none;padding:0;margin:.9rem 0 0;display:grid;gap:.35rem;max-height:18rem;overflow:auto}
+.qlist a{color:var(--chalk);text-decoration:none}
+.qlist a:hover{color:var(--yellow)}
+.qlist small{color:var(--chalk-dim);margin-left:.45rem}
 </style>
 </head>
 <body>
@@ -237,6 +281,7 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
   <div class="text">
     <p class="eyebrow">Chapter 1</p>
     <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Can you tell if two piles are the same size without counting either?</p>
     <div class="lv lv-k5"><h2>Counting by matching</h2><p>How do you know two piles have the same amount without counting? <em>Pair them up.</em> One apple, one cup. If nothing is left over, the piles are the same size. You never needed numbers at all.</p><p>Cantor's big idea: use pairing for infinite piles too, where counting would never finish.</p></div>
     <div class="lv lv-g8"><h2>Counting by matching</h2><p>A pairing where every item on each side has exactly one partner is called a one-to-one match. Two collections have the same size exactly when such a match exists.</p><p>This definition works for finite piles, and it is the only definition that still makes sense for infinite ones. Try the uneven piles: one item is left over, so no match exists, so the sizes differ.</p></div>
     <div class="lv lv-hs"><h2>Bijections</h2><p>A bijection between sets A and B is a function that is one-to-one and onto. Cantor defined |A| = |B| to mean that a bijection exists. For finite sets this agrees with counting; for infinite sets it <em>is</em> the definition.</p><p>|A| ≤ |B| means an injection A → B exists. The Cantor–Schröder–Bernstein theorem says that injections both ways give a bijection, so ≤ behaves like an order.</p></div>
@@ -249,13 +294,21 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="match-reset">Start over</button></div>
     <figcaption><b>Try this:</b> drag from each apple to a cup. <span data-lv="k5">If nothing is left over, the piles are the same size.</span><span data-lv="g8 hs col max">Above the Kids level the piles are uneven: find what is left over.</span></figcaption>
     <ul class="missions" data-ch="ch1"></ul>
-    
+    <div class="check" data-ch="ch1"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">How can you tell two piles are the same size without counting?</p><form class="cf choice" data-type="choice" data-a="1" data-hint="One apple, one cup." data-ok="Right. Pairing."><label class="opt"><input type="radio" name="c-infinity-1-k5" value="0"> weigh them</label><label class="opt"><input type="radio" name="c-infinity-1-k5" value="1"> pair them up</label><label class="opt"><input type="radio" name="c-infinity-1-k5" value="2"> guess</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A pairing where everything has exactly one partner is called</p><form class="cf choice" data-type="choice" data-a="0" data-hint="One to one." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-1-g8" value="0"> one-to-one</label><label class="opt"><input type="radio" name="c-infinity-1-g8" value="1"> a guess</label><label class="opt"><input type="radio" name="c-infinity-1-g8" value="2"> a count</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">|A| = |B| means</p><form class="cf choice" data-type="choice" data-a="1" data-hint="One-to-one and onto." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-1-hs" value="0"> A and B look alike</label><label class="opt"><input type="radio" name="c-infinity-1-hs" value="1"> a bijection A → B exists</label><label class="opt"><input type="radio" name="c-infinity-1-hs" value="2"> A is a subset of B</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">The Cantor–Schröder–Bernstein theorem says injections both ways give</p><form class="cf choice" data-type="choice" data-a="1" data-hint="So ≤ is antisymmetric." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-1-col" value="0"> nothing</label><label class="opt"><input type="radio" name="c-infinity-1-col" value="1"> a bijection</label><label class="opt"><input type="radio" name="c-infinity-1-col" value="2"> a contradiction</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Comparability of all cardinals is equivalent to</p><form class="cf choice" data-type="choice" data-a="0" data-hint="Hartogs 1915." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-1-max" value="0"> the axiom of choice</label><label class="opt"><input type="radio" name="c-infinity-1-max" value="1"> the continuum hypothesis</label><label class="opt"><input type="radio" name="c-infinity-1-max" value="2"> Peano arithmetic</label><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> decide whether two collections are the same size by pairing.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does pairing work even when counting cannot finish?</li><li>Is 'same size' the same as 'same shape'? Give an example.</li><li>What is left over when the pairing fails?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Explain pairing to someone using two piles from the room.</p>
+      
+      
+    </div>
   </figure>
 </section>
 <section class="chapter" id="ch2">
   <div class="text">
     <p class="eyebrow">Chapter 2</p>
     <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>A hotel with infinitely many rooms is full. Can it take one more guest?</p>
     <div class="lv lv-k5"><h2>Hilbert's Hotel</h2><p class="when">David Hilbert, 1924</p><p>Imagine a hotel with rooms numbered 1, 2, 3 and so on <em>forever</em>, and every room is full. A new guest arrives. No problem: everyone moves up one room, and room 1 is free.</p><p>A bus with infinitely many people arrives. Still no problem: everyone moves to double their room number, and all the odd rooms are free. A full hotel with room for more. That is what infinity is like.</p></div>
     <div class="lv lv-g8"><h2>Hilbert's Hotel</h2><p class="when">David Hilbert, 1924</p><p>David Hilbert used this hotel to show something strange: an infinite set can be matched one-to-one with <em>part of itself</em>. The guests in all the rooms match perfectly with the guests in only the even rooms. For finite piles that is impossible.</p><p>In fact that strangeness became the definition: a set is infinite exactly when it can be paired with a part of itself.</p></div>
     <div class="lv lv-hs"><h2>Countable infinity</h2><p class="when">David Hilbert, 1924</p><p>The whole numbers ℕ, the even numbers, the integers ℤ, and even ℕ × ℕ all have the same cardinality, written ℵ₀ (aleph-null). A set that can be paired with ℕ is called countable.</p><p>Dedekind turned the hotel trick into a definition: a set is infinite if it is in bijection with a proper subset of itself. The bus is the map n ↦ 2n; the infinitely many buses need a pairing of ℕ × ℕ with ℕ.</p></div>
@@ -268,13 +321,21 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="hotel-guest">A new guest arrives</button><button class="btn blue" id="hotel-bus">An infinite bus arrives</button><button class="btn" id="hotel-reset">Fill the hotel again</button></div>
     <figcaption><b>Try this:</b> the hotel is full. Make room for one more, then for a whole busload. <span data-lv="hs col max">The bus is the map n ↦ 2n.</span></figcaption>
     <ul class="missions" data-ch="ch2"></ul>
-    
+    <div class="check" data-ch="ch2"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">The hotel is full and one guest arrives. What does everyone do?</p><form class="cf choice" data-type="choice" data-a="1" data-hint="Room 1 becomes free." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-2-k5" value="0"> leave</label><label class="opt"><input type="radio" name="c-infinity-2-k5" value="1"> move up one room</label><label class="opt"><input type="radio" name="c-infinity-2-k5" value="2"> share</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A set is infinite exactly when it can be paired with</p><form class="cf choice" data-type="choice" data-a="1" data-hint="The even rooms." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-2-g8" value="0"> nothing</label><label class="opt"><input type="radio" name="c-infinity-2-g8" value="1"> a part of itself</label><label class="opt"><input type="radio" name="c-infinity-2-g8" value="2"> a bigger set</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">The size of the counting numbers is written</p><form class="cf choice" data-type="choice" data-a="0" data-hint="Aleph-null." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-2-hs" value="0"> ℵ₀</label><label class="opt"><input type="radio" name="c-infinity-2-hs" value="1"> ∞</label><label class="opt"><input type="radio" name="c-infinity-2-hs" value="2"> 10¹⁰⁰</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">The infinitely-many-buses trick needs</p><form class="cf choice" data-type="choice" data-a="0" data-hint="Choosing an enumeration for each bus." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-2-col" value="0"> countable choice</label><label class="opt"><input type="radio" name="c-infinity-2-col" value="1"> no extra assumptions</label><label class="opt"><input type="radio" name="c-infinity-2-col" value="2"> the continuum hypothesis</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">In ZF without choice, ℝ can be</p><form class="cf choice" data-type="choice" data-a="1" data-hint="Feferman–Levy." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-2-max" value="0"> finite</label><label class="opt"><input type="radio" name="c-infinity-2-max" value="1"> a countable union of countable sets</label><label class="opt"><input type="radio" name="c-infinity-2-max" value="2"> well-ordered always</label><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> show how an infinite set can match a part of itself.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why is 'matches part of itself' a definition of infinite?</li><li>Are there as many even numbers as whole numbers? Argue both sides, then decide.</li><li>What breaks if you try the hotel trick with 100 rooms?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Write the two moves: one guest, one bus.</p>
+      
+      
+    </div>
   </figure>
 </section>
 <section class="chapter" id="ch3">
   <div class="text">
     <p class="eyebrow">Chapter 3</p>
     <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Between 1 and 2 there are endless fractions. So are there more fractions than whole numbers?</p>
     <div class="lv lv-k5"><h2>More fractions than whole numbers?</h2><p class="when">Cantor, 1874</p><p>Between any two whole numbers there are endless fractions. So there must be more fractions than whole numbers, right?</p><p>Cantor said: let's try to pair them. Write every fraction in a giant grid and walk through it in a zigzag. Every fraction gets a number on the way. So there are exactly as many fractions as whole numbers. Surprise.</p></div>
     <div class="lv lv-g8"><h2>More fractions than whole numbers?</h2><p class="when">Cantor, 1874</p><p>The zigzag visits every fraction eventually, so it gives each one a label: 1st, 2nd, 3rd. That is a one-to-one match between fractions and counting numbers. The fractions are <em>countable</em>.</p><p>Being densely packed does not make a set bigger than the counting numbers. Density and size are different things.</p></div>
     <div class="lv lv-hs"><h2>ℚ is countable</h2><p class="when">Cantor, 1874</p><p>List positive fractions p/q in a grid indexed by (p, q), walk the diagonals p + q = 2, 3, 4, ..., skip repeats like 2/4, and interleave negatives. Every rational appears at a finite step.</p><p>So |ℚ| = ℵ₀, despite ℚ being dense in ℝ. The same trick shows the set of all finite strings over a finite alphabet is countable, so there are only countably many computer programs.</p></div>
@@ -287,13 +348,21 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="zig-next">Next fraction</button><button class="btn" id="zig-auto" aria-pressed="false">Auto</button><button class="btn" id="zig-reset">Start over</button></div>
     <figcaption><b>Try this:</b> step the zigzag and watch every fraction get a whole number. <span data-lv="hs col max">Repeats such as 2/4 are skipped, since 1/2 already has a number.</span></figcaption>
     <ul class="missions" data-ch="ch3"></ul>
-    
+    <div class="check" data-ch="ch3"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">How many fractions are there compared with whole numbers?</p><form class="cf choice" data-type="choice" data-a="1" data-hint="The zigzag numbers them all." data-ok="Right. The same."><label class="opt"><input type="radio" name="c-infinity-3-k5" value="0"> more</label><label class="opt"><input type="radio" name="c-infinity-3-k5" value="1"> exactly as many</label><label class="opt"><input type="radio" name="c-infinity-3-k5" value="2"> fewer</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A set that can be paired with 1, 2, 3, ... is called</p><form class="cf choice" data-type="choice" data-a="0" data-hint="Every element gets a number." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-3-g8" value="0"> countable</label><label class="opt"><input type="radio" name="c-infinity-3-g8" value="1"> dense</label><label class="opt"><input type="radio" name="c-infinity-3-g8" value="2"> huge</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Which is countable?</p><form class="cf choice" data-type="choice" data-a="0" data-hint="Zigzag versus diagonal." data-ok="Right. Only ℚ."><label class="opt"><input type="radio" name="c-infinity-3-hs" value="0"> the rationals</label><label class="opt"><input type="radio" name="c-infinity-3-hs" value="1"> the reals</label><label class="opt"><input type="radio" name="c-infinity-3-hs" value="2"> both</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Cantor's first proof that transcendentals exist used</p><form class="cf choice" data-type="choice" data-a="0" data-hint="1874." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-3-col" value="0"> counting the algebraic numbers</label><label class="opt"><input type="radio" name="c-infinity-3-col" value="1"> the diagonal argument</label><label class="opt"><input type="radio" name="c-infinity-3-col" value="2"> calculus</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Cantor's 1874 uncountability proof used</p><form class="cf choice" data-type="choice" data-a="0" data-hint="The diagonal came in 1891." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-3-max" value="0"> nested intervals</label><label class="opt"><input type="radio" name="c-infinity-3-max" value="1"> diagonalization</label><label class="opt"><input type="radio" name="c-infinity-3-max" value="2"> forcing</label><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> number the fractions with a zigzag and say why they are countable.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why does 'more crowded' not mean 'more of them'?</li><li>What does the zigzag skip, and why is that allowed?</li><li>Could you number the fractions row by row instead? Why not?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Why does every fraction get a whole number eventually?</p>
+      
+      
+    </div>
   </figure>
 </section>
 <section class="chapter" id="ch4">
   <div class="text">
     <p class="eyebrow">Chapter 4</p>
     <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>If someone claims to have a list of every number between 0 and 1, how would you test it?</p>
     <div class="lv lv-k5"><h2>The diagonal trick</h2><p class="when">Cantor, 1891</p><p>Now try the same trick with all the numbers between 0 and 1, written as endless strings of digits. Suppose you had a list of all of them.</p><p>Cantor makes a new number: look at the first digit of the first number and change it. Then the second digit of the second number, and change it. And so on down the diagonal. The new number is different from <em>every</em> number on the list. So the list was never complete. No list can ever be. These numbers are a bigger infinity.</p></div>
     <div class="lv lv-g8"><h2>The diagonal trick</h2><p class="when">Cantor, 1891</p><p>Here is why the new number cannot be on the list. Is it the 1st number? No, its first digit is different. The 2nd? No, its second digit is different. It differs from the nth number at the nth digit, for every n.</p><p>Any list you write leaves something out, so the numbers between 0 and 1 cannot be paired with 1, 2, 3, .... They form a bigger infinity than the counting numbers.</p></div>
     <div class="lv lv-hs"><h2>The diagonal argument</h2><p class="when">Cantor, 1891</p><p>Suppose f: ℕ → {0,1}^ℕ lists every infinite binary sequence, with f(n) = (aₙ₁, aₙ₂, ...). Define b by bₙ = 1 − aₙₙ. Then b differs from f(n) in position n, for every n, so b is not on the list. Contradiction.</p><p>Hence the infinite binary sequences are uncountable, and so is ℝ (via binary expansions, taking care with dual representations such as 0.0111... = 0.1000...). The cardinality of ℝ is written 𝔠, or 2^ℵ₀.</p></div>
@@ -306,13 +375,21 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><button class="btn" id="diag-flip">Flip the diagonal</button><button class="btn blue" id="diag-add">Add it to the list</button><button class="btn" id="diag-reset">New list</button></div>
     <figcaption><b>Try this:</b> flip the diagonal to build a new number, then add it to the list and flip again. The list can never catch up.</figcaption>
     <ul class="missions" data-ch="ch4"></ul>
-    
+    <div class="check" data-ch="ch4"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">The new number Cantor makes is</p><form class="cf choice" data-type="choice" data-a="1" data-hint="Change the diagonal." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-4-k5" value="0"> on the list somewhere</label><label class="opt"><input type="radio" name="c-infinity-4-k5" value="1"> different from every number on the list</label><label class="opt"><input type="radio" name="c-infinity-4-k5" value="2"> the biggest number</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">Why can't you fix the list by adding the new number?</p><form class="cf choice" data-type="choice" data-a="1" data-hint="Flip again." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-4-g8" value="0"> you can</label><label class="opt"><input type="radio" name="c-infinity-4-g8" value="1"> the diagonal grows with it and misses again</label><label class="opt"><input type="radio" name="c-infinity-4-g8" value="2"> the list is too long</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">The diagonal argument proves {0,1}^ℕ is</p><form class="cf choice" data-type="choice" data-a="1" data-hint="bₙ = 1 − aₙₙ." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-4-hs" value="0"> countable</label><label class="opt"><input type="radio" name="c-infinity-4-hs" value="1"> uncountable</label><label class="opt"><input type="radio" name="c-infinity-4-hs" value="2"> empty</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Cantor's theorem: for every set X there is no surjection from X onto</p><form class="cf choice" data-type="choice" data-a="1" data-hint="The power set." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-4-col" value="0"> X</label><label class="opt"><input type="radio" name="c-infinity-4-col" value="1"> 𝒫(X)</label><label class="opt"><input type="radio" name="c-infinity-4-col" value="2"> ℕ</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Lawvere's fixed-point theorem unifies Cantor with</p><form class="cf choice" data-type="choice" data-a="0" data-hint="One theorem, many categories." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-4-max" value="0"> Gödel, Tarski and Turing</label><label class="opt"><input type="radio" name="c-infinity-4-max" value="1"> Euclid</label><label class="opt"><input type="radio" name="c-infinity-4-max" value="2"> Newton</label><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> build a number that is not on any list and say why.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why can't you just add the new number to the list?</li><li>Where else does a 'make something the list misses' argument appear?</li><li>What exactly is bigger about the numbers on the line?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Write the diagonal rule in one sentence.</p>
+      
+      
+    </div>
   </figure>
 </section>
 <section class="chapter" id="ch5">
   <div class="text">
     <p class="eyebrow">Chapter 5</p>
     <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>Is there a biggest infinity?</p>
     <div class="lv lv-k5"><h2>The ladder, and the question nobody could answer</h2><p>Is there a biggest infinity? No. Cantor showed how to always make a bigger one: take all the different groups you can make from a set. That collection is always bigger than the set you started with. So the infinities climb a ladder that never ends.</p><p>Then he asked: is there an infinity in between the counting numbers and the numbers on the line? He couldn't answer it. He spent years on it. The answer, found seventy years later, was the strangest of all: <em>the question has no answer</em>. Both yes and no fit all the rules of mathematics.</p></div>
     <div class="lv lv-g8"><h2>The ladder, and the question nobody could answer</h2><p>A set with 3 things has 8 subsets. With 4 things, 16. In general 2ⁿ. Cantor proved the same holds for infinite sets: the subsets of a set always make a bigger infinity. So the infinities go up like a ladder: ℵ₀, then bigger, then bigger.</p><p>Cantor's question, the continuum hypothesis: is the infinity of the number line the very next rung after ℵ₀? In 1940 Kurt Gödel showed you cannot prove it false. In 1963 Paul Cohen showed you cannot prove it true. The usual rules of mathematics simply do not decide it.</p></div>
     <div class="lv lv-hs"><h2>Cantor's ladder and the continuum hypothesis</h2><p>Cantor's theorem: |X| < |𝒫(X)| for every set X, so ℵ₀ < 2^ℵ₀ < 2^(2^ℵ₀) < .... The continuum hypothesis (CH) says 2^ℵ₀ = ℵ₁, the first uncountable cardinal: there is no set strictly between ℕ and ℝ in size.</p><p>Gödel (1940) proved CH is consistent with the standard axioms, ZFC. Cohen (1963) proved its negation is consistent too. CH is independent of ZFC. Hilbert had put it first on his 1900 list of problems.</p></div>
@@ -325,7 +402,14 @@ input[type=number]{background:transparent;color:var(--chalk);border:2px solid va
     <div class="controls"><label class="slider">Things in the set <input type="range" id="ladder-n" min="1" max="5" step="1" value="3"><span class="val" id="ladder-n-val">3</span></label><button class="btn" id="ladder-ch" data-lv="hs col max" aria-pressed="true">Continuum hypothesis: true</button></div>
     <figcaption><b>Try this:</b> count the subsets as the set grows. <span data-lv="hs col max">Then flip the continuum hypothesis and watch nothing break. Both answers are consistent with the rules.</span></figcaption>
     <ul class="missions" data-ch="ch5"></ul>
-    
+    <div class="check" data-ch="ch5"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">Is there a biggest infinity?</p><form class="cf choice" data-type="choice" data-a="1" data-hint="Take all the groups you can make." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-5-k5" value="0"> yes</label><label class="opt"><input type="radio" name="c-infinity-5-k5" value="1"> no, they climb a ladder forever</label><label class="opt"><input type="radio" name="c-infinity-5-k5" value="2"> only two</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">The continuum hypothesis turned out to be</p><form class="cf choice" data-type="choice" data-a="2" data-hint="Gödel and Cohen." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-5-g8" value="0"> true</label><label class="opt"><input type="radio" name="c-infinity-5-g8" value="1"> false</label><label class="opt"><input type="radio" name="c-infinity-5-g8" value="2"> undecidable from the usual rules</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Gödel (1940) showed CH</p><form class="cf choice" data-type="choice" data-a="1" data-hint="The constructible universe." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-5-hs" value="0"> is true</label><label class="opt"><input type="radio" name="c-infinity-5-hs" value="1"> cannot be disproved in ZFC</label><label class="opt"><input type="radio" name="c-infinity-5-hs" value="2"> is false</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">Cohen's method for adding new reals is called</p><form class="cf choice" data-type="choice" data-a="0" data-hint="1963." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-5-col" value="0"> forcing</label><label class="opt"><input type="radio" name="c-infinity-5-col" value="1"> diagonalization</label><label class="opt"><input type="radio" name="c-infinity-5-col" value="2"> induction</label><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Forcing axioms such as PFA imply 2^ℵ₀ equals</p><form class="cf choice" data-type="choice" data-a="1" data-hint="Not CH." data-ok="Right."><label class="opt"><input type="radio" name="c-infinity-5-max" value="0"> ℵ₁</label><label class="opt"><input type="radio" name="c-infinity-5-max" value="1"> ℵ₂</label><label class="opt"><input type="radio" name="c-infinity-5-max" value="2"> ℵ₀</label><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> explain why the infinities never stop, and what 'no answer' means for the continuum hypothesis.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>How can a yes-or-no question have no answer?</li><li>Does 'independent' mean unknown, or something stronger?</li><li>Would you accept new rules to settle it? Which ones?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: what did Gödel show, and what did Cohen show?</p>
+      <p class="links">Before this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch9">One Rule for Everything 9, The puzzle is still open</a></p>
+      <p class="links"><span class="unitbadge">How we know · step 6</span></p>
+    </div>
   </figure>
 </section>
 </main>
@@ -416,7 +500,9 @@ function wireRead(){if(!canSpeak){document.querySelectorAll('.read').forEach(b=>
 let passed=new Set(),UNITWHY={};
 const uname=u=>{const o=document.querySelector(`form.cf select option[value="${u}"]`);return o?o.textContent:u};
 function checkPassed(ch){return passed.has(ch+':'+LEVEL)}
-function wireChecks(){document.querySelectorAll('form.cf').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const box=f.closest('.check');const fb=box.querySelector('.fb');const v=parseFloat(String(f.querySelector('input').value).replace(/,/g,''));const u=f.querySelector('select').value;const a=parseFloat(f.dataset.a),want=f.dataset.u,tol=parseFloat(f.dataset.tol||'.02');
+function wireChecks(){document.querySelectorAll('form.cf').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const box=f.closest('.check');const fb=box.querySelector('.fb');
+    if(f.dataset.type==='choice'){const c=f.querySelector('input[type=radio]:checked');if(!c){fb.textContent='Pick one.';fb.className='fb bad';return}if(c.value!==f.dataset.a){fb.textContent='Not that one. Hint: '+f.dataset.hint;fb.className='fb bad';return}fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}return}
+    const v=parseFloat(String(f.querySelector('input').value).replace(/,/g,''));const u=f.querySelector('select').value;const a=parseFloat(f.dataset.a),want=f.dataset.u,tol=parseFloat(f.dataset.tol||'.02');
     if(isNaN(v)){fb.textContent='Type a number first.';fb.className='fb bad';return}
     if(!u){fb.textContent='Pick a unit. A number without a unit is not an answer.';fb.className='fb bad';return}
     if(u!==want){fb.textContent=`Units first. You answered in ${uname(u)}, but this question wants ${uname(want)}: ${UNITWHY[want]||''}. Try again in ${want}.`;fb.className='fb bad';return}
@@ -437,8 +523,9 @@ return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box
 })();
 </script>
 <script>
-const MISSION_DEFS=[{"id": "inf1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Pair every apple with a cup."}, {"id": "inf1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Pair as many as you can and find the one left over."}, {"id": "inf2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the new guest."}, {"id": "inf2b", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the whole bus."}, {"id": "inf3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Number 20 fractions with the zigzag."}, {"id": "inf3b", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Number 30 fractions and watch the repeats get skipped."}, {"id": "inf4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Flip the diagonal to make a number that is not on the list."}, {"id": "inf4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Add the new number to the list, then flip again."}, {"id": "inf5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Show all 16 subsets of a four-thing set."}, {"id": "inf5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Flip the continuum hypothesis both ways."}];
+const MISSION_DEFS=[{"id": "inf1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Pair every apple with a cup."}, {"id": "inf1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Pair as many as you can and find the one left over."}, {"id": "inf2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the new guest."}, {"id": "inf2b", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the whole bus."}, {"id": "inf3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Number 20 fractions with the zigzag."}, {"id": "inf3b", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Number 30 fractions and watch the repeats get skipped."}, {"id": "inf4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Flip the diagonal to make a number that is not on the list."}, {"id": "inf4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Add the new number to the list, then flip again."}, {"id": "inf5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Show all 16 subsets of a four-thing set."}, {"id": "inf5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Flip the continuum hypothesis both ways."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}];
 const UNIT_WHY={};
+const TB_CHECKS={tb1:()=>Chalk.checkPassed('ch1'),tb2:()=>Chalk.checkPassed('ch2'),tb3:()=>Chalk.checkPassed('ch3'),tb4:()=>Chalk.checkPassed('ch4'),tb5:()=>Chalk.checkPassed('ch5')};
 const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
 
 /* ---------- CH1: pairing ---------- */
@@ -542,14 +629,14 @@ const ladder=makeSim('cv-ladder',{
 slide('ladder-n',v=>{if(ladder)ladder.n=Math.round(v)},v=>String(Math.round(v)));
 hook('ladder-ch',()=>{if(!ladder)return;ladder.ch=!ladder.ch;ladder.chSeen[ladder.ch]=true;const b=$('ladder-ch');b.textContent='Continuum hypothesis: '+(ladder.ch?'true':'false');b.setAttribute('aria-pressed',String(ladder.ch))});
 
-Chalk.start({key:'infinity',missions:MISSION_DEFS,checks:{
+Chalk.start({key:'infinity',missions:MISSION_DEFS,checks:Object.assign(TB_CHECKS,{
   inf1:()=>match&&match.na===match.nb&&match.paired(match)===match.na,
   inf1b:()=>match&&match.na>match.nb&&match.paired(match)===match.nb,
   inf2:()=>hotel&&hotel.guestDone,inf2b:()=>hotel&&hotel.busDone,
   inf3:()=>zig&&zig.num>=20,inf3b:()=>zig&&zig.num>=30,
   inf4:()=>diag&&diag.flips>0,inf4b:()=>diag&&diag.adds>0&&diag.flips>diag.adds,
   inf5:()=>ladder&&ladder.n===4,inf5b:()=>ladder&&ladder.chSeen.true&&ladder.chSeen.false
-}});
+})});
 
 </script>
 </body>
