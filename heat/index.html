@@ -261,7 +261,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
 <body>
 
 <a class="skip" href="#ch1">Skip to the story</a>
-<ul class="trail" aria-label="Chapters"><li><a href="#top" data-for="top"><span>Start</span></a></li><li><a href="#ch1" data-for="ch1"><span>1 · Heat flows downhill</span></a></li><li><a href="#ch2" data-for="ch2"><span>2 · Boiling water</span></a></li><li><a href="#ch3" data-for="ch3"><span>3 · The wood fire</span></a></li><li><a href="#ch4" data-for="ch4"><span>4 · Hot side, cold side</span></a></li><li><a href="#ch5" data-for="ch5"><span>5 · Why only five percent</span></a></li><li><a href="#ch6" data-for="ch6"><span>6 · Match the load</span></a></li><li><a href="#ch7" data-for="ch7"><span>7 · Build a heat-power system</span></a></li></ul>
+<ul class="trail" aria-label="Chapters"><li><a href="#top" data-for="top"><span>Start</span></a></li><li><a href="#ch1" data-for="ch1"><span>1 · Heat flows downhill</span></a></li><li><a href="#ch2" data-for="ch2"><span>2 · Boiling water</span></a></li><li><a href="#ch3" data-for="ch3"><span>3 · The wood fire</span></a></li><li><a href="#ch4" data-for="ch4"><span>4 · Hot side, cold side</span></a></li><li><a href="#ch5" data-for="ch5"><span>5 · Why only five percent</span></a></li><li><a href="#ch6" data-for="ch6"><span>6 · Match the load</span></a></li><li><a href="#ch7" data-for="ch7"><span>7 · Build a heat-power system</span></a></li><li><a href="#ch8" data-for="ch8"><span>8 · Blackout</span></a></li></ul>
 <nav class="levels" aria-label="Reading level">
   <div class="wrap levels-in">
     <a class="home" href="https://thedimension5.github.io/chalkboard/">The Chalkboard</a>
@@ -484,6 +484,34 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
     </div>
   </figure>
 </section>
+<section class="chapter" id="ch8">
+  <div class="text">
+    <p class="eyebrow">Chapter 8</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>The power just went out on a winter night. What do you turn on first, and what do you turn off?</p>
+    <div class="lv lv-k5"><h2>Blackout</h2><p>The power goes out. It is winter, it is night, and you have a stove, a pile of logs, a battery, and one long night to get through. Keep the lamp on. Charge the phone. Keep the room warm. Don't run out of wood.</p><p>Everything you learned is in this room. Cut the grid and see how you do.</p></div>
+    <div class="lv lv-g8"><h2>Blackout: the whole system, live</h2><p>When the grid is on, the wall charges the battery and the furnace warms the room. Cut it and the stove has to do both jobs. The plate must stay in its band for the modules to make watts, the water must stay cool for the difference to hold, and the battery must never hit empty or everything on the shelf goes dark.</p><p>Wood is limited. So is time. Decide what to run and when: the lamp all night, the phone before midnight, the radio for the morning news. Try the fridge and learn why nobody runs one on a stove.</p></div>
+    <div class="lv lv-hs"><h2>Blackout: budgets and priorities</h2><p>The numbers: eight modules make about 13 W usable at a 100 K difference, less the 2 W pump. The battery holds 200 Wh. The lamp is 5 W, 40 Wh for an eight-hour night; the phone needs 10 Wh; the radio 3 W; the fridge 60 W, which is 480 Wh a night and far beyond a stove. Each log is a kilogram, 16 MJ, about an hour of fire at a good burn.</p><p>The room is a second energy balance: the cabin loses about 100 W per degree above the outside air, and the stove gives it most of the fire. Play it twice: once to survive, once to finish with logs to spare.</p></div>
+    <div class="lv lv-col"><h2>Blackout as a scheduling problem</h2><p>Two coupled balances, electrical and thermal, with one controllable input (fuel rate) and a set of switchable loads. The electrical side is a small storage system with a variable source; the thermal side has a fast state (the plate), a medium one (the tank) and a slow one (the room). The plate's 170 °C limit and the tank's 60 °C limit are constraints; wood is the budget.</p><p>Good play looks like good control: anticipate the plate's lag, stoke before it falls out of band, open the loop before the tank runs away, and shift loads to when the source is strong. Priority ordering under a fixed budget is the whole discipline of off-grid operation.</p></div>
+    <div class="lv lv-max"><h2>What a real winter setup needs</h2><p>Storage sized for autonomy days rather than one night; a source that does not depend on someone awake to stoke it, which is why real installations pair a thermoelectric CHP unit with solar and a larger bank; telemetry loads that are small but never off; and protection against the failure modes this game exposes, plate overtemperature and cold-side runaway, as automatic interlocks rather than player attention.</p><p>At high latitude in midwinter, solar delivers a fraction of its summer output while heating demand peaks; a stove that yields tens of watts of electricity from heat you were making anyway is the rare resource that is strongest exactly when it is needed.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Let a child run the night alone before you say anything. The lesson arrives when the battery hits empty at 3 a.m.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-blackout" aria-label="A cabin at night with a wood stove, thermoelectric modules, a water tank, a battery, and a shelf of devices. Cut the grid and get through the night."></canvas></div>
+    <div class="controls"><button class="btn primary" id="bo-cut">Cut the grid</button><button class="btn" id="bo-log">Add a log</button><label class="slider">Air <input type="range" id="bo-air" min="0.3" max="2" step="0.1" value="0.8"><span class="val" id="bo-air-val">0.8 kg/h</span></label><button class="btn is-on" id="bo-pump" aria-pressed="true">Pump: on</button><button class="btn" id="bo-loop" aria-pressed="false">Loop to radiator: off</button><span class="sep"></span><button class="btn is-on" id="bo-lamp" aria-pressed="true">Lamp: on</button><button class="btn is-on" id="bo-phone" aria-pressed="true">Phone: charging</button><button class="btn" id="bo-radio" aria-pressed="false">Radio: off</button><button class="btn" id="bo-fridge" aria-pressed="false">Fridge: off</button><button class="btn" id="bo-reset">Restart the night</button></div>
+    <figcaption><b>Try this:</b> cut the grid at 10 p.m. Feed the stove, keep the plate in the band, keep the water cool, and get to 6 a.m. with the lamp on and the phone charged. Three real seconds are ten minutes of night.</figcaption>
+    <ul class="missions" data-ch="ch8"></ul>
+    <div class="check" data-ch="ch8"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">The battery holds 200 Wh. The lamp uses 5 W. If nothing else is on and nothing charges it, how many hours does the lamp last?</p><form class="cf" data-a="40" data-u="h" data-tol="0.02" data-hint="Amount ÷ rate." data-ok="Right. 40 hours, so the lamp is never the problem."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">The modules make 12 W. The lamp and the phone together use 10 W. Net power into the battery?</p><form class="cf" data-a="2" data-u="W" data-tol="0.02" data-hint="In minus out." data-ok="Right. 2 W: it charges, slowly."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">An 8-hour night with the lamp (5 W) and the radio (3 W) on the whole time. Energy needed?</p><form class="cf" data-a="64" data-u="Wh" data-tol="0.02" data-hint="8 W × 8 h." data-ok="Right. 64 Wh, a third of the battery."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">A 60 W fridge for 24 hours. Energy?</p><form class="cf" data-a="1440" data-u="Wh" data-tol="0.02" data-hint="60 × 24." data-ok="Right. 1,440 Wh, more than a hundred stove-nights of surplus."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Output is 13 W at ΔT = 100 K. The tank warms and ΔT drops to 70 K. Output, with P ∝ ΔT²?</p><form class="cf" data-a="6.4" data-u="W" data-tol="0.04" data-hint="(70/100)² × 13." data-ok="Right. About 6.4 W: half the power for 30% less difference."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="°C">degrees Celsius</option><option value="K">kelvin, a temperature or a difference</option><option value="W">watts</option><option value="kW">kilowatts</option><option value="Wh">watt-hours</option><option value="J">joules</option><option value="kJ">kilojoules</option><option value="MJ">megajoules</option><option value="V">volts</option><option value="A">amps</option><option value="Ω">ohms</option><option value="s">seconds</option><option value="min">minutes</option><option value="h">hours</option><option value="kg">kilograms</option><option value="L">litres</option><option value="%">percent</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> run a small off-grid system through a night: fuel, plate, water, battery and loads together.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>What did you decide to run, and why in that order?</li><li>What happened to the modules when the water got hot?</li><li>Why can a stove keep a phone alive but not a fridge?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: what ran out first, and what would you change?</p>
+      
+      <p class="links"><span class="unitbadge">Fire into watts · step 9</span></p>
+      <p class="links std"><b>Standards</b> 4-PS3-4, MS-PS3-3, MS-ETS1-4, HS-PS3-3, HS-ETS1-3</p>
+    </div>
+  </figure>
+</section>
 </main>
 <footer class="closing">
   <p class="eyebrow">The end, for now</p>
@@ -596,12 +624,46 @@ return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box
 })();
 </script>
 <script>
-const MISSION_DEFS=[{"id": "ht1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Watch the two blocks reach the same temperature."}, {"id": "ht1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Hold a difference of at least 50 degrees for 30 seconds using the heater and the water."}, {"id": "ht2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Boil one litre."}, {"id": "ht2b", "ch": "ch2", "lv": ["hs", "col", "max"], "text": "Predict the seconds to the boil within 10%."}, {"id": "ht3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Hold the stove top between 150 and 170 °C for 30 seconds."}, {"id": "ht3b", "ch": "ch3", "lv": ["g8", "hs", "col", "max"], "text": "Overshoot 170 °C on purpose and read the warning."}, {"id": "ht4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make one watt."}, {"id": "ht4b", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make three watts from one module without going over 170 °C."}, {"id": "ht4c", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Use your hand as the heat source and read how little you get."}, {"id": "ht5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Set 170 °C over 0 °C and read the Carnot limit."}, {"id": "ht5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Reach 10% real efficiency."}, {"id": "ht6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Find the load that gives the most watts."}, {"id": "ht6b", "ch": "ch6", "lv": ["hs", "col", "max"], "text": "Get at least 2 W out of the USB converter."}, {"id": "ht7", "ch": "ch7", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Charge the phone in under 4 hours."}, {"id": "ht7b", "ch": "ch7", "lv": ["g8", "hs", "col", "max"], "text": "Try the candle and read how long the phone would take."}, {"id": "ht7c", "ch": "ch7", "lv": ["hs", "col", "max"], "text": "Run three hours on the water tank without the water passing 60 °C."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb7", "ch": "ch7", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}];
+const MISSION_DEFS=[{"id": "ht1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Watch the two blocks reach the same temperature."}, {"id": "ht1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Hold a difference of at least 50 degrees for 30 seconds using the heater and the water."}, {"id": "ht2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Boil one litre."}, {"id": "ht2b", "ch": "ch2", "lv": ["hs", "col", "max"], "text": "Predict the seconds to the boil within 10%."}, {"id": "ht3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Hold the stove top between 150 and 170 °C for 30 seconds."}, {"id": "ht3b", "ch": "ch3", "lv": ["g8", "hs", "col", "max"], "text": "Overshoot 170 °C on purpose and read the warning."}, {"id": "ht4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make one watt."}, {"id": "ht4b", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make three watts from one module without going over 170 °C."}, {"id": "ht4c", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Use your hand as the heat source and read how little you get."}, {"id": "ht5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Set 170 °C over 0 °C and read the Carnot limit."}, {"id": "ht5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Reach 10% real efficiency."}, {"id": "ht6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Find the load that gives the most watts."}, {"id": "ht6b", "ch": "ch6", "lv": ["hs", "col", "max"], "text": "Get at least 2 W out of the USB converter."}, {"id": "ht7", "ch": "ch7", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Charge the phone in under 4 hours."}, {"id": "ht7b", "ch": "ch7", "lv": ["g8", "hs", "col", "max"], "text": "Try the candle and read how long the phone would take."}, {"id": "ht7c", "ch": "ch7", "lv": ["hs", "col", "max"], "text": "Run three hours on the water tank without the water passing 60 °C."}, {"id": "bo1", "ch": "ch8", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Cut the grid and reach 6 a.m. with the lamp still on."}, {"id": "bo2", "ch": "ch8", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Charge the phone before midnight."}, {"id": "bo3", "ch": "ch8", "lv": ["g8", "hs", "col", "max"], "text": "Finish the night with the room above 10 °C."}, {"id": "bo4", "ch": "ch8", "lv": ["hs", "col", "max"], "text": "Never let the plate pass 170 °C."}, {"id": "bo5", "ch": "ch8", "lv": ["hs", "col", "max"], "text": "Finish with at least two logs to spare."}, {"id": "bo6", "ch": "ch8", "lv": ["g8", "hs", "col", "max"], "text": "Switch on the fridge and watch what it does to the battery."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb7", "ch": "ch7", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb8", "ch": "ch8", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}];
 const UNIT_WHY={"°C": "degrees measure a temperature", "K": "kelvin measures a temperature or a difference between two", "W": "watts are a rate: energy per second", "kW": "kilowatts are a rate: energy per second", "Wh": "watt-hours are an amount of energy", "J": "joules are an amount of energy", "kJ": "kilojoules are an amount of energy", "MJ": "megajoules are an amount of energy", "V": "volts measure the push", "A": "amps measure the flow", "Ω": "ohms measure opposition", "s": "seconds measure a time", "min": "minutes measure a time", "h": "hours measure a time", "kg": "kilograms measure mass", "L": "litres measure volume", "%": "percent is a share, no unit", "n": "a ratio, no unit"};
 const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
 const toggle=(id,get,set,label)=>hook(id,()=>{set(!get());const b=$(id);b.classList.toggle('is-on',get());b.setAttribute('aria-pressed',String(get()));b.textContent=label(get())});
 const group=(attr,fn)=>document.querySelectorAll(`[${attr}]`).forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll(`[${attr}]`).forEach(x=>x.classList.toggle('is-on',x===b));fn(parseFloat(b.getAttribute(attr)))}));
 const tcol=T=>{const k=clamp((T-20)/180,0,1);return `rgb(${Math.round(120+135*k)},${Math.round(160-80*k)},${Math.round(220-180*k)})`};
+/* ---------- fire renderer ---------- */
+function makeFire(){return{p:[],e:[],s:[]}}
+function fireStep(f,dt,x,y,w,k){k=clamp(k,0,1);const spawn=k*170*dt;const n=Math.floor(spawn)+(Math.random()<spawn%1?1:0);
+  for(let i=0;i<n;i++)f.p.push({x:x+(Math.random()-.5)*w,y:y+(Math.random()-.5)*4,vx:(Math.random()-.5)*18,vy:-(45+Math.random()*70)*(.5+k),sz:(6+Math.random()*9)*(.6+.8*k)*(w/60+.4),age:0,dur:.45+Math.random()*.5,ph:Math.random()*6.3});
+  if(Math.random()<k*dt*12)f.e.push({x:x+(Math.random()-.5)*w*.8,y:y-10,vx:(Math.random()-.5)*30,vy:-(60+Math.random()*90),age:0,dur:1+Math.random()*1.5});
+  if(Math.random()<k*dt*5)f.s.push({x:x+(Math.random()-.5)*w*.6,y:y-w*(.6+.6*k),vx:(Math.random()-.5)*8,vy:-(15+Math.random()*15),age:0,dur:1.5+Math.random()*1.5,sz:8+Math.random()*10});
+  for(const P of f.p){P.age+=dt;P.x+=(P.vx+Math.sin(P.age*9+P.ph)*22)*dt;P.y+=P.vy*dt;P.vy-=20*dt}
+  for(const E of f.e){E.age+=dt;E.x+=(E.vx+Math.sin(E.age*5)*20)*dt;E.y+=E.vy*dt;E.vy+=10*dt}
+  for(const S of f.s){S.age+=dt;S.x+=(S.vx+Math.sin(S.age*2)*6)*dt;S.y+=S.vy*dt;S.sz+=12*dt}
+  f.p=f.p.filter(P=>P.age<P.dur);f.e=f.e.filter(E=>E.age<E.dur);f.s=f.s.filter(S=>S.age<S.dur)}
+function fireGlow(ctx,x,y,r,k){if(k<=0)return;ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(255,150,50,${.32*k})`);g.addColorStop(.5,`rgba(255,110,30,${.12*k})`);g.addColorStop(1,'rgba(255,100,20,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore()}
+function fireDraw(ctx,f,smoke=true){ctx.save();if(smoke)for(const S of f.s){const t=S.age/S.dur;ctx.fillStyle=`rgba(140,140,140,${.16*(1-t)})`;ctx.beginPath();ctx.arc(S.x,S.y,S.sz,0,Math.PI*2);ctx.fill()}
+  ctx.globalCompositeOperation='lighter';
+  for(const P of f.p){const t=P.age/P.dur;const a=(1-t)*(1-t);const r=P.sz*(1-t*.6);const g=ctx.createRadialGradient(P.x,P.y,0,P.x,P.y,r);g.addColorStop(0,`rgba(255,${Math.round(235-130*t)},${Math.round(160-150*t)},${.9*a})`);g.addColorStop(.45,`rgba(255,${Math.round(140-90*t)},20,${.5*a})`);g.addColorStop(1,'rgba(180,30,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(P.x,P.y,r,0,Math.PI*2);ctx.fill()}
+  for(const E of f.e){const t=E.age/E.dur;ctx.fillStyle=`rgba(255,${Math.round(200-150*t)},60,${1-t})`;ctx.beginPath();ctx.arc(E.x,E.y,1.7,0,Math.PI*2);ctx.fill()}ctx.restore()}
+function steamStep(f,dt,x,y,w,k){if(!f.v)f.v=[];if(Math.random()<k*dt*8)f.v.push({x:x+(Math.random()-.5)*w,y,vx:(Math.random()-.5)*10,vy:-(20+Math.random()*25),age:0,dur:1.2+Math.random(),sz:5+Math.random()*6});for(const V of f.v){V.age+=dt;V.x+=(V.vx+Math.sin(V.age*3)*8)*dt;V.y+=V.vy*dt;V.sz+=10*dt}f.v=f.v.filter(V=>V.age<V.dur)}
+function steamDraw(ctx,f){if(!f.v)return;ctx.save();for(const V of f.v){const t=V.age/V.dur;ctx.fillStyle=`rgba(235,235,240,${.22*(1-t)})`;ctx.beginPath();ctx.arc(V.x,V.y,V.sz,0,Math.PI*2);ctx.fill()}ctx.restore()}
+function iron(ctx,x,y,w,h,r=8){const g=ctx.createLinearGradient(x,y,x+w,y);g.addColorStop(0,'#2a2d31');g.addColorStop(.5,'#4a4f55');g.addColorStop(1,'#25282c');rr(ctx,x,y,w,h,r);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='rgba(241,236,223,.55)';ctx.lineWidth=1.5;ctx.stroke()}
+function drawStove(ctx,s,x,y,W,H,T,fuel,k,fire,dt){ // x,y = bottom-centre of stove
+  const bx=x-W/2,by=y-H;fireGlow(ctx,x,by+H*.62,W*1.3,k);
+  for(const lx of[bx+10,bx+W-14])iron(ctx,lx,y-8,6,8,2);
+  iron(ctx,bx,by,W,H-8,10);
+  const dx=bx+W*.16,dy=by+H*.3,dw=W*.68,dh=H*.46;ctx.save();rr(ctx,dx,dy,dw,dh,6);ctx.clip();ctx.fillStyle='#0d0f10';ctx.fillRect(dx,dy,dw,dh);
+  for(let i=0;i<Math.min(Math.ceil(fuel),4);i++){ctx.fillStyle='#6b4a2b';rr(ctx,dx+8+i*(dw-16)/4,dy+dh-14,(dw-16)/4-4,9,3);ctx.fill()}
+  fireStep(fire,dt,x,dy+dh-10,dw*.7,k);fireDraw(ctx,fire,false);ctx.restore();
+  ctx.strokeStyle='rgba(241,236,223,.6)';ctx.lineWidth=2;rr(ctx,dx,dy,dw,dh,6);ctx.stroke();circle(ctx,dx+dw+8,dy+dh/2,3,'#c9c3b5');
+  iron(ctx,x+W*.22,by-H*.5,W*.14,H*.5+4,3);
+  const pc=tcol(T);rr(ctx,bx-6,by-10,W+12,12,3);ctx.fillStyle=pc;ctx.fill();ctx.strokeStyle='rgba(241,236,223,.7)';ctx.lineWidth=1.5;ctx.stroke();
+  if(T>120){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(x,by-4,0,x,by-4,W*.7);g.addColorStop(0,`rgba(255,120,40,${clamp((T-120)/150,0,.5)})`);g.addColorStop(1,'rgba(255,80,20,0)');ctx.fillStyle=g;ctx.fillRect(bx-W*.3,by-40,W*1.6,60);ctx.restore()}}
+function drawPot(ctx,x,y,pw,ph,T,level,boiling){const g=ctx.createLinearGradient(x-pw/2,0,x+pw/2,0);g.addColorStop(0,'#3a3d42');g.addColorStop(.35,'#8a9098');g.addColorStop(.6,'#5b6168');g.addColorStop(1,'#2e3135');rr(ctx,x-pw/2,y-ph/2,pw,ph,[4,4,14,14]);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='rgba(241,236,223,.6)';ctx.lineWidth=1.5;ctx.stroke();
+  const wl=clamp(level,0,1)*(ph-12);rr(ctx,x-pw/2+5,y+ph/2-5-wl,pw-10,wl,[0,0,10,10]);ctx.fillStyle=`rgba(${Math.round(120+100*clamp((T-20)/80,0,1))},${Math.round(190-40*clamp((T-20)/80,0,1))},240,.55)`;ctx.fill();
+  if(boiling){for(let i=0;i<6;i++){const u=((performance.now()/900)+i/6)%1;circle(ctx,x-pw/3+i*pw/7.5,y+ph/2-8-u*wl,2+u*3,`rgba(255,255,255,${.5*(1-u)})`)}}
+  rr(ctx,x-pw/2-4,y-ph/2-4,pw+8,8,3);ctx.fillStyle='#6b7178';ctx.fill();ctx.strokeStyle='rgba(241,236,223,.6)';ctx.stroke();ctx.strokeStyle='#8a9098';ctx.lineWidth=4;ctx.beginPath();ctx.arc(x,y-ph/2-8,pw*.3,Math.PI,0);ctx.stroke()}
+
 function flame(ctx,x,y,s,t){for(let i=0;i<3;i++){const ph=t*6+i*2;ctx.beginPath();ctx.fillStyle=rgba(i?C.yellow:C.pink,.7);ctx.ellipse(x+(i-1)*s*.35+Math.sin(ph)*s*.1,y-s*.6,s*.28,s*(.7+.15*Math.sin(ph*1.3)),0,0,Math.PI*2);ctx.fill()}}
 const MOD={S:.04,r:2.5,Rm:1.5,Tmax:170};
 const modP=dT=>dT>0?(MOD.S*dT)**2/(4*MOD.r):0;
@@ -625,15 +687,16 @@ group('data-mat',v=>{if(fw)fw.k=v});toggle('fw-src',()=>fw.src,v=>{fw.src=v},v=>
 
 /* ---------- CH2: boiling water ---------- */
 const bl=makeSim('cv-boil',{
-  init(s){s.P=800;s.m=1;s.reset(s)},
+  init(s){s.P=800;s.m=1;s.fire=makeFire();s.vapor={};s.reset(s)},
   reset(s){s.T=20;s.steam=0;s.t=0;s.on=false;s.boiledAt=null;s.pred=null;s.err=null},
   go(s){s.reset(s);s.on=true;const pv=parseFloat(($('bl-pred')||{}).value);s.pred=isNaN(pv)?null:pv},
   step(dt,s){if(!s.on)return;const h=dt*10;s.t+=h;const loss=1.5*(s.T-20);const P=Math.max(0,s.P-loss);if(s.T<100){s.T+=P*h/(s.m*4186);if(s.T>=100){s.T=100;s.boiledAt=s.t;if(s.pred!=null)s.err=Math.abs(s.t-s.pred)/s.t}}else{s.steam+=P*h/2.26e6;if(s.steam>=s.m)s.on=false}},
-  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const px=w*.5,py=h*.62,pw=w*.28,ph=h*.3;
-    if(s.on)flame(ctx,px,py+ph/2+38,26+s.P/80,s.t);
-    box(ctx,px-pw/2,py-ph/2,pw,ph,rgba(C.chalk,.06),C.chalk,6,2.5);const lvl=clamp((s.m-s.steam)/3,0,1)*.9;box(ctx,px-pw/2+3,py+ph/2-3-lvl*(ph-6),pw-6,lvl*(ph-6),rgba(C.blue,.35+.4*clamp((s.T-20)/80,0,1)),null,3);
-    if(s.T>=100&&s.on){for(let i=0;i<5;i++){const u=(s.t*.4+i/5)%1;circle(ctx,px-pw/4+i*pw/8,py-ph/2-10-u*50,4+u*6,rgba(C.chalk,.5*(1-u)))}}
-    text(ctx,`${s.T.toFixed(0)} °C`,px,py-ph/2-40-(s.T>=100?40:0),{size:30,color:s.T>=100?C.pink:C.chalk});
+  draw(s){const{ctx,w,h,dt}=s;ctx.clearRect(0,0,w,h);const px=w*.5,py=h*.58,pw=w*.28,ph=h*.28;const k=s.on?clamp(s.P/2500,.15,1):0;
+    for(let i=0;i<7;i++)circle(ctx,px-pw*.72+i*pw*.24,h*.9,9,'#3a3f45','rgba(241,236,223,.4)',1.2);
+    fireGlow(ctx,px,h*.8,w*.35,k);fireStep(s.fire,dt,px,h*.87,pw*.8,k);fireDraw(ctx,s.fire,true);
+    drawPot(ctx,px,py,pw,ph,s.T,clamp((s.m-s.steam)/3,0,1),s.T>=100&&s.on);
+    steamStep(s.vapor,dt,px,py-ph/2-14,pw*.6,(s.T>=95&&s.on)?clamp((s.T-95)/5,0,1):0);steamDraw(ctx,s.vapor);
+    const tx=w*.12,t0=h*.2,t1=h*.8;box(ctx,tx-6,t0,12,t1-t0,rgba(C.chalk,.08),C.chalk,6,1.5);const fr=clamp(s.T/110,0,1);box(ctx,tx-4,t1-2-(t1-t0-4)*fr,8,(t1-t0-4)*fr,s.T>=100?C.pink:tcol(s.T),null,4);text(ctx,`${s.T.toFixed(0)} °C`,tx,t1+22,{size:20,color:s.T>=100?C.pink:C.chalk});poly(ctx,[[tx-10,t1-(t1-t0)*(100/110)],[tx+10,t1-(t1-t0)*(100/110)]],C.pink,1.5,.8);text(ctx,'boil',tx-16,t1-(t1-t0)*(100/110),{size:12,align:'right',alpha:.6});
     const Qh=s.m*4186*80,tIdeal=Qh/s.P;const lines=[`${s.m} L, ${s.P} W into the pot, clock ${s.t.toFixed(0)} s (10× speed)`];
     if(s.boiledAt)lines.push(`boiled at ${s.boiledAt.toFixed(0)} s${s.err!=null?`, you predicted ${s.pred} s: ${(s.err*100).toFixed(0)}% off`:''}`);if(s.steam>0)lines.push(`${(s.steam*1000).toFixed(0)} mL boiled away`);
     if(at('g8'))lines.push(`to 100 °C needs ${s.m} × 4,186 × 80 = ${(Qh/1000).toFixed(0)} kJ`);if(at('hs'))lines.push(`t = Q/P = ${tIdeal.toFixed(0)} s with no losses; the pot loses heat as it warms`);if(at('col'))lines.push('then 2.26 MJ per kg to boil it away, at a fixed 100 °C');readout(ctx,lines,16,12,{size:12})}
@@ -642,15 +705,14 @@ hook('bl-go',()=>bl&&bl.go(bl));slide('bl-p',v=>{if(bl)bl.P=v},v=>v+' W');slide(
 
 /* ---------- CH3: the wood fire ---------- */
 const st=makeSim('cv-stove',{
-  init(s){s.air=.6;s.reset(s)},
+  init(s){s.air=.6;s.fire=makeFire();s.reset(s)},
   reset(s){s.T=20;s.fuel=0;s.hold=0;s.over=false;s.log=0},
   addLog(s){s.fuel+=1;s.log++},
   step(dt,s){const h=dt*30;const burn=s.fuel>0?Math.min(s.fuel,s.air/3600*h):0;s.fuel-=burn;const P=burn*16e6/h;const loss=15*(s.T-20);s.T+=(P*.5-loss)*h/12000;s.T=Math.max(20,s.T);
     if(s.T>=150&&s.T<=170)s.hold+=dt;else s.hold=0;if(s.T>170)s.over=true;s.P=P},
-  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const sx=w*.35,sy=h*.55,sw=w*.3,sh=h*.4;
-    box(ctx,sx-sw/2,sy-sh/2,sw,sh,rgba(C.chalk,.08),C.chalk,6,2.5);box(ctx,sx-sw/2-8,sy-sh/2-8,sw+16,10,tcol(s.T),C.chalk,3,1.5);box(ctx,sx+sw/2-10,sy-sh/2-60,14,60,rgba(C.chalk,.15),C.chalk,2,1.5);
-    box(ctx,sx-sw*.3,sy-sh*.15,sw*.6,sh*.35,C.board,C.chalk,4,1.5);if(s.fuel>0)flame(ctx,sx,sy+sh*.2,16+s.air*14+Math.min(s.fuel,3)*4,s.t);
-    for(let i=0;i<Math.min(Math.ceil(s.fuel),6);i++)box(ctx,sx-sw*.25+i*sw*.09,sy+sh*.12,sw*.08,10,'#a0733a',null,3);
+  draw(s){const{ctx,w,h,dt}=s;ctx.clearRect(0,0,w,h);const k=s.fuel>0?clamp(s.air/1.5,.25,1)*clamp(s.fuel,.3,1):0;
+    poly(ctx,[[0,h*.86],[w,h*.86]],C.chalk,2,.35);drawStove(ctx,s,w*.36,h*.86,w*.3,h*.42,s.T,s.fuel,k,s.fire,dt);
+    for(let i=0;i<Math.min(6,Math.ceil(s.fuel));i++)void 0;
     const gx=w*.8,gy=h*.5,gr=Math.min(w,h)*.18;circle(ctx,gx,gy,gr,rgba(C.board,.6),C.chalk,2);const a0=Math.PI*.8,a1=Math.PI*2.2;const ang=T=>a0+(a1-a0)*clamp(T/300,0,1);
     ctx.save();ctx.lineWidth=8;ctx.strokeStyle=rgba(C.green,.7);ctx.beginPath();ctx.arc(gx,gy,gr-8,ang(150),ang(170));ctx.stroke();ctx.strokeStyle=rgba(C.pink,.7);ctx.beginPath();ctx.arc(gx,gy,gr-8,ang(170),ang(300));ctx.stroke();ctx.restore();
     const a=ang(s.T);poly(ctx,[[gx,gy],[gx+Math.cos(a)*(gr-14),gy+Math.sin(a)*(gr-14)]],C.chalk,3);circle(ctx,gx,gy,4,C.chalk);text(ctx,`${s.T.toFixed(0)} °C`,gx,gy+gr+22,{size:22,color:s.T>170?C.pink:s.T>=150?C.green:C.chalk});text(ctx,'top plate',gx,gy+gr+42,{size:14,alpha:.7});
@@ -726,6 +788,67 @@ const sy=makeSim('cv-sys',{
 });
 hook('sy-run',()=>sy&&sy.run(sy));slide('sy-n',v=>{},v=>String(v));
 
+/* ---------- CH8: Blackout ---------- */
+const bo=makeSim('cv-blackout',{
+  init(s){s.air=.8;s.fire=makeFire();s.steam={};s.reset(s)},
+  reset(s){s.min=0;s.out=false;s.logs=12;s.fuel=0;s.Tp=20;s.Tw=15;s.Tr=18;s.bat=120;s.phoneWh=0;s.phoneDone=false;s.phoneAt=null;s.lamp=true;s.phone=true;s.radio=false;s.fridge=false;s.fridgeTried=false;s.pump=true;s.loop=false;s.over=0;s.dmg=1;s.lampMin=0;s.ended=false;s.dead=false;s.Pe=0;s.usable=0;s.L=0;s.msg='the grid is on. Stock the stove, then cut it.';s.Pf=0},
+  cut(s){if(!s.out){s.out=true;s.phoneWh=0;s.phoneDone=false;s.phoneAt=null;s.lampMin=0;s.msg='10 p.m. Grid is out. Outside: −5 °C.'}},
+  addLog(s){if(s.logs>0&&s.fuel<4){s.logs--;s.fuel+=1}},
+  step(dt,s){if(s.ended)return;const m=dt*10/3;if(s.out){s.min+=m;if(s.min>=480){s.min=480;s.ended=true;s.msg='6 a.m. Dawn.'}}
+    const burn=s.fuel>0?Math.min(s.fuel,s.air/60*m):0;s.fuel-=burn;const Pf=burn*16e6/(m*60+1e-9);s.Pf=Pf;
+    const Rc=s.pump?.04:.5;const tot=.05+.19+Rc;const Q=Math.max(0,(s.Tp-s.Tw)/tot);const dTm=Q*.19;s.Pe=8*1.6e-4*dTm*dTm*s.dmg;s.usable=Math.max(0,s.Pe*.85-(s.pump?2:0));
+    s.Tp+=(0.45*Pf-12*(s.Tp-s.Tr)-Q)*m*60/12000;s.Tp=Math.max(s.Tr,s.Tp);
+    if(s.pump){s.Tw+=Q*m*60/(20*4186);if(s.loop){s.Tw+=(35-s.Tw)*(1-Math.exp(-m/15))}}else{s.Tw+=(Q*m*60/(1*4186))-(s.Tw-s.Tr)*.05*m}
+    if(s.Tp>170)s.over+=m;if(s.over>5)s.dmg=.5;
+    const roomGain=0.45*Pf+(s.loop&&s.pump?Q:0)+(s.out?0:2500);const roomLoss=100*(s.Tr+5);s.Tr+=(roomGain-roomLoss)*m*60/1.5e6;
+    const phoneOn=s.phone&&!s.phoneDone;const L=(s.lamp?5:0)+(phoneOn?5:0)+(s.radio?3:0)+(s.fridge?60:0);s.L=L;
+    const src=s.out?s.usable:100+s.usable;s.bat=clamp(s.bat+(src-L)*m/60,0,200);
+    if(s.bat<=0&&s.out){s.dead=true;if(s.lamp)s.msg='battery empty: the shelf went dark'}else{s.dead=false;if(s.out&&s.lamp)s.lampMin+=m;if(phoneOn){s.phoneWh+=5*m/60;if(s.phoneWh>=10){s.phoneDone=true;s.phoneAt=s.min;s.msg='phone charged'}}}
+    if(s.fridge&&s.out)s.fridgeTried=true;if(s.out&&s.Tp>170)s.msg='PLATE OVER 170 °C: modules being damaged';else if(s.out&&s.Tw>60&&s.pump)s.msg='water over 60 °C: the difference is collapsing. Open the loop';else if(s.out&&s.fuel<=0&&!s.ended)s.msg='the fire is out. Add a log'},
+  clock(s){const mins=22*60+s.min;const hh=Math.floor(mins/60)%24,mm=Math.floor(mins%60);return `${hh}:${mm<10?'0':''}${mm}`},
+  draw(s){const{ctx,w,h,dt}=s;ctx.clearRect(0,0,w,h);const k=clamp(s.Pf/4000,0,1);
+    // room darkness and light sources
+    ctx.fillStyle=s.out?'rgba(5,8,12,.55)':'rgba(30,36,44,.25)';ctx.fillRect(0,0,w,h);
+    // window
+    box(ctx,w*.06,h*.08,w*.2,h*.22,'#0a1020','rgba(241,236,223,.6)',4,2);for(let i=0;i<14;i++)circle(ctx,w*.07+((i*37)%(w*.18)),h*.09+((i*53)%(h*.2)),1,`rgba(255,255,255,${.4+.5*Math.sin(s.t/7+i)})`);circle(ctx,w*.21,h*.14,9,'#e8e4d0');poly(ctx,[[w*.16,h*.08],[w*.16,h*.3]],'rgba(241,236,223,.5)',2);poly(ctx,[[w*.06,h*.19],[w*.26,h*.19]],'rgba(241,236,223,.5)',2);
+    // floor
+    poly(ctx,[[0,h*.86],[w,h*.86]],C.chalk,2,.35);
+    // stove
+    const sx=w*.3,sy=h*.86;drawStove(ctx,s,sx,sy,w*.2,h*.3,s.Tp,s.fuel,k,s.fire,dt);
+    // module + water block on plate
+    box(ctx,sx-26,sy-h*.3-22,52,10,rgba(C.yellow,.9),C.chalk,2,1);box(ctx,sx-30,sy-h*.3-40,60,18,rgba(C.blue,.75),C.chalk,3,1);
+    // hoses to tank
+    const tx=w*.56,ty=h*.6;ctx.save();ctx.strokeStyle=rgba(C.blue,.8);ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(sx+30,sy-h*.3-32);ctx.bezierCurveTo(sx+80,sy-h*.3-40,tx-40,ty-20,tx-22,ty);ctx.moveTo(sx+30,sy-h*.3-28);ctx.bezierCurveTo(sx+90,sy-h*.3-10,tx-40,ty+10,tx-22,ty+18);ctx.stroke();ctx.restore();
+    if(s.pump){for(let i=0;i<5;i++){const u=((s.t/2)+i/5)%1;const px=sx+30+(tx-22-sx-30)*u,py=(sy-h*.3-32)*(1-u)+ty*u-Math.sin(u*Math.PI)*25;circle(ctx,px,py,2.5,C.blue)}}
+    box(ctx,tx-22,ty-30,44,70,rgba(C.chalk,.06),C.chalk,6,1.5);box(ctx,tx-18,ty+36-60*clamp((s.Tw+10)/110,0,1),36,60*clamp((s.Tw+10)/110,0,1),tcol(s.Tw),null,3);text(ctx,`${s.Tw.toFixed(0)} °C`,tx,ty+56,{size:15});text(ctx,'tank',tx,ty-40,{size:14,alpha:.7});if(s.Tw>60)steamStep(s.steam,dt,tx,ty-30,30,1);steamDraw(ctx,s.steam);
+    if(s.loop){box(ctx,tx+40,ty-20,14,50,null,C.chalk,2,1.5);for(let i=0;i<4;i++)poly(ctx,[[tx+40,ty-12+i*12],[tx+54,ty-12+i*12]],C.chalk,1,.6);text(ctx,'radiator',tx+47,ty+44,{size:12,alpha:.7})}
+    // battery
+    const bxx=w*.8,byy=h*.62;box(ctx,bxx-40,byy-22,80,44,rgba(C.chalk,.06),C.chalk,6,1.5);box(ctx,bxx+40,byy-8,6,16,C.chalk,null,2);box(ctx,bxx-36,byy-18,72*(s.bat/200),36,s.bat<20?C.pink:C.green,null,4);text(ctx,`${s.bat.toFixed(0)} Wh`,bxx,byy+1,{size:16,color:C.board});text(ctx,'battery',bxx,byy+38,{size:14,alpha:.7});
+    poly(ctx,[[bxx-40,byy],[tx+22,ty-10]],C.yellow,1.5,s.usable>0?.6:.2);if(s.usable>0){for(let i=0;i<3;i++){const u=((s.t/1.5)+i/3)%1;circle(ctx,tx+22+(bxx-40-tx-22)*(1-u),ty-10+(byy-ty+10)*(1-u),2.5,C.yellow)}}
+    // shelf and devices
+    const shy=h*.32;poly(ctx,[[w*.58,shy+26],[w*.96,shy+26]],C.chalk,3,.6);
+    const dev=[{n:'lamp',on:s.lamp&&!s.dead&&(s.out||true),x:w*.64},{n:'phone',on:s.phone&&!s.phoneDone&&!s.dead,x:w*.73},{n:'radio',on:s.radio&&!s.dead,x:w*.82},{n:'fridge',on:s.fridge&&!s.dead,x:w*.91}];
+    for(const d of dev){const x=d.x;if(d.n==='lamp'){if(d.on){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(x,shy+2,0,x,shy+2,h*.3);g.addColorStop(0,'rgba(255,230,150,.45)');g.addColorStop(1,'rgba(255,220,120,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,shy+2,h*.3,0,Math.PI*2);ctx.fill();ctx.restore()}poly(ctx,[[x-12,shy+20],[x+12,shy+20],[x+5,shy-4],[x-5,shy-4]],C.chalk,1.5,.9);circle(ctx,x,shy+2,6,d.on?C.yellow:rgba(C.chalk,.15))}
+      else if(d.n==='phone'){box(ctx,x-9,shy-8,18,32,rgba(C.chalk,.08),C.chalk,4,1.5);box(ctx,x-6,shy-4,12*Math.min(1,s.phoneWh/10),4,s.phoneDone?C.green:C.yellow,null,1);text(ctx,s.phoneDone?'100%':`${Math.round(s.phoneWh*10)}%`,x,shy+12,{size:11,fam:'body'})}
+      else if(d.n==='radio'){box(ctx,x-16,shy,32,22,rgba(C.chalk,.08),C.chalk,4,1.5);poly(ctx,[[x+10,shy],[x+18,shy-16]],C.chalk,1.5);if(d.on)for(let i=1;i<=3;i++)circle(ctx,x+18,shy-16,i*6,null,rgba(C.blue,.5-i*.12),1)}
+      else{box(ctx,x-14,shy-18,28,42,rgba(C.chalk,.08),C.chalk,4,1.5);poly(ctx,[[x-14,shy-2],[x+14,shy-2]],C.chalk,1);if(d.on)circle(ctx,x+9,shy-10,2.5,C.green)}
+      text(ctx,d.n,x,shy+42,{size:13,alpha:.75,color:d.on?C.chalk:rgba(C.chalk,.5)})}
+    // wood pile
+    for(let i=0;i<s.logs;i++){const r=i%4,c=Math.floor(i/4);box(ctx,w*.06+r*22,h*.84-c*11,20,9,'#6b4a2b','rgba(241,236,223,.5)',3,1)}text(ctx,`${s.logs} logs`,w*.11,h*.94,{size:15,alpha:.8});
+    // grid lamp on wall
+    circle(ctx,w*.5,h*.1,7,s.out?rgba(C.chalk,.12):C.yellow);text(ctx,s.out?'grid: OUT':'grid: on',w*.5,h*.16,{size:15,color:s.out?C.pink:C.green});
+    // HUD
+    const lines=[`${s.clock(s)}   outside −5 °C   room ${s.Tr.toFixed(1)} °C   plate ${s.Tp.toFixed(0)} °C   water ${s.Tw.toFixed(0)} °C`,`making ${s.usable.toFixed(1)} W${s.dmg<1?' (modules damaged)':''}   using ${s.L} W   fire ${(s.Pf/1000).toFixed(1)} kW   fuel ${s.fuel.toFixed(1)} kg`,s.msg];
+    if(s.ended)lines.push(`DAWN: lamp on ${(s.lampMin/60).toFixed(1)} h of 8 · phone ${s.phoneDone?'charged':'not charged'} · room ${s.Tr.toFixed(0)} °C · logs left ${s.logs} · plate over limit ${s.over.toFixed(0)} min`);
+    if(at('hs')&&!s.ended)lines.push(`ΔT across modules ${(Math.max(0,(s.Tp-s.Tw)/(.05+.19+(s.pump?.04:.5))*.19)).toFixed(0)} K → ${s.Pe.toFixed(1)} W raw`);
+    readout(ctx,lines,16,12,{size:12})}
+});
+window.__bo=bo;
+hook('bo-cut',()=>{if(bo){bo.cut(bo);$('bo-cut').textContent='Grid is out'}});hook('bo-log',()=>bo&&bo.addLog(bo));slide('bo-air',v=>{if(bo)bo.air=v},v=>v.toFixed(1)+' kg/h');
+toggle('bo-pump',()=>bo.pump,v=>{bo.pump=v},v=>'Pump: '+(v?'on':'off'));toggle('bo-loop',()=>bo.loop,v=>{bo.loop=v},v=>'Loop to radiator: '+(v?'on':'off'));
+toggle('bo-lamp',()=>bo.lamp,v=>{bo.lamp=v},v=>'Lamp: '+(v?'on':'off'));toggle('bo-phone',()=>bo.phone,v=>{bo.phone=v},v=>'Phone: '+(v?'charging':'unplugged'));toggle('bo-radio',()=>bo.radio,v=>{bo.radio=v},v=>'Radio: '+(v?'on':'off'));toggle('bo-fridge',()=>bo.fridge,v=>{bo.fridge=v},v=>'Fridge: '+(v?'on':'off'));
+hook('bo-reset',()=>{if(bo){bo.reset(bo);$('bo-cut').textContent='Cut the grid';for(const[id,v,l]of[['bo-pump',true,'Pump: on'],['bo-loop',false,'Loop to radiator: off'],['bo-lamp',true,'Lamp: on'],['bo-phone',true,'Phone: charging'],['bo-radio',false,'Radio: off'],['bo-fridge',false,'Fridge: off']]){const b=$(id);b.classList.toggle('is-on',v);b.setAttribute('aria-pressed',String(v));b.textContent=l}}});
+
 Chalk.start({key:'heat',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
   ht1:()=>fw&&fw.met,ht1b:()=>fw&&fw.hold>=30,
   ht2:()=>bl&&bl.boiledAt!=null&&bl.m===1,ht2b:()=>bl&&bl.err!=null&&bl.err<=.1,
@@ -733,8 +856,9 @@ Chalk.start({key:'heat',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.ass
   ht4:()=>tg&&tg.best>=1,ht4b:()=>tg&&tg.best>=3,ht4c:()=>tg&&tg.handTried,
   ht5:()=>cn&&cn.th===170&&cn.tc===0,ht5b:()=>cn&&cn.real>=.10,
   ht6:()=>ld&&ld.near,ht6b:()=>ld&&ld.boost&&ld.usb>=2,
-  ht7:()=>sy&&sy.phoneOK,ht7b:()=>sy&&sy.candleTried,ht7c:()=>sy&&sy.tankOK
-},Object.fromEntries(Array.from({length:7},(_,i)=>[`tb${i+1}`,()=>Chalk.checkPassed(`ch${i+1}`)])))});
+  ht7:()=>sy&&sy.phoneOK,ht7b:()=>sy&&sy.candleTried,ht7c:()=>sy&&sy.tankOK,
+  bo1:()=>bo&&bo.ended&&bo.lampMin>=470,bo2:()=>bo&&bo.out&&bo.phoneDone&&bo.phoneAt!=null&&bo.phoneAt<=120,bo3:()=>bo&&bo.ended&&bo.Tr>10,bo4:()=>bo&&bo.ended&&bo.over===0,bo5:()=>bo&&bo.ended&&bo.logs>=2,bo6:()=>bo&&bo.fridgeTried
+},Object.fromEntries(Array.from({length:8},(_,i)=>[`tb${i+1}`,()=>Chalk.checkPassed(`ch${i+1}`)])))});
 
 </script>
 </body>
