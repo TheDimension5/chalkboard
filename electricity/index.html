@@ -256,6 +256,19 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
 .baselist .what{grid-column:2;color:var(--chalk-dim);font-size:.92rem}
 .baselist .ngss{grid-column:2;font-size:.78rem;color:var(--chalk-dim);letter-spacing:.04em}
 @media (min-width:700px){.baselist li{grid-template-columns:4.2rem 14rem 1fr 14rem}.baselist .what,.baselist .ngss{grid-column:auto}}
+
+.hub-hero{grid-template-columns:1fr;padding-bottom:1.2rem}
+.hub-hero .text{max-width:64ch}
+.hub-hero .lede{max-width:56ch}
+.cards{margin-top:1.6rem}
+.card{position:relative;padding-top:1.6rem}
+.card .badge{position:absolute;top:-.8rem;left:1.2rem;font-size:.66rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.25rem .7rem}
+.card p{min-height:3.2em}
+.how{margin-top:3.2rem}
+.teachers{margin-top:3rem;padding:1.3rem 1.5rem;border:2px dashed var(--chalk-faint);border-radius:14px;display:grid;gap:.4rem;max-width:72ch}
+.teachers p{color:var(--chalk-dim);font-size:1rem;margin:0}
+.teachers a{color:var(--yellow);font-weight:700}
+.hub-hero .eyebrow .home{border:none;padding:0}
 </style>
 </head>
 <body>
@@ -264,7 +277,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
 <ul class="trail" aria-label="Chapters"><li><a href="#top" data-for="top"><span>Start</span></a></li><li><a href="#ch1" data-for="ch1"><span>1 · Watts and watt-hours</span></a></li><li><a href="#ch2" data-for="ch2"><span>2 · Push, flow, opposition</span></a></li><li><a href="#ch3" data-for="ch3"><span>3 · Power and voltage</span></a></li><li><a href="#ch4" data-for="ch4"><span>4 · Real batteries</span></a></li><li><a href="#ch5" data-for="ch5"><span>5 · Series and parallel</span></a></li><li><a href="#ch6" data-for="ch6"><span>6 · Kirchhoff</span></a></li><li><a href="#ch7" data-for="ch7"><span>7 · AC</span></a></li><li><a href="#ch8" data-for="ch8"><span>8 · Power factor</span></a></li><li><a href="#ch9" data-for="ch9"><span>9 · What actually moves</span></a></li><li><a href="#ch10" data-for="ch10"><span>10 · The system checker</span></a></li></ul>
 <nav class="levels" aria-label="Reading level">
   <div class="wrap levels-in">
-    <a class="home" href="https://thedimension5.github.io/chalkboard/">The Chalkboard</a>
+    <a class="home" href="https://thedimension5.github.io/chalkboard/boards/">The Chalkboard</a>
     <span class="levels-label">Who's reading?</span>
     <div class="levels-btns" role="tablist">
       <button role="tab" data-level="k5" aria-selected="true">Kids<small>K to 5th</small></button>
@@ -563,7 +576,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <details class="discuss"><summary>Discuss</summary><ol><li>Why is the fuse sized for the wire and not the load?</li><li>Which limit usually bites first: wire, inverter, or BMS?</li><li>What does 'manufacturer limits' cover that the arithmetic does not?</li></ol></details>
       <p class="exit"><b>Exit ticket</b> Run the checker on any appliance label and write down the run time.</p>
       <p class="links">Before this: <a href="https://thedimension5.github.io/chalkboard/heat/#ch7">Hot Side, Cold Side 7, Build a heat-power system</a></p>
-      <p class="links"><span class="unitbadge">Fire into watts · step 9</span></p>
+      <p class="links"><span class="unitbadge">Fire into watts · step 10</span></p>
       
     </div>
   </figure>
@@ -573,7 +586,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
   <p class="eyebrow">The end, for now</p>
   <p>Five words, ten chapters, and you can now read any electrical system from the label to the wire. Go look at one.</p>
   <p class="big" style="margin-left:auto;margin-right:auto">Rate, amount, push, flow, opposition.</p>
-  <p class="teach"><a href="https://thedimension5.github.io/chalkboard/">More boards at The Chalkboard</a></p>
+  <p class="teach"><a href="https://thedimension5.github.io/chalkboard/boards/">More boards at The Chalkboard</a></p>
 </footer>
 </div>
 <div class="tray" aria-hidden="true"></div>
