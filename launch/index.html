@@ -269,6 +269,50 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
 .teachers p{color:var(--chalk-dim);font-size:1rem;margin:0}
 .teachers a{color:var(--yellow);font-weight:700}
 .hub-hero .eyebrow .home{border:none;padding:0}
+
+.handin{margin-top:.2rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--blue);border-radius:10px;display:grid;gap:.55rem}
+.handin .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.handin p{margin:0;font-size:.95rem;color:var(--chalk-dim)}
+.handin .row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.handin input,.handin textarea{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .65rem;font:700 .95rem var(--body);width:100%}
+.handin input{max-width:16rem}
+.handin textarea{min-height:3.6rem;resize:vertical}
+.receipt{margin:0;white-space:pre-wrap;font:700 .85rem/1.5 "JetBrains Mono",Menlo,Consolas,monospace;background:rgba(0,0,0,.25);border:1px dashed var(--chalk-faint);border-radius:8px;padding:.8rem .9rem;color:var(--chalk)}
+@media print{
+  body.print-receipt *{visibility:hidden}
+  body.print-receipt .receipt.printing,body.print-receipt .receipt.printing *{visibility:visible}
+  body.print-receipt .receipt.printing{position:fixed;left:0;top:0;width:100%;color:#000;background:#fff;border:1px solid #000;font-size:12pt}
+}
+
+.picker{display:flex;flex-wrap:wrap;gap:.7rem 1rem;align-items:center;margin-top:1.4rem}
+.lcard{margin-top:1.8rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.6rem 1.6rem;display:grid;gap:1rem;max-width:80ch}
+.lcard header h2{font-size:2.4rem}
+.lcard .meta{color:var(--chalk-dim);font-size:.9rem}
+.lcard section h3{font-size:1.45rem;margin-bottom:.2rem}
+.lcard section h3 small{font-family:var(--body);font-weight:900;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-left:.5rem}
+.lcard p{margin:0;font-size:.98rem}
+.lcard .q{font-weight:700}
+.lcard .key{font-size:.92rem;color:var(--chalk-dim);margin-top:.25rem}
+.lcard .key b{color:var(--green)}
+.lcard .opts{margin:.3rem 0 0;padding-left:1.3rem}
+.lcard .opts .right{color:var(--green);font-weight:700}
+.lcard .ms{list-style:none;padding:0;margin:.2rem 0 0;display:grid;gap:.35rem}
+.lcard .ms li{display:flex;gap:.6rem;align-items:center;font-size:.95rem}
+.lcard .ms .box{width:1.05rem;height:1.05rem;border:2px solid var(--chalk-dim);border-radius:3px;flex:none}
+.lcard .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.15rem .5rem;color:var(--board);background:var(--green)}
+.lcard .pill.try{background:var(--yellow)}
+.lcard .sl{font-size:.88rem;word-break:break-all}
+.lcard ol{margin:.3rem 0 0;padding-left:1.3rem;display:grid;gap:.3rem}
+.lcard .skill{font-size:.92rem;color:var(--chalk-dim)}
+.verify{margin-top:3rem;display:grid;gap:.7rem;max-width:80ch}
+.verify textarea{width:100%;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:10px;padding:.7rem .8rem;font:700 .88rem/1.5 "JetBrains Mono",Menlo,Consolas,monospace}
+@media print{
+  .picker,.verify,.grade,.tray,.closing,.hub-hero .eyebrow{display:none!important}
+  body{background:#fff;color:#111}
+  :root{--chalk:#111;--chalk-dim:#444;--chalk-faint:#999;--yellow:#7a5a00;--green:#2b6b2b;--board:#fff}
+  .lcard{page-break-after:always;border-color:#999;max-width:none}
+  .lcard a{color:#111}
+}
 </style>
 </head>
 <body>
@@ -326,6 +370,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       
       <p class="links"><span class="unitbadge">Why things move · step 1</span></p>
       <p class="links std"><b>Standards</b> K-PS2-1, K-PS2-2, 3-PS2-1, MS-PS2-2, HS-PS2-1</p>
+      <div class="handin" data-ch="ch1" data-board="Launch Lab" data-title="Pushes and pulls"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
     </div>
   </figure>
 </section>
@@ -354,6 +399,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="links">After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch2">One Rule for Everything 2, Gravity is a dent</a></p>
       <p class="links"><span class="unitbadge">Why things move · step 2</span><span class="unitbadge">Fields and forces · step 3</span></p>
       <p class="links std"><b>Standards</b> 5-PS2-1, MS-PS2-4, HS-PS2-4</p>
+      <div class="handin" data-ch="ch2" data-board="Launch Lab" data-title="Everything falls the same"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
     </div>
   </figure>
 </section>
@@ -382,6 +428,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="links">After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch10">One Rule for Everything 10, The Rule Lab</a></p>
       <p class="links"><span class="unitbadge">Why things move · step 3</span></p>
       <p class="links std"><b>Standards</b> 3-PS2-1, MS-PS2-2, MS-PS3-1, MS-PS3-2, HS-PS2-1, HS-PS3-1</p>
+      <div class="handin" data-ch="ch3" data-board="Launch Lab" data-title="The launch"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
     </div>
   </figure>
 </section>
@@ -410,6 +457,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/electricity/#ch6">Electricity From Zero 6, Kirchhoff</a></p>
       <p class="links"><span class="unitbadge">Why things move · step 4</span></p>
       <p class="links std"><b>Standards</b> MS-PS2-1, HS-PS2-2, HS-PS2-3</p>
+      <div class="handin" data-ch="ch4" data-board="Launch Lab" data-title="The crash lab"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
     </div>
   </figure>
 </section>
@@ -438,6 +486,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="links">After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch2">One Rule for Everything 2, Gravity is a dent</a></p>
       <p class="links"><span class="unitbadge">Why things move · step 5</span></p>
       <p class="links std"><b>Standards</b> MS-ESS1-2, HS-PS2-4, HS-ESS1-4</p>
+      <div class="handin" data-ch="ch5" data-board="Launch Lab" data-title="Round and round"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
     </div>
   </figure>
 </section>
@@ -466,6 +515,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       
       <p class="links"><span class="unitbadge">Why things move · step 6</span></p>
       <p class="links std"><b>Standards</b> MS-PS2-1, HS-PS2-2, HS-ETS1-2</p>
+      <div class="handin" data-ch="ch6" data-board="Launch Lab" data-title="Rockets"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
     </div>
   </figure>
 </section>
@@ -568,16 +618,29 @@ function wireChecks(){document.querySelectorAll('form.cf').forEach(f=>f.addEvent
     if(err>tol){fb.textContent='Right unit, wrong number. Hint: '+f.dataset.hint;fb.className='fb bad';return}
     fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}}))}
 
+
+/* ---------- hand it in: receipts ---------- */
+const LVNAME={k5:'Kids (K to 5th)',g8:'8th grade',hs:'High school',col:'College',max:'Max'};
+function fnv(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36).toUpperCase().padStart(7,'0').slice(-6)}
+function receiptFor(box){const ch=box.dataset.ch;const ms=DEFS.filter(m=>m.ch===ch&&mApplies(m));const done=ms.filter(m=>mdone.has(m.id));const name=(box.querySelector('.hi-name').value||'').trim()||'(no name)';const exit=(box.querySelector('.hi-exit').value||'').trim().replace(/\s+/g,' ')||'(blank)';
+  const lines=['THE CHALKBOARD RECEIPT',`Board: ${box.dataset.board}`,`Chapter: ${ch.replace('ch','')} · ${box.dataset.title}`,`Level: ${LVNAME[LEVEL]}`,`Name: ${name}`,`Date: ${new Date().toISOString().slice(0,10)}`,`Missions: ${done.length}/${ms.length}${done.length?' ('+done.map(m=>m.id).join(', ')+')':''}`,`Teach it back: ${passed.has(ch+':'+LEVEL)?'passed':'not yet'}`,`Exit ticket: ${exit}`];
+  return lines.join('\n')+'\nCode: '+fnv(lines.join('\n'))}
+function wireHandin(){let savedName='';try{savedName=localStorage.getItem('chalk:name')||''}catch(e){}
+  document.querySelectorAll('.handin').forEach(box=>{const nm=box.querySelector('.hi-name');if(savedName)nm.value=savedName;nm.addEventListener('change',()=>{try{localStorage.setItem('chalk:name',nm.value)}catch(e){}});
+    const out=box.querySelector('.receipt');box.querySelector('.hi-make').addEventListener('click',()=>{out.textContent=receiptFor(box);out.hidden=false;box.querySelector('.hi-tools').hidden=false});
+    box.querySelector('.hi-copy').addEventListener('click',async()=>{const t=out.textContent;try{await navigator.clipboard.writeText(t);box.querySelector('.hi-copy').textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents(out);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);box.querySelector('.hi-copy').textContent='Selected: press copy'}setTimeout(()=>box.querySelector('.hi-copy').textContent='Copy',1800)});
+    box.querySelector('.hi-print').addEventListener('click',()=>{document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},50)})})}
+
 /* ---------- start ---------- */
 function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
-  try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();
+  try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();wireHandin();
   try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
   document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
   wireRead();
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions()};
+return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();
 </script>
 <script>
