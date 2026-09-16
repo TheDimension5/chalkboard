@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1B2923">
+<link rel="manifest" href="https://thedimension5.github.io/chalkboard/manifest.json">
+<link rel="apple-touch-icon" href="https://thedimension5.github.io/chalkboard/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chalkboard">
 <meta charset="utf-8">
 <title>Electricity From Zero</title>
 <meta name="description" content="Electricity from watts and watt-hours to fields and the Poynting vector, one concept at a time, with experiments, unit-checked teach-backs, and a system checker at five reading levels.">
@@ -326,6 +331,43 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
   .card p{min-height:0}
   .unit,.teachers{padding:1rem}
 }
+
+.lowpow{font:900 .66rem var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.35rem .6rem;cursor:pointer;white-space:nowrap}
+.lowpow.is-on{background:var(--green);color:var(--board);border-color:var(--green)}
+@media (max-width:640px){.lowpow{display:none}}
+.rowrap{overflow-x:auto;margin-top:.6rem}
+.roster{border-collapse:collapse;font-size:.88rem;min-width:100%}
+.roster th,.roster td{border:1px solid var(--chalk-line);padding:.4rem .6rem;text-align:left;white-space:nowrap}
+.roster thead th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+.roster td.good{color:var(--green);font-weight:700}.roster td.part{color:var(--yellow)}.roster td.bad{color:var(--pink)}.roster td.empty{color:var(--chalk-faint)}
+.verify .small{font-size:.85rem;color:var(--chalk-dim)}
+
+.cert{margin:2.2rem auto 0;max-width:60ch;padding:1.2rem 1.4rem;border:2px solid var(--green);border-radius:14px;display:grid;gap:.6rem;text-align:center}
+.cert .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin:0}
+.cert p{margin:0;font-size:1rem}
+.certout{border:3px double var(--chalk);border-radius:12px;padding:1.4rem 1.2rem;display:grid;gap:.4rem}
+.certout .c-eyebrow{font-weight:900;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--chalk-dim)}
+.certout .c-name{font-family:var(--display);font-size:2.6rem;color:var(--yellow);line-height:1.05}
+.certout .c-what{font-size:1.05rem}
+.certout .c-meta{font-size:.8rem;color:var(--chalk-dim)}
+@media print{body.print-receipt .certout.printing{visibility:visible;position:fixed;left:5%;top:15%;width:90%;color:#000;background:#fff;border:3px double #000;padding:2rem}body.print-receipt .certout.printing *{visibility:visible;color:#000}}
+.kits{display:grid;gap:2.2rem;margin-top:1.4rem}
+.kitboard h2{font-size:2.2rem;margin-bottom:.4rem}
+.kitboard .sub{color:var(--chalk-dim);font-size:.95rem;margin-bottom:.8rem}
+.kitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.kit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.1rem;display:grid;gap:.5rem;align-content:start}
+.kit h3{font-size:1.6rem}
+.kit .pair{font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow)}
+.kit .pair a{color:var(--yellow);text-decoration:none}
+.kit p{margin:0;font-size:.93rem}
+.kit ol{margin:0;padding-left:1.2rem;display:grid;gap:.25rem;font-size:.93rem}
+.kit .notice{color:var(--chalk-dim);border-left:3px solid var(--green);padding-left:.7rem}
+.kit .mat b,.kit .notice b{color:var(--chalk)}
+@media print{.kit{page-break-inside:avoid}}
+.qa table{border-collapse:collapse;margin-top:1rem;font-size:.9rem}
+.qa th,.qa td{border:1px solid var(--chalk-line);padding:.4rem .7rem;text-align:left}
+.qa .ok{color:var(--green);font-weight:700}.qa .fail{color:var(--pink);font-weight:700}
+.qa iframe{width:1px;height:1px;opacity:0;position:absolute;left:-9999px}
 </style>
 </head>
 <body>
@@ -344,6 +386,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <button role="tab" data-level="max" aria-selected="false">Max<small>no limits</small></button>
     </div>
     <span class="mcount" id="mcount"></span>
+    <button class="lowpow" id="lowpow" type="button" aria-pressed="false" title="Fewer effects for older computers">Low power</button>
   </div>
 </nav>
 <div class="wrap" id="top">
@@ -409,7 +452,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="skill"><b>You can now:</b> use I = V ÷ R and name volts, amps and ohms by what they measure.</p>
       <details class="discuss"><summary>Discuss</summary><ol><li>Where does the water analogy for electricity break down?</li><li>Why does a bulb glow but a wire does not?</li><li>If you double both the push and the opposition, what happens to the flow?</li></ol></details>
       <p class="exit"><b>Exit ticket</b> Fill in: push is measured in ___, flow in ___, opposition in ___.</p>
-      <p class="links">Before this: <a href="https://thedimension5.github.io/chalkboard/heat/#ch6">Hot Side, Cold Side 6, Match the load</a> · After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch1">One Rule for Everything 1, Two kinds of pull</a></p>
+      <p class="links">Before this: <a href="https://thedimension5.github.io/chalkboard/heat/#ch6">Hot Side, Cold Side 6, Match the load</a> · After this: <a href="https://thedimension5.github.io/chalkboard/einstein/#ch1">One Rule for Everything 1, Two kinds of pull</a></p>
       <p class="links"><span class="unitbadge">Fields and forces · step 1</span></p>
       
       <div class="handin" data-ch="ch2" data-board="Electricity From Zero" data-title="Push, flow, opposition"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
@@ -612,7 +655,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
       <p class="skill"><b>You can now:</b> explain slow drift and fast signal, and say where the energy travels.</p>
       <details class="discuss"><summary>Discuss</summary><ol><li>Why is the hose analogy exactly right here?</li><li>If the wires only guide the energy, what carries it?</li><li>What would happen to the signal speed if you doubled the current?</li></ol></details>
       <p class="exit"><b>Exit ticket</b> One sentence: what moves slowly, what moves fast, and where does the energy go?</p>
-      <p class="links">Before this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch3">One Rule for Everything 3, Magnets have invisible hair</a> · After this: <a href="https://thedimension5.github.io/one-rule-for-everything/#ch4">One Rule for Everything 4, Einstein's wish</a></p>
+      <p class="links">Before this: <a href="https://thedimension5.github.io/chalkboard/einstein/#ch3">One Rule for Everything 3, Magnets have invisible hair</a> · After this: <a href="https://thedimension5.github.io/chalkboard/einstein/#ch4">One Rule for Everything 4, Einstein's wish</a></p>
       <p class="links"><span class="unitbadge">Fields and forces · step 6</span></p>
       
       <div class="handin" data-ch="ch9" data-board="Electricity From Zero" data-title="What actually moves"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
@@ -653,6 +696,7 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
   <p class="eyebrow">The end, for now</p>
   <p>Five words, ten chapters, and you can now read any electrical system from the label to the wire. Go look at one.</p>
   <p class="big" style="margin-left:auto;margin-right:auto">Rate, amount, push, flow, opposition.</p>
+  <div class="cert" id="cert" hidden data-board="Electricity From Zero"><p class="mh">Certificate</p><p class="cert-note"></p><button class="btn primary" id="cert-go" type="button">Print my certificate</button><div class="certout" hidden></div></div>
   <p class="teach"><a href="https://thedimension5.github.io/chalkboard/boards/">More boards at The Chalkboard</a></p>
 </footer>
 </div>
@@ -661,6 +705,8 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
 'use strict';
 const C={chalk:'#F1ECDF',yellow:'#F6D46B',blue:'#8CC4EE',pink:'#F596A8',green:'#9DDBA3',board:'#1B2923'};
 const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let LOWPOW=false;try{LOWPOW=localStorage.getItem('chalk:lowpow')==='1'}catch(e){}
+function setLowPow(v){LOWPOW=!!v;try{localStorage.setItem('chalk:lowpow',LOWPOW?'1':'0')}catch(e){}const b=$('lowpow');if(b){b.classList.toggle('is-on',LOWPOW);b.setAttribute('aria-pressed',String(LOWPOW))}document.querySelectorAll('canvas').forEach(c=>c.dispatchEvent(new Event('chalk-resize')))}
 const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -695,8 +741,8 @@ function setLevel(l,fromClick){if(!LV.includes(l))l='k5';LEVEL=l;keepPlace(()=>{
 /* ---------- sims ---------- */
 const sims=[];
 function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getContext('2d');const s=Object.assign({cv,ctx,w:0,h:0,visible:false,t:0,dt:0,pointer:null},def);
-  function resize(){const r=cv.getBoundingClientRect();if(r.width<2)return;const dpr=Math.min(window.devicePixelRatio||1,2);const first=s.w===0;s.w=r.width;s.h=r.height;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);if(first){s.init&&s.init(s)}else{s.onResize&&s.onResize(s)}s.draw(s)}
-  new ResizeObserver(resize).observe(cv);resize();
+  function resize(){const r=cv.getBoundingClientRect();if(r.width<2)return;const dpr=LOWPOW?1:Math.min(window.devicePixelRatio||1,2);const first=s.w===0;s.w=r.width;s.h=r.height;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);if(first){s.init&&s.init(s)}else{s.onResize&&s.onResize(s)}s.draw(s)}
+  new ResizeObserver(resize).observe(cv);resize();cv.addEventListener('chalk-resize',resize);
   new IntersectionObserver(e=>{s.visible=e[0].isIntersecting},{rootMargin:'120px'}).observe(cv);
   const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
   cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);s.pointer=pos(e);s.down&&s.down(s.pointer,s,e)});
@@ -705,7 +751,7 @@ function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getConte
   cv.addEventListener('pointerleave',()=>{s.leave&&s.leave(s)});
   sims.push(s);return s}
 let last=performance.now();
-function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
+let skip=false;function loop(now){const dt=Math.min(.05,(now-last)/1000);if(LOWPOW){skip=!skip;if(skip){requestAnimationFrame(loop);return}}last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 function tick(dt){for(const s of sims){if(!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}}
 const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
@@ -714,7 +760,9 @@ const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=(
 /* ---------- missions ---------- */
 let DEFS=[],CHECKS={},KEY='chalk',mdone=new Set();
 const mApplies=m=>m.lv.includes(LEVEL);
-function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:''}
+function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:'';updateCert(all)}
+function updateCert(all){const box=$('cert');if(!box)return;const must=all.filter(m=>!m.try);const ok=must.length>0&&must.every(m=>mdone.has(m.id));box.hidden=!ok;if(ok){const left=all.filter(m=>m.try&&!mdone.has(m.id)).length;box.querySelector('.cert-note').textContent=left?`Every must-do mission at this level is done. ${left} try-your-best mission${left>1?'s':''} still open.`:'Every mission at this level is done.'}}
+function makeCert(){const box=$('cert');let name='';try{name=localStorage.getItem('chalk:name')||''}catch(e){}name=name||prompt('Name for the certificate?')||'';const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const lines=['THE CHALKBOARD',box.dataset.board,`${LVNAME[LEVEL]} level`,name||'(no name)',`${n} of ${all.length} missions`,new Date().toISOString().slice(0,10)];const code=fnv(lines.join('\n'));const out=box.querySelector('.certout');out.innerHTML=`<p class="c-eyebrow">The Chalkboard certifies that</p><p class="c-name">${name.replace(/</g,'&lt;')||'&nbsp;'}</p><p class="c-what">completed <b>${box.dataset.board}</b> at the ${LVNAME[LEVEL]} level</p><p class="c-meta">${n} of ${all.length} missions · ${lines[5]} · code ${code}</p>`;out.hidden=false;document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},80)}
 function renderMissions(){document.querySelectorAll('.missions').forEach(ul=>{const ms=DEFS.filter(m=>m.ch===ul.dataset.ch&&mApplies(m));ul.hidden=!ms.length;ul.innerHTML='<li class="mh">Mission'+(ms.length>1?'s':'')+'</li>'+ms.map(m=>`<li class="m${mdone.has(m.id)?' done':''}" data-m="${m.id}"><span class="box">✓</span><span>${m.text}</span></li>`).join('')});mcount()}
 function checkMissions(){let changed=false;for(const m of DEFS){if(mdone.has(m.id)||!mApplies(m))continue;let ok=false;try{ok=!!(CHECKS[m.id]&&CHECKS[m.id]())}catch(e){ok=false}
     if(ok){mdone.add(m.id);changed=true;const li=document.querySelector(`.missions li[data-m="${m.id}"]`);if(li)li.classList.add('done','just')}}
@@ -767,11 +815,11 @@ function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNI
   try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();wireHandin();
   try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
   document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
-  wireRead();
+  wireRead();const cb=$('cert-go');if(cb)cb.addEventListener('click',makeCert);const lp=$('lowpow');if(lp){lp.addEventListener('click',()=>setLowPow(!LOWPOW));setLowPow(LOWPOW)}
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();
 </script>
 <script>
@@ -956,5 +1004,6 @@ Chalk.start({key:'electricity',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Obj
 },Object.fromEntries(Array.from({length:10},(_,i)=>[`tb${i+1}`,()=>Chalk.checkPassed(`ch${i+1}`)])))});
 
 </script>
+<script>if("serviceWorker" in navigator&&location.hostname.endsWith("github.io")){addEventListener("load",()=>navigator.serviceWorker.register("https://thedimension5.github.io/chalkboard/sw.js").catch(()=>{}))}</script>
 </body>
 </html>
