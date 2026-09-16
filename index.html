@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1B2923">
+<link rel="manifest" href="https://thedimension5.github.io/chalkboard/manifest.json">
+<link rel="apple-touch-icon" href="https://thedimension5.github.io/chalkboard/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chalkboard">
 <meta charset="utf-8">
 <title>The Chalkboard</title>
 <meta name="description" content="Hard ideas, made playable. Enter the Chalkboard to play, or the Classroom to teach.">
@@ -114,5 +119,6 @@ const go=()=>requestAnimationFrame(frame);
 if(document.fonts&&document.fonts.load){Promise.race([document.fonts.load('700 100px Caveat'),new Promise(r=>setTimeout(r,900))]).then(go)}else go();
 })();
 </script>
+<script>if("serviceWorker" in navigator&&location.hostname.endsWith("github.io")){addEventListener("load",()=>navigator.serviceWorker.register("https://thedimension5.github.io/chalkboard/sw.js").catch(()=>{}))}</script>
 </body>
 </html>
