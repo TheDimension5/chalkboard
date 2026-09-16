@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1B2923">
+<link rel="manifest" href="https://thedimension5.github.io/chalkboard/manifest.json">
+<link rel="apple-touch-icon" href="https://thedimension5.github.io/chalkboard/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chalkboard">
+<meta charset="utf-8">
+<title>Chalk Kits</title>
+<meta name="description" content="The physical twin of every experiment on The Chalkboard: cheap classroom activities with materials, steps and what to notice, paired to the digital missions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;700;900&display=swap">
+<style>
+:root{
+  --board:#1B2923;--board-2:#1F2F28;--board-3:#2A3B33;
+  --chalk:#F1ECDF;--chalk-dim:rgba(241,236,223,.66);--chalk-faint:rgba(241,236,223,.32);--chalk-line:rgba(241,236,223,.15);
+  --yellow:#F6D46B;--blue:#8CC4EE;--pink:#F596A8;--green:#9DDBA3;
+  --tray:#5C3D27;--tray-2:#3B2718;
+  --display:'Caveat','Segoe Print','Bradley Hand',cursive;
+  --body:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{margin:0;background:var(--board);color:var(--chalk);font-family:var(--body);font-size:1.0625rem;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background-color:var(--board);background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E"),radial-gradient(ellipse at 12% 0%,rgba(255,255,255,.05),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(255,255,255,.045),transparent 50%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.28));background-attachment:scroll,fixed,fixed,fixed;background-size:240px 240px,auto,auto,auto;background-repeat:repeat,no-repeat,no-repeat,no-repeat}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem);position:relative;z-index:1}
+.skip{position:absolute;left:-999px;top:0;background:var(--yellow);color:var(--board);padding:.5rem 1rem;z-index:10;font-weight:900}
+.skip:focus{left:1rem;top:1rem}
+
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:clamp(3.2rem,7.5vw,6rem)}
+h2{font-size:clamp(2.3rem,4.6vw,3.5rem)}
+h3{font-size:1.75rem}
+p{margin:0}
+a{color:var(--yellow)}
+.eyebrow{font-weight:900;font-size:.76rem;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem}
+.eyebrow.dim{color:var(--chalk-dim)}
+.lede{font-size:1.28rem;max-width:34ch;margin-top:1.1rem}
+.text{max-width:60ch}
+.text h2{margin-bottom:1rem}
+.text p+p{margin-top:.95em}
+.text em{font-style:normal;color:var(--yellow)}
+.text .when{font-family:var(--display);font-size:1.45rem;color:var(--chalk-dim);margin-top:-.4rem;margin-bottom:1rem}
+.chalkword{font-family:var(--display);font-size:1.25em;line-height:1;color:var(--yellow)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;padding:clamp(2.5rem,6vw,5rem) 0 clamp(2rem,5vw,4rem)}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.4rem;margin-top:1.8rem}
+.hint{font-family:var(--display);font-size:1.3rem;color:var(--chalk-dim)}
+.chapter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:start;padding:clamp(3rem,7vw,6rem) 0;border-top:1px solid var(--chalk-line);scroll-margin-top:.5rem}
+.chapter.wide{grid-template-columns:1fr}
+.chapter.wide .text{max-width:70ch}
+@media (max-width:860px){.hero,.chapter{grid-template-columns:1fr}}
+
+.panel{position:relative;border:2px solid var(--chalk-faint);border-radius:10px;background:rgba(0,0,0,.16);box-shadow:inset 0 0 70px rgba(0,0,0,.28);overflow:hidden}
+.panel canvas{display:block;width:100%;aspect-ratio:4/3;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.panel canvas.short{aspect-ratio:16/10}
+.panel .doodle{position:absolute;right:1.1rem;bottom:.6rem;font-family:var(--display);font-size:1.6rem;color:var(--chalk-faint);transform:rotate(-5deg);pointer-events:none}
+.lab{margin:0;display:flex;flex-direction:column;gap:.85rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem .9rem;align-items:center}
+.controls .sep{width:1px;height:1.6rem;background:var(--chalk-line)}
+.btn{font:900 .88rem/1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-dim);border-radius:999px;padding:.66rem 1.05rem;cursor:pointer;transition:background .15s,color .15s,transform .15s,border-color .15s}
+.btn:hover{background:var(--chalk);color:var(--board);border-color:var(--chalk)}
+.btn:active{transform:scale(.97)}
+.btn.is-on{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--board);font-size:1rem;padding:.85rem 1.5rem}
+.btn.primary:hover{background:var(--chalk);border-color:var(--chalk)}
+.btn.blue{border-color:var(--blue);color:var(--blue)}.btn.blue:hover,.btn.blue.is-on{background:var(--blue);color:var(--board)}
+.btn.pink{border-color:var(--pink);color:var(--pink)}.btn.pink:hover,.btn.pink.is-on{background:var(--pink);color:var(--board)}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.slider{display:flex;align-items:center;gap:.6rem;font-weight:900;font-size:.85rem;letter-spacing:.03em}
+.slider input{accent-color:var(--yellow);width:150px;margin:0}
+.slider .val{font-family:var(--display);font-size:1.25rem;font-weight:700;min-width:3.2ch;color:var(--yellow);font-variant-numeric:tabular-nums}
+figcaption{font-size:.95rem;color:var(--chalk-dim)}
+figcaption b{color:var(--chalk);font-weight:900}
+
+.grownups{margin-top:1.5rem;border-left:3px solid var(--chalk-faint);padding:.2rem 0 .2rem 1rem;font-size:.95rem;color:var(--chalk-dim)}
+.grownups summary{cursor:pointer;font-weight:900;color:var(--chalk);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:.55rem}
+.grownups summary::-webkit-details-marker{display:none}
+.grownups summary::before{content:"+";font-family:var(--display);font-size:1.5rem;line-height:1;color:var(--yellow)}
+.grownups[open] summary::before{content:"–"}
+.grownups p{margin-top:.6rem;max-width:62ch}
+
+.trail{position:fixed;left:1rem;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:.6rem;margin:0;padding:0;list-style:none}
+.trail a{display:block;width:11px;height:11px;border-radius:50%;border:2px solid var(--chalk-faint);position:relative;transition:background .2s,border-color .2s}
+.trail a.is-active{background:var(--yellow);border-color:var(--yellow)}
+.trail a span{position:absolute;left:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font:700 .8rem var(--body);color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .15s;background:var(--board-3);padding:.2rem .55rem;border-radius:4px}
+.trail a:hover span,.trail a:focus-visible span{opacity:1}
+@media (max-width:1320px){.trail{display:none}}
+
+.forces{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;position:relative;margin-top:1.5rem}
+.force{border:2px solid var(--chalk-faint);border-radius:12px;padding:1.1rem 1.1rem 1.2rem;background:var(--board-2);transition:transform .8s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:.45rem;position:relative}
+.force h3{font-size:1.9rem}
+.force p{font-size:.92rem;color:var(--chalk-dim)}
+.force .tag{font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.force .tag.later{color:var(--pink)}
+.force svg{width:60px;height:60px;display:block}
+.forces.united .force[data-f="em"]{transform:translateX(calc(100% + 1rem)) rotate(-4deg)}
+.forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+.forces.united .force[data-f="weak"]{transform:scale(1.03)}
+.forces.united .force[data-f="gravity"]{animation:wobble 1.3s ease-in-out 1}
+.united-label{position:absolute;left:0;right:0;bottom:-2.6rem;text-align:center;font-family:var(--display);font-size:1.7rem;color:var(--yellow);opacity:0;transition:opacity .5s .5s;pointer-events:none}
+.forces.united .united-label{opacity:1}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(2deg)}}
+@media (max-width:760px){
+  .forces{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forces.united .force[data-f="em"]{transform:translate(calc(-100% - 1rem),calc(100% + 1rem)) rotate(-4deg)}
+  .forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.force{transition:none}.forces.united .force[data-f="gravity"]{animation:none}}
+
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2.5rem;margin-top:2.5rem;align-items:start}
+.timeline{list-style:none;margin:.5rem 0 0;padding:0}
+.timeline li{display:grid;grid-template-columns:5.2rem 1fr;gap:1rem;align-items:baseline;padding:.5rem 0;border-bottom:1px dashed var(--chalk-line)}
+.timeline .year{font-family:var(--display);font-size:1.6rem;font-weight:700;color:var(--yellow);font-variant-numeric:tabular-nums}
+.timeline .what{font-size:.95rem}
+.timeline .what b{font-weight:900}
+
+.checks{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.85rem}
+.checks li{display:grid;grid-template-columns:2rem 1fr;gap:.8rem;align-items:start}
+.checks .box{width:1.55rem;height:1.55rem;border:2px solid var(--chalk-dim);border-radius:5px;display:grid;place-items:center;font-family:var(--display);font-size:1.5rem;line-height:1;margin-top:.1rem}
+.checks .box.ok{color:var(--green)}.checks .box.q{color:var(--yellow)}
+.checks small{display:block;color:var(--chalk-dim);font-size:.9rem}
+
+.note{border:2px dashed var(--chalk-faint);border-radius:12px;padding:1.2rem 1.3rem;margin-top:1.8rem;font-size:.97rem}
+.note h3{font-size:1.6rem;margin-bottom:.4rem}
+.note ul{margin:.4rem 0 0;padding-left:1.2rem}
+.note li+li{margin-top:.35rem}
+
+.closing{text-align:center;padding:clamp(3rem,7vw,6rem) 0 3rem;border-top:1px solid var(--chalk-line)}
+.closing p{max-width:52ch;margin:1rem auto 0;font-size:1.15rem}
+.closing .big{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.1;color:var(--yellow);max-width:20ch;margin-top:1.5rem}
+.tray{height:20px;background:linear-gradient(var(--tray),var(--tray-2));border-top:2px solid rgba(255,255,255,.14);position:relative;z-index:1}
+.tray::before,.tray::after{content:"";position:absolute;top:-8px;height:8px;width:54px;border-radius:3px;background:var(--chalk);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tray::before{left:12%}
+.tray::after{left:calc(12% + 70px);width:38px;background:var(--pink)}
+
+.levels{position:sticky;top:0;z-index:6;background:rgba(27,41,35,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--chalk-line)}
+.levels-in{display:flex;align-items:center;gap:1rem;padding-top:.5rem;padding-bottom:.5rem}
+.levels-label{font-family:var(--display);font-size:1.4rem;color:var(--chalk-dim);white-space:nowrap}
+.levels-btns{display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;padding:3px}
+.levels-btns::-webkit-scrollbar{display:none}
+.levels-btns button{font:900 .82rem/1.1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.4rem .9rem;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:.12rem;transition:background .15s,color .15s,border-color .15s}
+.levels-btns button small{font-weight:700;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.levels-btns button:hover{border-color:var(--chalk)}
+.levels-btns button[aria-selected="true"]{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+@media (max-width:560px){.levels-label{display:none}}
+.lv{display:none}
+html:not([data-level]) .lv-k5,html[data-level="k5"] .lv-k5,html[data-level="g8"] .lv-g8,html[data-level="hs"] .lv-hs,html[data-level="col"] .lv-col,html[data-level="max"] .lv-max{display:block}
+.eq{font-family:Georgia,'Times New Roman',serif;font-style:italic;white-space:nowrap;color:var(--yellow)}
+.text sub,.text sup{font-size:.72em;line-height:0}
+.chapter,.hero{scroll-margin-top:4.6rem}
+.note p+p{margin-top:0}
+[hidden]{display:none!important}
+
+.labs{display:grid;gap:2.4rem}
+.missions{list-style:none;margin:.1rem 0 0;padding:.7rem .95rem .8rem;border:2px dashed var(--chalk-faint);border-radius:10px;display:grid;gap:.45rem}
+.missions .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.missions li.m{display:grid;grid-template-columns:1.45rem 1fr;gap:.6rem;align-items:start;font-size:.95rem}
+.missions .box{width:1.35rem;height:1.35rem;border:2px solid var(--chalk-dim);border-radius:4px;display:grid;place-items:center;font-family:var(--display);font-size:1.3rem;line-height:1;color:transparent;margin-top:.05rem}
+.missions li.done .box{color:var(--green);border-color:var(--green)}
+.missions li.done span:last-child{color:var(--chalk-dim)}
+.missions li.just .box{animation:pop .7s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.7) rotate(-8deg)}100%{transform:scale(1)}}
+.mcount{margin-left:auto;font-family:var(--display);font-size:1.35rem;color:var(--yellow);white-space:nowrap}
+.btn.read{display:inline-flex;align-items:center;gap:.45rem;margin:.1rem 0 1rem;padding:.5rem .9rem;font-size:.8rem}
+.btn.read svg{width:16px;height:16px}
+.lv.reading{border-left:3px solid var(--yellow);padding-left:.9rem;margin-left:-1.1rem}
+.teach{margin-top:2.2rem;font-size:1rem}
+@media (prefers-reduced-motion:reduce){.missions li.just .box{animation:none}}
+.panel canvas.short{aspect-ratio:16/9}
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+.keys{display:flex;flex-wrap:wrap;gap:.3rem}
+.key{width:2.15rem;height:2.15rem;border:2px solid var(--chalk-faint);border-radius:6px;background:transparent;color:var(--chalk);font:900 .9rem var(--body);cursor:pointer}
+.key:hover{background:var(--chalk);color:var(--board)}
+.controls .lbl{font-weight:900;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+input[type=number]{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.4rem .5rem;font:700 .95rem var(--body)}
+.hero-art{padding:1.2rem}
+.hero-art svg{width:100%;height:auto;display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.4rem;margin-top:2.2rem}
+.card{display:flex;flex-direction:column;gap:.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.4rem 1.5rem;background:var(--board-2);text-decoration:none;color:var(--chalk);transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:var(--yellow)}
+.card svg{width:72px;height:72px;display:block}
+.card h2{font-size:2.2rem;color:var(--chalk)}
+.card .subj{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.card p{color:var(--chalk-dim);font-size:.98rem}
+.card .meta{margin-top:auto;font-family:var(--display);font-size:1.2rem;color:var(--chalk-dim)}
+.card .go{font-weight:900;font-size:.85rem;letter-spacing:.05em;color:var(--yellow)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.6rem;margin-top:3.5rem;padding-top:2.2rem;border-top:1px solid var(--chalk-line)}
+.how h3{font-size:1.7rem;margin-bottom:.3rem}
+.how p{color:var(--chalk-dim);font-size:.97rem}
+.next{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--chalk-faint);border-radius:12px;color:var(--chalk-dim);font-size:.97rem}
+.next b{color:var(--chalk)}
+.check{margin-top:.1rem;padding:.8rem 1rem .9rem;border:2px solid var(--chalk-faint);border-radius:10px;display:grid;gap:.5rem}
+.check .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.check .q{font-weight:700;margin-bottom:.5rem}
+.cf{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.cf input{width:7.5rem;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .6rem;font:700 1rem var(--body)}
+.cf select,.controls select{background:var(--board-2);color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .5rem;font:700 .9rem var(--body)}
+.fb{margin:0;font-size:.95rem;min-height:1.2em}
+.fb.ok{color:var(--green)}.fb.bad{color:var(--pink)}
+.warmup{margin:0 0 1.1rem;padding:.6rem .9rem;border-left:3px solid var(--blue);font-size:.98rem}
+.warmup b{color:var(--blue);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.15rem}
+.lesson-end{display:grid;gap:.6rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--green);border-radius:10px}
+.lesson-end p{margin:0}
+.lesson-end .skill b{color:var(--green)}
+.lesson-end .exit b{color:var(--yellow);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.1rem}
+.discuss summary{cursor:pointer;font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);list-style:none}
+.discuss summary::-webkit-details-marker{display:none}
+.discuss summary::before{content:"+ ";color:var(--yellow)}
+.discuss[open] summary::before{content:"– "}
+.discuss ol{margin:.5rem 0 0;padding-left:1.3rem;display:grid;gap:.35rem;font-size:.95rem}
+.discuss ol.lv{display:none}
+html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5,html[data-level="g8"] .discuss ol.lv-g8,html[data-level="hs"] .discuss ol.lv-hs,html[data-level="col"] .discuss ol.lv-col,html[data-level="max"] .discuss ol.lv-max{display:grid}
+.links{font-size:.9rem;color:var(--chalk-dim)}
+.links a{color:var(--yellow)}
+.unitbadge{display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.18rem .6rem;margin:0 .35rem .3rem 0}
+.cf.choice{flex-direction:column;align-items:flex-start;gap:.35rem}
+.cf label.opt{display:flex;gap:.55rem;align-items:center;font-weight:700;font-size:.95rem;cursor:pointer}
+.cf input[type=radio]{accent-color:var(--yellow);width:1.1rem;height:1.1rem;margin:0}
+.grade{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-top:1.3rem}
+.grade .lbl,.mapbar .lbl{font-weight:900;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-right:.3rem}
+.grade .hint{font-size:1.05rem}
+.mapwrap{margin-top:1.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1rem 1rem .6rem;background:var(--board-2)}
+.mapbar{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-bottom:.6rem}
+.mapbar .hint{font-family:var(--body);font-size:.88rem;color:var(--chalk-dim)}
+.map{position:relative}
+.map canvas{display:block;width:100%;height:auto;cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--board);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .75rem;font-size:.85rem;max-width:300px;display:none;z-index:2;color:var(--chalk)}
+.tip b{display:block;font-family:var(--display);font-size:1.25rem;color:var(--yellow);line-height:1.1}
+.tip small{color:var(--chalk-dim)}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.4rem}
+.unit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.2rem}
+.unit h3{font-size:1.8rem}
+.unit p{color:var(--chalk-dim);font-size:.95rem;margin:.3rem 0 .7rem}
+.unit ol{margin:0;padding-left:1.3rem;display:grid;gap:.3rem;font-size:.95rem}
+.unit ol a{color:var(--chalk);text-decoration:none;border-bottom:1px dotted var(--chalk-faint)}
+.unit ol a:hover{color:var(--yellow)}
+.unit ol small{color:var(--chalk-dim);display:block}
+.qsearch{margin-top:2.8rem}
+.qsearch input{width:100%;max-width:520px;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:999px;padding:.6rem 1rem;font:700 1rem var(--body);margin-top:.6rem}
+.qlist{list-style:none;padding:0;margin:.9rem 0 0;display:grid;gap:.35rem;max-height:18rem;overflow:auto}
+.qlist a{color:var(--chalk);text-decoration:none}
+.qlist a:hover{color:var(--yellow)}
+.qlist small{color:var(--chalk-dim);margin-left:.45rem}
+
+.links.std{font-size:.82rem}.links.std b{color:var(--chalk-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.68rem;margin-right:.3rem}
+.baselist{list-style:none;margin:1.2rem 0 0;padding:0;display:grid;gap:.4rem}
+.baselist li{display:grid;grid-template-columns:4.2rem 1fr;gap:.2rem .8rem;align-items:baseline;padding:.55rem .2rem;border-bottom:1px dashed var(--chalk-line)}
+.baselist .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.2rem .5rem;text-align:center;color:var(--board);background:var(--chalk-dim)}
+.baselist li.built .pill{background:var(--green)}
+.baselist a,.baselist b{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--chalk);text-decoration:none}
+.baselist a{color:var(--yellow)}
+.baselist .what{grid-column:2;color:var(--chalk-dim);font-size:.92rem}
+.baselist .ngss{grid-column:2;font-size:.78rem;color:var(--chalk-dim);letter-spacing:.04em}
+@media (min-width:700px){.baselist li{grid-template-columns:4.2rem 14rem 1fr 14rem}.baselist .what,.baselist .ngss{grid-column:auto}}
+
+.hub-hero{grid-template-columns:1fr;padding-bottom:1.2rem}
+.hub-hero .text{max-width:64ch}
+.hub-hero .lede{max-width:56ch}
+.cards{margin-top:1.6rem}
+.card{position:relative;padding-top:1.6rem}
+.card .badge{position:absolute;top:-.8rem;left:1.2rem;font-size:.66rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.25rem .7rem}
+.card p{min-height:3.2em}
+.how{margin-top:3.2rem}
+.teachers{margin-top:3rem;padding:1.3rem 1.5rem;border:2px dashed var(--chalk-faint);border-radius:14px;display:grid;gap:.4rem;max-width:72ch}
+.teachers p{color:var(--chalk-dim);font-size:1rem;margin:0}
+.teachers a{color:var(--yellow);font-weight:700}
+.hub-hero .eyebrow .home{border:none;padding:0}
+
+.handin{margin-top:.2rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--blue);border-radius:10px;display:grid;gap:.55rem}
+.handin .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.handin p{margin:0;font-size:.95rem;color:var(--chalk-dim)}
+.handin .row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.handin input,.handin textarea{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .65rem;font:700 .95rem var(--body);width:100%}
+.handin input{max-width:16rem}
+.handin textarea{min-height:3.6rem;resize:vertical}
+.receipt{margin:0;white-space:pre-wrap;font:700 .85rem/1.5 "JetBrains Mono",Menlo,Consolas,monospace;background:rgba(0,0,0,.25);border:1px dashed var(--chalk-faint);border-radius:8px;padding:.8rem .9rem;color:var(--chalk)}
+@media print{
+  body.print-receipt *{visibility:hidden}
+  body.print-receipt .receipt.printing,body.print-receipt .receipt.printing *{visibility:visible}
+  body.print-receipt .receipt.printing{position:fixed;left:0;top:0;width:100%;color:#000;background:#fff;border:1px solid #000;font-size:12pt}
+}
+
+.picker{display:flex;flex-wrap:wrap;gap:.7rem 1rem;align-items:center;margin-top:1.4rem}
+.lcard{margin-top:1.8rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.6rem 1.6rem;display:grid;gap:1rem;max-width:80ch}
+.lcard header h2{font-size:2.4rem}
+.lcard .meta{color:var(--chalk-dim);font-size:.9rem}
+.lcard section h3{font-size:1.45rem;margin-bottom:.2rem}
+.lcard section h3 small{font-family:var(--body);font-weight:900;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-left:.5rem}
+.lcard p{margin:0;font-size:.98rem}
+.lcard .q{font-weight:700}
+.lcard .key{font-size:.92rem;color:var(--chalk-dim);margin-top:.25rem}
+.lcard .key b{color:var(--green)}
+.lcard .opts{margin:.3rem 0 0;padding-left:1.3rem}
+.lcard .opts .right{color:var(--green);font-weight:700}
+.lcard .ms{list-style:none;padding:0;margin:.2rem 0 0;display:grid;gap:.35rem}
+.lcard .ms li{display:flex;gap:.6rem;align-items:center;font-size:.95rem}
+.lcard .ms .box{width:1.05rem;height:1.05rem;border:2px solid var(--chalk-dim);border-radius:3px;flex:none}
+.lcard .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.15rem .5rem;color:var(--board);background:var(--green)}
+.lcard .pill.try{background:var(--yellow)}
+.lcard .sl{font-size:.88rem;word-break:break-all}
+.lcard ol{margin:.3rem 0 0;padding-left:1.3rem;display:grid;gap:.3rem}
+.lcard .skill{font-size:.92rem;color:var(--chalk-dim)}
+.verify{margin-top:3rem;display:grid;gap:.7rem;max-width:80ch}
+.verify textarea{width:100%;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:10px;padding:.7rem .8rem;font:700 .88rem/1.5 "JetBrains Mono",Menlo,Consolas,monospace}
+@media print{
+  .picker,.verify,.grade,.tray,.closing,.hub-hero .eyebrow{display:none!important}
+  body{background:#fff;color:#111}
+  :root{--chalk:#111;--chalk-dim:#444;--chalk-faint:#999;--yellow:#7a5a00;--green:#2b6b2b;--board:#fff}
+  .lcard{page-break-after:always;border-color:#999;max-width:none}
+  .lcard a{color:#111}
+}
+
+@media (max-width:520px){
+  .slider input[type=range]{width:110px}
+  .levels-in{gap:.5rem}
+  .home{padding-right:.5rem;font-size:.64rem}
+  .mcount{font-size:1.05rem}
+  .lcard{padding:1rem 1rem 1.2rem}
+  .picker{gap:.5rem .7rem}
+  .picker select{max-width:58vw}
+  .hero-cta .hint{display:none}
+  .card p{min-height:0}
+  .unit,.teachers{padding:1rem}
+}
+
+.lowpow{font:900 .66rem var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.35rem .6rem;cursor:pointer;white-space:nowrap}
+.lowpow.is-on{background:var(--green);color:var(--board);border-color:var(--green)}
+@media (max-width:640px){.lowpow{display:none}}
+.rowrap{overflow-x:auto;margin-top:.6rem}
+.roster{border-collapse:collapse;font-size:.88rem;min-width:100%}
+.roster th,.roster td{border:1px solid var(--chalk-line);padding:.4rem .6rem;text-align:left;white-space:nowrap}
+.roster thead th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+.roster td.good{color:var(--green);font-weight:700}.roster td.part{color:var(--yellow)}.roster td.bad{color:var(--pink)}.roster td.empty{color:var(--chalk-faint)}
+.verify .small{font-size:.85rem;color:var(--chalk-dim)}
+
+.cert{margin:2.2rem auto 0;max-width:60ch;padding:1.2rem 1.4rem;border:2px solid var(--green);border-radius:14px;display:grid;gap:.6rem;text-align:center}
+.cert .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin:0}
+.cert p{margin:0;font-size:1rem}
+.certout{border:3px double var(--chalk);border-radius:12px;padding:1.4rem 1.2rem;display:grid;gap:.4rem}
+.certout .c-eyebrow{font-weight:900;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--chalk-dim)}
+.certout .c-name{font-family:var(--display);font-size:2.6rem;color:var(--yellow);line-height:1.05}
+.certout .c-what{font-size:1.05rem}
+.certout .c-meta{font-size:.8rem;color:var(--chalk-dim)}
+@media print{body.print-receipt .certout.printing{visibility:visible;position:fixed;left:5%;top:15%;width:90%;color:#000;background:#fff;border:3px double #000;padding:2rem}body.print-receipt .certout.printing *{visibility:visible;color:#000}}
+.kits{display:grid;gap:2.2rem;margin-top:1.4rem}
+.kitboard h2{font-size:2.2rem;margin-bottom:.4rem}
+.kitboard .sub{color:var(--chalk-dim);font-size:.95rem;margin-bottom:.8rem}
+.kitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.kit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.1rem;display:grid;gap:.5rem;align-content:start}
+.kit h3{font-size:1.6rem}
+.kit .pair{font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow)}
+.kit .pair a{color:var(--yellow);text-decoration:none}
+.kit p{margin:0;font-size:.93rem}
+.kit ol{margin:0;padding-left:1.2rem;display:grid;gap:.25rem;font-size:.93rem}
+.kit .notice{color:var(--chalk-dim);border-left:3px solid var(--green);padding-left:.7rem}
+.kit .mat b,.kit .notice b{color:var(--chalk)}
+@media print{.kit{page-break-inside:avoid}}
+.qa table{border-collapse:collapse;margin-top:1rem;font-size:.9rem}
+.qa th,.qa td{border:1px solid var(--chalk-line);padding:.4rem .7rem;text-align:left}
+.qa .ok{color:var(--green);font-weight:700}.qa .fail{color:var(--pink);font-weight:700}
+.qa iframe{width:1px;height:1px;opacity:0;position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="top">
+<header class="hero hub-hero"><div class="text"><p class="eyebrow"><a class="home" href="https://thedimension5.github.io/chalkboard/boards/">The Chalkboard</a></p><h1>Chalk Kits</h1><p class="lede">Every experiment on the boards has a twin you can do with things already in the room. Coins for the crash lab, a balloon for rockets, a ruler for the launch, a candle for the module. Each one takes minutes, and each points back to the chapter and its missions.</p></div></header>
+<main><div class="kits"><section class="kitboard"><h2>Launch Lab</h2><p class="sub">Physics · 5 activities</p><div class="kitgrid"><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/launch/#ch1">pairs with chapter 1: Pushes and pulls</a> · 10 min</span><h3>Coin push</h3><p class="mat"><b>You need:</b> A coin, a smooth table, a rough placemat or towel.</p><ol><li>Flick the coin across the bare table and measure how far it slides.</li><li>Do the same push across the towel.</li><li>Try a heavier coin with the same flick.</li></ol><p class="notice"><b>What to notice:</b> The push ends at your finger; friction does the stopping. Rougher surface, shorter slide. The heavier coin needs a harder flick to reach the same speed but stops in about the same distance.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/launch/#ch2">pairs with chapter 2: Everything falls the same</a> · 5 min</span><h3>Paper and book drop</h3><p class="mat"><b>You need:</b> A hardback book, a sheet of paper.</p><ol><li>Drop the book and the paper side by side. The paper floats.</li><li>Put the paper on top of the book and drop them together. They land together.</li><li>Crumple the paper into a tight ball and drop it beside the book.</li></ol><p class="notice"><b>What to notice:</b> The book shields the paper from the air, so gravity alone acts on both and they fall the same. Crumpling shrinks the paper's area so the air matters less.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/launch/#ch3">pairs with chapter 3: The launch</a> · 15 min</span><h3>Ruler ramp and marble</h3><p class="mat"><b>You need:</b> A ruler with a groove or a length of track, books to prop it, a marble, masking tape, a cup as the target.</p><ol><li>Prop the ruler on one book. Release the marble from the top and mark where it lands with tape.</li><li>Add a second book. Mark the new landing spot.</li><li>Put the cup where you predict the marble will land from three books. Test it.</li></ol><p class="notice"><b>What to notice:</b> Higher start, faster marble, longer flight, but not double: the speed goes with the square root of the height. A heavier marble lands in the same place.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/launch/#ch4">pairs with chapter 4: The crash lab</a> · 5 min</span><h3>Coin crash</h3><p class="mat"><b>You need:</b> Two identical coins, one larger coin.</p><ol><li>Slide one coin into a resting identical coin. The mover stops; the other takes off.</li><li>Slide the small coin into the large one. It bounces back.</li><li>Slide the large coin into the small one. Both keep going.</li></ol><p class="notice"><b>What to notice:</b> Equal masses swap motion. A light thing bouncing off a heavy one, and a heavy thing barely noticing a light one, are momentum conservation with no equations.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/launch/#ch6">pairs with chapter 6: Rockets</a> · 10 min</span><h3>Balloon rocket</h3><p class="mat"><b>You need:</b> A balloon, a drinking straw, string, tape.</p><ol><li>Thread the string through the straw and tie it across the room, slightly uphill.</li><li>Blow up the balloon, hold it closed, tape it to the straw.</li><li>Let go.</li></ol><p class="notice"><b>What to notice:</b> The balloon pushes air backward; the air pushes the balloon forward. It is not pushing on the room air: it would work in a vacuum. Ask what runs out first, air or string.</p></div></div></section><section class="kitboard"><h2>Hot Side, Cold Side</h2><p class="sub">Engineering · 4 activities</p><div class="kitgrid"><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/heat/#ch1">pairs with chapter 1: Heat flows downhill</a> · 5 min</span><h3>Spoon in hot water</h3><p class="mat"><b>You need:</b> A metal spoon, a wooden spoon, a plastic spoon, a mug of hot tap water.</p><ol><li>Stand all three spoons in the mug.</li><li>After a minute, touch each handle.</li></ol><p class="notice"><b>What to notice:</b> Metal carries heat fast, wood and plastic barely at all. That is the bar between the two blocks. Which spoon would you make a heat sink from?</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/heat/#ch2">pairs with chapter 2: Boiling water</a> · 10 min</span><h3>Time the kettle</h3><p class="mat"><b>You need:</b> A kettle or pot, a measuring jug, a stopwatch, the kettle's wattage from its label.</p><ol><li>Boil exactly one litre from cold and time it.</li><li>Repeat with half a litre.</li><li>Compare with 4,186 J per kg per degree divided by the label wattage.</li></ol><p class="notice"><b>What to notice:</b> Half the water takes roughly half the time. The measured time is a little longer than the arithmetic because the kettle warms up and loses heat as it goes.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/heat/#ch4">pairs with chapter 4: Hot side, cold side</a> · 10 min</span><h3>Hand-warmed module</h3><p class="mat"><b>You need:</b> A thermoelectric module (a few dollars online), an LED or a small motor, a bowl of ice water.</p><ol><li>Press the module between your palm and a cold metal surface or a bowl of ice water.</li><li>Connect the LED. Watch for a glow. Swap the wires if not.</li><li>Try a cup of hot water on the top instead of your hand.</li></ol><p class="notice"><b>What to notice:</b> Your hand is the hot side at 33 °C. The bigger the difference, the brighter the glow. A module on a candle can light an LED easily; the same module on a warm hand needs a very cold other side.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/heat/#ch5">pairs with chapter 5: Why only five percent</a> · 5 min</span><h3>Where the heat goes</h3><p class="mat"><b>You need:</b> A running laptop or phone, your hand.</p><ol><li>Feel the back of a laptop that has been working hard.</li><li>Ask: the laptop used 30 W of electricity; where is it now?</li></ol><p class="notice"><b>What to notice:</b> All of it became heat. Turning electricity into heat is easy and complete; turning heat back into electricity is hard and partial. That asymmetry is the second law.</p></div></div></section><section class="kitboard"><h2>Electricity From Zero</h2><p class="sub">Engineering · 4 activities</p><div class="kitgrid"><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/electricity/#ch1">pairs with chapter 1: Watts and watt-hours</a> · 10 min</span><h3>Read the labels</h3><p class="mat"><b>You need:</b> A phone charger, a light bulb box, a power bank, the electricity bill.</p><ol><li>Find the watts on the charger and the bulb.</li><li>Find the watt-hours (or mAh and volts) on the power bank.</li><li>Find the kWh on the bill.</li></ol><p class="notice"><b>What to notice:</b> Every number is either a rate (W) or an amount (Wh). Sort them into two columns. Then work out how many hours the power bank could run the bulb.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/electricity/#ch2">pairs with chapter 2: Push, flow, opposition</a> · 10 min</span><h3>Battery, bulb, wire</h3><p class="mat"><b>You need:</b> A AA battery, a flashlight bulb, a wire, a pencil lead.</p><ol><li>Light the bulb with one wire, the battery and the bulb touching.</li><li>Put the pencil lead in the circuit and slide the wire along it.</li></ol><p class="notice"><b>What to notice:</b> The lead is a resistor. More lead in the path, dimmer bulb: more opposition, less flow. This is the ohm slider in your hand.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/electricity/#ch5">pairs with chapter 5: Series and parallel</a> · 5 min</span><h3>Stack the batteries</h3><p class="mat"><b>You need:</b> Two AA batteries, a 3 V LED, tape.</p><ol><li>Try to light the LED with one battery. Nothing, or very dim.</li><li>Tape two batteries end to end and try again.</li><li>Put the batteries side by side (same ends together) and try again.</li></ol><p class="notice"><b>What to notice:</b> End to end the pushes add and the LED lights. Side by side the push is the same as one battery, so it stays dim, but they would last twice as long.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/electricity/#ch9">pairs with chapter 9: What actually moves</a> · 5 min</span><h3>The full hose</h3><p class="mat"><b>You need:</b> A garden hose already full of water, or a straw full of water with a finger over the end.</p><ol><li>Push water in one end.</li><li>Watch water come out the other end immediately.</li></ol><p class="notice"><b>What to notice:</b> The water that came out was not the water you pushed. Electrons in a wire work the same way: the wire is full, and the push travels far faster than the stuff.</p></div></div></section><section class="kitboard"><h2>One Rule for Everything</h2><p class="sub">Physics · 3 activities</p><div class="kitgrid"><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/einstein/#ch2">pairs with chapter 2: Gravity is a dent</a> · 15 min</span><h3>Bedsheet gravity</h3><p class="mat"><b>You need:</b> A bedsheet or stretchy fabric, four people to hold it, a heavy ball, marbles.</p><ol><li>Hold the sheet taut and flat. Roll a marble across: straight line.</li><li>Put the heavy ball in the middle. Roll a marble past it.</li><li>Roll a marble sideways fast enough to circle the ball.</li></ol><p class="notice"><b>What to notice:</b> The marble is not pulled by the ball; it follows the dent. Faster sideways roll makes a longer orbit. Everything the simulation does, the sheet does, except time.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/einstein/#ch3">pairs with chapter 3: Magnets have invisible hair</a> · 10 min</span><h3>Iron filings and a magnet</h3><p class="mat"><b>You need:</b> A bar magnet, iron filings or steel wool cut fine, a sheet of paper.</p><ol><li>Put the paper over the magnet and sprinkle the filings.</li><li>Tap the paper.</li><li>Move a compass around the edge.</li></ol><p class="notice"><b>What to notice:</b> The filings draw the field lines the simulation computes. The compass points along them. Nothing about the paper bent; the pattern sits on top of it.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/einstein/#ch9">pairs with chapter 9: The puzzle is still open</a> · 10 min</span><h3>Two rulebooks on one desk</h3><p class="mat"><b>You need:</b> A magnet, a paper clip, a small ball.</p><ol><li>Drop the ball: gravity. Lift the clip with the magnet: magnetism.</li><li>Try to pick the ball up with the magnet. Try to drop the clip past the magnet.</li></ol><p class="notice"><b>What to notice:</b> Two pulls on one desk that ignore each other completely. That is what Einstein could not stand.</p></div></div></section><section class="kitboard"><h2>Bigger than Infinity</h2><p class="sub">Mathematics · 3 activities</p><div class="kitgrid"><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/infinity/#ch1">pairs with chapter 1: Counting by matching</a> · 5 min</span><h3>Cups and spoons</h3><p class="mat"><b>You need:</b> A pile of cups, a pile of spoons.</p><ol><li>Without counting, put one spoon in each cup.</li><li>Whatever is left over tells you which pile was bigger.</li></ol><p class="notice"><b>What to notice:</b> Matching decides same-size without numbers. This is the whole tool Cantor used for infinite piles.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/infinity/#ch2">pairs with chapter 2: Hilbert's Hotel</a> · 10 min</span><h3>The hallway hotel</h3><p class="mat"><b>You need:</b> A hallway of chairs, a class of students.</p><ol><li>Every chair has a student. A new student arrives.</li><li>Everyone moves one chair down. Where does the last student go?</li><li>Now say the hallway never ends.</li></ol><p class="notice"><b>What to notice:</b> With a real hallway someone falls off the end. With an endless one, nobody does, and there is always a free chair. Infinite means the trick never fails.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/infinity/#ch4">pairs with chapter 4: The diagonal trick</a> · 10 min</span><h3>Beat the list</h3><p class="mat"><b>You need:</b> Paper, a partner.</p><ol><li>Your partner writes five rows of five random 0s and 1s and claims it is every possible row.</li><li>You write a new row by flipping the first digit of row one, second of row two, and so on.</li><li>Show it is not on their list. Let them add it. Do it again.</li></ol><p class="notice"><b>What to notice:</b> The list can never catch up. That is the diagonal argument played as a game.</p></div></div></section><section class="kitboard"><h2>How History Survives</h2><p class="sub">History · 4 activities</p><div class="kitgrid"><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/history/#ch1">pairs with chapter 1: The copying game</a> · 15 min</span><h3>Scribe chain</h3><p class="mat"><b>You need:</b> A paragraph on paper, six students, pens.</p><ol><li>Student one copies the paragraph by hand and passes only their copy on.</li><li>Each student copies the copy they received.</li><li>Compare the last copy with the original.</li></ol><p class="notice"><b>What to notice:</b> Errors accumulate and are inherited. Find one mistake that every later copy shares: it tells you where in the chain it was born.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/history/#ch2">pairs with chapter 2: Family trees of books</a> · 15 min</span><h3>Find the family</h3><p class="mat"><b>You need:</b> Five copies of a sentence prepared by the teacher with planted shared errors.</p><ol><li>Give each group all five copies.</li><li>Ask them to draw the family tree from shared mistakes and reconstruct the original.</li></ol><p class="notice"><b>What to notice:</b> Groups discover on their own that three copies can be wrong together if they descend from one bad parent. Count branches, not copies.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/history/#ch4">pairs with chapter 4: How old is it?</a> · 10 min</span><h3>Halving pennies</h3><p class="mat"><b>You need:</b> 64 pennies, a table.</p><ol><li>Each round, remove half the pennies. Count rounds until one is left.</li><li>Ask how many rounds ago there were 64.</li></ol><p class="notice"><b>What to notice:</b> Six halvings from 64 to 1. Carbon-14 does this every 5,730 years, and the pennies left tell you the rounds elapsed. That is the whole dating method.</p></div><div class="kit"><span class="pair"><a href="https://thedimension5.github.io/chalkboard/history/#ch5">pairs with chapter 5: Bits rot too</a> · 10 min</span><h3>Three copies vote</h3><p class="mat"><b>You need:</b> Three copies of a short text, one with a planted error in each copy at different places.</p><ol><li>Compare the three line by line.</li><li>Wherever they disagree, take the majority.</li></ol><p class="notice"><b>What to notice:</b> You recovered the original with no copy being perfect. This is exactly what the copies-and-voting switch does to the picture.</p></div></div></section></div></main>
+<footer class="closing" style="padding-top:3rem"><p class="eyebrow">The Chalkboard</p><p class="big" style="margin-left:auto;margin-right:auto"><a href="https://thedimension5.github.io/chalkboard/classroom/" style="text-decoration:none">Lesson cards are in the Classroom</a></p></footer>
+</div><div class="tray" aria-hidden="true"></div>
+<script>if("serviceWorker" in navigator&&location.hostname.endsWith("github.io")){addEventListener("load",()=>navigator.serviceWorker.register("https://thedimension5.github.io/chalkboard/sw.js").catch(()=>{}))}</script>
+</body>
+</html>
