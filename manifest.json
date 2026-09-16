@@ -1,0 +1,22 @@
+{
+ "name": "The Chalkboard",
+ "short_name": "Chalkboard",
+ "start_url": "https://thedimension5.github.io/chalkboard/boards/",
+ "scope": "https://thedimension5.github.io/chalkboard/",
+ "display": "standalone",
+ "background_color": "#1B2923",
+ "theme_color": "#1B2923",
+ "description": "Hard ideas, made playable.",
+ "icons": [
+  {
+   "src": "https://thedimension5.github.io/chalkboard/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "https://thedimension5.github.io/chalkboard/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}
