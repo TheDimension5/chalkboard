@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1B2923">
+<link rel="manifest" href="https://thedimension5.github.io/chalkboard/manifest.json">
+<link rel="apple-touch-icon" href="https://thedimension5.github.io/chalkboard/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chalkboard">
+<meta charset="utf-8">
+<title>The Eyepiece</title>
+<meta name="description" content="One eyepiece that is a telescope and a microscope at once: turn the focus from the edge of the observable universe all the way in to the Planck length, 62 powers of ten, with every object drawn at its true relative size and every reading in metres and powers of ten.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;700;900&display=swap">
+<style>
+:root{
+  --board:#1B2923;--board-2:#1F2F28;--board-3:#2A3B33;
+  --chalk:#F1ECDF;--chalk-dim:rgba(241,236,223,.66);--chalk-faint:rgba(241,236,223,.32);--chalk-line:rgba(241,236,223,.15);
+  --yellow:#F6D46B;--blue:#8CC4EE;--pink:#F596A8;--green:#9DDBA3;
+  --tray:#5C3D27;--tray-2:#3B2718;
+  --display:'Caveat','Segoe Print','Bradley Hand',cursive;
+  --body:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{margin:0;background:var(--board);color:var(--chalk);font-family:var(--body);font-size:1.0625rem;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background-color:var(--board);background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E"),radial-gradient(ellipse at 12% 0%,rgba(255,255,255,.05),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(255,255,255,.045),transparent 50%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.28));background-attachment:scroll,fixed,fixed,fixed;background-size:240px 240px,auto,auto,auto;background-repeat:repeat,no-repeat,no-repeat,no-repeat}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem);position:relative;z-index:1}
+.skip{position:absolute;left:-999px;top:0;background:var(--yellow);color:var(--board);padding:.5rem 1rem;z-index:10;font-weight:900}
+.skip:focus{left:1rem;top:1rem}
+
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:clamp(3.2rem,7.5vw,6rem)}
+h2{font-size:clamp(2.3rem,4.6vw,3.5rem)}
+h3{font-size:1.75rem}
+p{margin:0}
+a{color:var(--yellow)}
+.eyebrow{font-weight:900;font-size:.76rem;letter-spacing:.15em;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem}
+.eyebrow.dim{color:var(--chalk-dim)}
+.lede{font-size:1.28rem;max-width:34ch;margin-top:1.1rem}
+.text{max-width:60ch}
+.text h2{margin-bottom:1rem}
+.text p+p{margin-top:.95em}
+.text em{font-style:normal;color:var(--yellow)}
+.text .when{font-family:var(--display);font-size:1.45rem;color:var(--chalk-dim);margin-top:-.4rem;margin-bottom:1rem}
+.chalkword{font-family:var(--display);font-size:1.25em;line-height:1;color:var(--yellow)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;padding:clamp(2.5rem,6vw,5rem) 0 clamp(2rem,5vw,4rem)}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.4rem;margin-top:1.8rem}
+.hint{font-family:var(--display);font-size:1.3rem;color:var(--chalk-dim)}
+.chapter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:start;padding:clamp(3rem,7vw,6rem) 0;border-top:1px solid var(--chalk-line);scroll-margin-top:.5rem}
+.chapter.wide{grid-template-columns:1fr}
+.chapter.wide .text{max-width:70ch}
+@media (max-width:860px){.hero,.chapter{grid-template-columns:1fr}}
+
+.panel{position:relative;border:2px solid var(--chalk-faint);border-radius:10px;background:rgba(0,0,0,.16);box-shadow:inset 0 0 70px rgba(0,0,0,.28);overflow:hidden}
+.panel canvas{display:block;width:100%;aspect-ratio:4/3;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.panel canvas.short{aspect-ratio:16/10}
+.panel .doodle{position:absolute;right:1.1rem;bottom:.6rem;font-family:var(--display);font-size:1.6rem;color:var(--chalk-faint);transform:rotate(-5deg);pointer-events:none}
+.lab{margin:0;display:flex;flex-direction:column;gap:.85rem}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem .9rem;align-items:center}
+.controls .sep{width:1px;height:1.6rem;background:var(--chalk-line)}
+.btn{font:900 .88rem/1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-dim);border-radius:999px;padding:.66rem 1.05rem;cursor:pointer;transition:background .15s,color .15s,transform .15s,border-color .15s}
+.btn:hover{background:var(--chalk);color:var(--board);border-color:var(--chalk)}
+.btn:active{transform:scale(.97)}
+.btn.is-on{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--board);font-size:1rem;padding:.85rem 1.5rem}
+.btn.primary:hover{background:var(--chalk);border-color:var(--chalk)}
+.btn.blue{border-color:var(--blue);color:var(--blue)}.btn.blue:hover,.btn.blue.is-on{background:var(--blue);color:var(--board)}
+.btn.pink{border-color:var(--pink);color:var(--pink)}.btn.pink:hover,.btn.pink.is-on{background:var(--pink);color:var(--board)}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.slider{display:flex;align-items:center;gap:.6rem;font-weight:900;font-size:.85rem;letter-spacing:.03em}
+.slider input{accent-color:var(--yellow);width:150px;margin:0}
+.slider .val{font-family:var(--display);font-size:1.25rem;font-weight:700;min-width:3.2ch;color:var(--yellow);font-variant-numeric:tabular-nums}
+figcaption{font-size:.95rem;color:var(--chalk-dim)}
+figcaption b{color:var(--chalk);font-weight:900}
+
+.grownups{margin-top:1.5rem;border-left:3px solid var(--chalk-faint);padding:.2rem 0 .2rem 1rem;font-size:.95rem;color:var(--chalk-dim)}
+.grownups summary{cursor:pointer;font-weight:900;color:var(--chalk);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:.55rem}
+.grownups summary::-webkit-details-marker{display:none}
+.grownups summary::before{content:"+";font-family:var(--display);font-size:1.5rem;line-height:1;color:var(--yellow)}
+.grownups[open] summary::before{content:"–"}
+.grownups p{margin-top:.6rem;max-width:62ch}
+
+.trail{position:fixed;left:1rem;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:.6rem;margin:0;padding:0;list-style:none}
+.trail a{display:block;width:11px;height:11px;border-radius:50%;border:2px solid var(--chalk-faint);position:relative;transition:background .2s,border-color .2s}
+.trail a.is-active{background:var(--yellow);border-color:var(--yellow)}
+.trail a span{position:absolute;left:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font:700 .8rem var(--body);color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .15s;background:var(--board-3);padding:.2rem .55rem;border-radius:4px}
+.trail a:hover span,.trail a:focus-visible span{opacity:1}
+@media (max-width:1320px){.trail{display:none}}
+
+.forces{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;position:relative;margin-top:1.5rem}
+.force{border:2px solid var(--chalk-faint);border-radius:12px;padding:1.1rem 1.1rem 1.2rem;background:var(--board-2);transition:transform .8s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:.45rem;position:relative}
+.force h3{font-size:1.9rem}
+.force p{font-size:.92rem;color:var(--chalk-dim)}
+.force .tag{font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.force .tag.later{color:var(--pink)}
+.force svg{width:60px;height:60px;display:block}
+.forces.united .force[data-f="em"]{transform:translateX(calc(100% + 1rem)) rotate(-4deg)}
+.forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+.forces.united .force[data-f="weak"]{transform:scale(1.03)}
+.forces.united .force[data-f="gravity"]{animation:wobble 1.3s ease-in-out 1}
+.united-label{position:absolute;left:0;right:0;bottom:-2.6rem;text-align:center;font-family:var(--display);font-size:1.7rem;color:var(--yellow);opacity:0;transition:opacity .5s .5s;pointer-events:none}
+.forces.united .united-label{opacity:1}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(2deg)}}
+@media (max-width:760px){
+  .forces{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forces.united .force[data-f="em"]{transform:translate(calc(-100% - 1rem),calc(100% + 1rem)) rotate(-4deg)}
+  .forces.united .force[data-f="strong"]{transform:translateX(calc(-100% - 1rem)) rotate(4deg)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.force{transition:none}.forces.united .force[data-f="gravity"]{animation:none}}
+
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2.5rem;margin-top:2.5rem;align-items:start}
+.timeline{list-style:none;margin:.5rem 0 0;padding:0}
+.timeline li{display:grid;grid-template-columns:5.2rem 1fr;gap:1rem;align-items:baseline;padding:.5rem 0;border-bottom:1px dashed var(--chalk-line)}
+.timeline .year{font-family:var(--display);font-size:1.6rem;font-weight:700;color:var(--yellow);font-variant-numeric:tabular-nums}
+.timeline .what{font-size:.95rem}
+.timeline .what b{font-weight:900}
+
+.checks{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.85rem}
+.checks li{display:grid;grid-template-columns:2rem 1fr;gap:.8rem;align-items:start}
+.checks .box{width:1.55rem;height:1.55rem;border:2px solid var(--chalk-dim);border-radius:5px;display:grid;place-items:center;font-family:var(--display);font-size:1.5rem;line-height:1;margin-top:.1rem}
+.checks .box.ok{color:var(--green)}.checks .box.q{color:var(--yellow)}
+.checks small{display:block;color:var(--chalk-dim);font-size:.9rem}
+
+.note{border:2px dashed var(--chalk-faint);border-radius:12px;padding:1.2rem 1.3rem;margin-top:1.8rem;font-size:.97rem}
+.note h3{font-size:1.6rem;margin-bottom:.4rem}
+.note ul{margin:.4rem 0 0;padding-left:1.2rem}
+.note li+li{margin-top:.35rem}
+
+.closing{text-align:center;padding:clamp(3rem,7vw,6rem) 0 3rem;border-top:1px solid var(--chalk-line)}
+.closing p{max-width:52ch;margin:1rem auto 0;font-size:1.15rem}
+.closing .big{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.1;color:var(--yellow);max-width:20ch;margin-top:1.5rem}
+.tray{height:20px;background:linear-gradient(var(--tray),var(--tray-2));border-top:2px solid rgba(255,255,255,.14);position:relative;z-index:1}
+.tray::before,.tray::after{content:"";position:absolute;top:-8px;height:8px;width:54px;border-radius:3px;background:var(--chalk);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tray::before{left:12%}
+.tray::after{left:calc(12% + 70px);width:38px;background:var(--pink)}
+
+.levels{position:sticky;top:0;z-index:6;background:rgba(27,41,35,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--chalk-line)}
+.levels-in{display:flex;align-items:center;gap:1rem;padding-top:.5rem;padding-bottom:.5rem}
+.levels-label{font-family:var(--display);font-size:1.4rem;color:var(--chalk-dim);white-space:nowrap}
+.levels-btns{display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;padding:3px}
+.levels-btns::-webkit-scrollbar{display:none}
+.levels-btns button{font:900 .82rem/1.1 var(--body);letter-spacing:.04em;color:var(--chalk);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.4rem .9rem;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:.12rem;transition:background .15s,color .15s,border-color .15s}
+.levels-btns button small{font-weight:700;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.levels-btns button:hover{border-color:var(--chalk)}
+.levels-btns button[aria-selected="true"]{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+@media (max-width:560px){.levels-label{display:none}}
+.lv{display:none}
+html:not([data-level]) .lv-k5,html[data-level="k5"] .lv-k5,html[data-level="g8"] .lv-g8,html[data-level="hs"] .lv-hs,html[data-level="col"] .lv-col,html[data-level="max"] .lv-max{display:block}
+.eq{font-family:Georgia,'Times New Roman',serif;font-style:italic;white-space:nowrap;color:var(--yellow)}
+.text sub,.text sup{font-size:.72em;line-height:0}
+.chapter,.hero{scroll-margin-top:4.6rem}
+.note p+p{margin-top:0}
+[hidden]{display:none!important}
+
+.labs{display:grid;gap:2.4rem}
+.missions{list-style:none;margin:.1rem 0 0;padding:.7rem .95rem .8rem;border:2px dashed var(--chalk-faint);border-radius:10px;display:grid;gap:.45rem}
+.missions .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.missions li.m{display:grid;grid-template-columns:1.45rem 1fr;gap:.6rem;align-items:start;font-size:.95rem}
+.missions .box{width:1.35rem;height:1.35rem;border:2px solid var(--chalk-dim);border-radius:4px;display:grid;place-items:center;font-family:var(--display);font-size:1.3rem;line-height:1;color:transparent;margin-top:.05rem}
+.missions li.done .box{color:var(--green);border-color:var(--green)}
+.missions li.done span:last-child{color:var(--chalk-dim)}
+.missions li.just .box{animation:pop .7s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.7) rotate(-8deg)}100%{transform:scale(1)}}
+.mcount{margin-left:auto;font-family:var(--display);font-size:1.35rem;color:var(--yellow);white-space:nowrap}
+.btn.read{display:inline-flex;align-items:center;gap:.45rem;margin:.1rem 0 1rem;padding:.5rem .9rem;font-size:.8rem}
+.btn.read svg{width:16px;height:16px}
+.lv.reading{border-left:3px solid var(--yellow);padding-left:.9rem;margin-left:-1.1rem}
+.teach{margin-top:2.2rem;font-size:1rem}
+@media (prefers-reduced-motion:reduce){.missions li.just .box{animation:none}}
+.panel canvas.short{aspect-ratio:16/9}
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+
+.home{font:900 .74rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);text-decoration:none;white-space:nowrap;padding-right:.9rem;border-right:1px solid var(--chalk-line)}
+.home:hover{color:var(--yellow)}
+.keys{display:flex;flex-wrap:wrap;gap:.3rem}
+.key{width:2.15rem;height:2.15rem;border:2px solid var(--chalk-faint);border-radius:6px;background:transparent;color:var(--chalk);font:900 .9rem var(--body);cursor:pointer}
+.key:hover{background:var(--chalk);color:var(--board)}
+.controls .lbl{font-weight:900;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+input[type=number]{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.4rem .5rem;font:700 .95rem var(--body)}
+.hero-art{padding:1.2rem}
+.hero-art svg{width:100%;height:auto;display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.4rem;margin-top:2.2rem}
+.card{display:flex;flex-direction:column;gap:.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.4rem 1.5rem;background:var(--board-2);text-decoration:none;color:var(--chalk);transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:var(--yellow)}
+.card svg{width:72px;height:72px;display:block}
+.card h2{font-size:2.2rem;color:var(--chalk)}
+.card .subj{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow)}
+.card p{color:var(--chalk-dim);font-size:.98rem}
+.card .meta{margin-top:auto;font-family:var(--display);font-size:1.2rem;color:var(--chalk-dim)}
+.card .go{font-weight:900;font-size:.85rem;letter-spacing:.05em;color:var(--yellow)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.6rem;margin-top:3.5rem;padding-top:2.2rem;border-top:1px solid var(--chalk-line)}
+.how h3{font-size:1.7rem;margin-bottom:.3rem}
+.how p{color:var(--chalk-dim);font-size:.97rem}
+.next{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--chalk-faint);border-radius:12px;color:var(--chalk-dim);font-size:.97rem}
+.next b{color:var(--chalk)}
+.check{margin-top:.1rem;padding:.8rem 1rem .9rem;border:2px solid var(--chalk-faint);border-radius:10px;display:grid;gap:.5rem}
+.check .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.check .q{font-weight:700;margin-bottom:.5rem}
+.cf{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.cf input{width:7.5rem;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .6rem;font:700 1rem var(--body)}
+.cf select,.controls select{background:var(--board-2);color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.45rem .5rem;font:700 .9rem var(--body)}
+.fb{margin:0;font-size:.95rem;min-height:1.2em}
+.fb.ok{color:var(--green)}.fb.bad{color:var(--pink)}
+.warmup{margin:0 0 1.1rem;padding:.6rem .9rem;border-left:3px solid var(--blue);font-size:.98rem}
+.warmup b{color:var(--blue);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.15rem}
+.lesson-end{display:grid;gap:.6rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--green);border-radius:10px}
+.lesson-end p{margin:0}
+.lesson-end .skill b{color:var(--green)}
+.lesson-end .exit b{color:var(--yellow);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:.1rem}
+.discuss summary{cursor:pointer;font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);list-style:none}
+.discuss summary::-webkit-details-marker{display:none}
+.discuss summary::before{content:"+ ";color:var(--yellow)}
+.discuss[open] summary::before{content:"– "}
+.discuss ol{margin:.5rem 0 0;padding-left:1.3rem;display:grid;gap:.35rem;font-size:.95rem}
+.discuss ol.lv{display:none}
+html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5,html[data-level="g8"] .discuss ol.lv-g8,html[data-level="hs"] .discuss ol.lv-hs,html[data-level="col"] .discuss ol.lv-col,html[data-level="max"] .discuss ol.lv-max{display:grid}
+.links{font-size:.9rem;color:var(--chalk-dim)}
+.links a{color:var(--yellow)}
+.unitbadge{display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.18rem .6rem;margin:0 .35rem .3rem 0}
+.cf.choice{flex-direction:column;align-items:flex-start;gap:.35rem}
+.cf label.opt{display:flex;gap:.55rem;align-items:center;font-weight:700;font-size:.95rem;cursor:pointer}
+.cf input[type=radio]{accent-color:var(--yellow);width:1.1rem;height:1.1rem;margin:0}
+.grade{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-top:1.3rem}
+.grade .lbl,.mapbar .lbl{font-weight:900;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-right:.3rem}
+.grade .hint{font-size:1.05rem}
+.mapwrap{margin-top:1.6rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1rem 1rem .6rem;background:var(--board-2)}
+.mapbar{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-bottom:.6rem}
+.mapbar .hint{font-family:var(--body);font-size:.88rem;color:var(--chalk-dim)}
+.map{position:relative}
+.map canvas{display:block;width:100%;height:auto;cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--board);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .75rem;font-size:.85rem;max-width:300px;display:none;z-index:2;color:var(--chalk)}
+.tip b{display:block;font-family:var(--display);font-size:1.25rem;color:var(--yellow);line-height:1.1}
+.tip small{color:var(--chalk-dim)}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.4rem}
+.unit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.2rem}
+.unit h3{font-size:1.8rem}
+.unit p{color:var(--chalk-dim);font-size:.95rem;margin:.3rem 0 .7rem}
+.unit ol{margin:0;padding-left:1.3rem;display:grid;gap:.3rem;font-size:.95rem}
+.unit ol a{color:var(--chalk);text-decoration:none;border-bottom:1px dotted var(--chalk-faint)}
+.unit ol a:hover{color:var(--yellow)}
+.unit ol small{color:var(--chalk-dim);display:block}
+.qsearch{margin-top:2.8rem}
+.qsearch input{width:100%;max-width:520px;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:999px;padding:.6rem 1rem;font:700 1rem var(--body);margin-top:.6rem}
+.qlist{list-style:none;padding:0;margin:.9rem 0 0;display:grid;gap:.35rem;max-height:18rem;overflow:auto}
+.qlist a{color:var(--chalk);text-decoration:none}
+.qlist a:hover{color:var(--yellow)}
+.qlist small{color:var(--chalk-dim);margin-left:.45rem}
+
+.links.std{font-size:.82rem}.links.std b{color:var(--chalk-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.68rem;margin-right:.3rem}
+.baselist{list-style:none;margin:1.2rem 0 0;padding:0;display:grid;gap:.4rem}
+.baselist li{display:grid;grid-template-columns:4.2rem 1fr;gap:.2rem .8rem;align-items:baseline;padding:.55rem .2rem;border-bottom:1px dashed var(--chalk-line)}
+.baselist .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.2rem .5rem;text-align:center;color:var(--board);background:var(--chalk-dim)}
+.baselist li.built .pill{background:var(--green)}
+.baselist a,.baselist b{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--chalk);text-decoration:none}
+.baselist a{color:var(--yellow)}
+.baselist .what{grid-column:2;color:var(--chalk-dim);font-size:.92rem}
+.baselist .ngss{grid-column:2;font-size:.78rem;color:var(--chalk-dim);letter-spacing:.04em}
+@media (min-width:700px){.baselist li{grid-template-columns:4.2rem 14rem 1fr 14rem}.baselist .what,.baselist .ngss{grid-column:auto}}
+
+.hub-hero{grid-template-columns:1fr;padding-bottom:1.2rem}
+.hub-hero .text{max-width:64ch}
+.hub-hero .lede{max-width:56ch}
+.cards{margin-top:1.6rem}
+.card{position:relative;padding-top:1.6rem}
+.card .badge{position:absolute;top:-.8rem;left:1.2rem;font-size:.66rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--board);background:var(--green);border-radius:999px;padding:.25rem .7rem}
+.card p{min-height:3.2em}
+.how{margin-top:3.2rem}
+.teachers{margin-top:3rem;padding:1.3rem 1.5rem;border:2px dashed var(--chalk-faint);border-radius:14px;display:grid;gap:.4rem;max-width:72ch}
+.teachers p{color:var(--chalk-dim);font-size:1rem;margin:0}
+.teachers a{color:var(--yellow);font-weight:700}
+.hub-hero .eyebrow .home{border:none;padding:0}
+
+.handin{margin-top:.2rem;padding:.9rem 1rem 1rem;border:2px solid var(--chalk-faint);border-top:3px solid var(--blue);border-radius:10px;display:grid;gap:.55rem}
+.handin .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.handin p{margin:0;font-size:.95rem;color:var(--chalk-dim)}
+.handin .row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.handin input,.handin textarea{background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:8px;padding:.5rem .65rem;font:700 .95rem var(--body);width:100%}
+.handin input{max-width:16rem}
+.handin textarea{min-height:3.6rem;resize:vertical}
+.receipt{margin:0;white-space:pre-wrap;font:700 .85rem/1.5 "JetBrains Mono",Menlo,Consolas,monospace;background:rgba(0,0,0,.25);border:1px dashed var(--chalk-faint);border-radius:8px;padding:.8rem .9rem;color:var(--chalk)}
+@media print{
+  body.print-receipt *{visibility:hidden}
+  body.print-receipt .receipt.printing,body.print-receipt .receipt.printing *{visibility:visible}
+  body.print-receipt .receipt.printing{position:fixed;left:0;top:0;width:100%;color:#000;background:#fff;border:1px solid #000;font-size:12pt}
+}
+
+.picker{display:flex;flex-wrap:wrap;gap:.7rem 1rem;align-items:center;margin-top:1.4rem}
+.lcard{margin-top:1.8rem;border:2px solid var(--chalk-faint);border-radius:14px;padding:1.4rem 1.6rem 1.6rem;display:grid;gap:1rem;max-width:80ch}
+.lcard header h2{font-size:2.4rem}
+.lcard .meta{color:var(--chalk-dim);font-size:.9rem}
+.lcard section h3{font-size:1.45rem;margin-bottom:.2rem}
+.lcard section h3 small{font-family:var(--body);font-weight:900;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);margin-left:.5rem}
+.lcard p{margin:0;font-size:.98rem}
+.lcard .q{font-weight:700}
+.lcard .key{font-size:.92rem;color:var(--chalk-dim);margin-top:.25rem}
+.lcard .key b{color:var(--green)}
+.lcard .opts{margin:.3rem 0 0;padding-left:1.3rem}
+.lcard .opts .right{color:var(--green);font-weight:700}
+.lcard .ms{list-style:none;padding:0;margin:.2rem 0 0;display:grid;gap:.35rem}
+.lcard .ms li{display:flex;gap:.6rem;align-items:center;font-size:.95rem}
+.lcard .ms .box{width:1.05rem;height:1.05rem;border:2px solid var(--chalk-dim);border-radius:3px;flex:none}
+.lcard .pill{font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:.15rem .5rem;color:var(--board);background:var(--green)}
+.lcard .pill.try{background:var(--yellow)}
+.lcard .sl{font-size:.88rem;word-break:break-all}
+.lcard ol{margin:.3rem 0 0;padding-left:1.3rem;display:grid;gap:.3rem}
+.lcard .skill{font-size:.92rem;color:var(--chalk-dim)}
+.verify{margin-top:3rem;display:grid;gap:.7rem;max-width:80ch}
+.verify textarea{width:100%;background:transparent;color:var(--chalk);border:2px solid var(--chalk-faint);border-radius:10px;padding:.7rem .8rem;font:700 .88rem/1.5 "JetBrains Mono",Menlo,Consolas,monospace}
+@media print{
+  .picker,.verify,.grade,.tray,.closing,.hub-hero .eyebrow{display:none!important}
+  body{background:#fff;color:#111}
+  :root{--chalk:#111;--chalk-dim:#444;--chalk-faint:#999;--yellow:#7a5a00;--green:#2b6b2b;--board:#fff}
+  .lcard{page-break-after:always;border-color:#999;max-width:none}
+  .lcard a{color:#111}
+}
+
+@media (max-width:520px){
+  .slider input[type=range]{width:110px}
+  .levels-in{gap:.5rem}
+  .home{padding-right:.5rem;font-size:.64rem}
+  .mcount{font-size:1.05rem}
+  .lcard{padding:1rem 1rem 1.2rem}
+  .picker{gap:.5rem .7rem}
+  .picker select{max-width:58vw}
+  .hero-cta .hint{display:none}
+  .card p{min-height:0}
+  .unit,.teachers{padding:1rem}
+}
+
+.lowpow{font:900 .66rem var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);background:transparent;border:2px solid var(--chalk-faint);border-radius:999px;padding:.35rem .6rem;cursor:pointer;white-space:nowrap}
+.lowpow.is-on{background:var(--green);color:var(--board);border-color:var(--green)}
+@media (max-width:640px){.lowpow{display:none}}
+.rowrap{overflow-x:auto;margin-top:.6rem}
+.roster{border-collapse:collapse;font-size:.88rem;min-width:100%}
+.roster th,.roster td{border:1px solid var(--chalk-line);padding:.4rem .6rem;text-align:left;white-space:nowrap}
+.roster thead th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim)}
+.roster td.good{color:var(--green);font-weight:700}.roster td.part{color:var(--yellow)}.roster td.bad{color:var(--pink)}.roster td.empty{color:var(--chalk-faint)}
+.verify .small{font-size:.85rem;color:var(--chalk-dim)}
+
+.cert{margin:2.2rem auto 0;max-width:60ch;padding:1.2rem 1.4rem;border:2px solid var(--green);border-radius:14px;display:grid;gap:.6rem;text-align:center}
+.cert .mh{font-weight:900;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin:0}
+.cert p{margin:0;font-size:1rem}
+.certout{border:3px double var(--chalk);border-radius:12px;padding:1.4rem 1.2rem;display:grid;gap:.4rem}
+.certout .c-eyebrow{font-weight:900;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--chalk-dim)}
+.certout .c-name{font-family:var(--display);font-size:2.6rem;color:var(--yellow);line-height:1.05}
+.certout .c-what{font-size:1.05rem}
+.certout .c-meta{font-size:.8rem;color:var(--chalk-dim)}
+@media print{body.print-receipt .certout.printing{visibility:visible;position:fixed;left:5%;top:15%;width:90%;color:#000;background:#fff;border:3px double #000;padding:2rem}body.print-receipt .certout.printing *{visibility:visible;color:#000}}
+.kits{display:grid;gap:2.2rem;margin-top:1.4rem}
+.kitboard h2{font-size:2.2rem;margin-bottom:.4rem}
+.kitboard .sub{color:var(--chalk-dim);font-size:.95rem;margin-bottom:.8rem}
+.kitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.kit{border:2px solid var(--chalk-faint);border-radius:12px;padding:1rem 1.1rem 1.1rem;display:grid;gap:.5rem;align-content:start}
+.kit h3{font-size:1.6rem}
+.kit .pair{font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow)}
+.kit .pair a{color:var(--yellow);text-decoration:none}
+.kit p{margin:0;font-size:.93rem}
+.kit ol{margin:0;padding-left:1.2rem;display:grid;gap:.25rem;font-size:.93rem}
+.kit .notice{color:var(--chalk-dim);border-left:3px solid var(--green);padding-left:.7rem}
+.kit .mat b,.kit .notice b{color:var(--chalk)}
+@media print{.kit{page-break-inside:avoid}}
+.qa table{border-collapse:collapse;margin-top:1rem;font-size:.9rem}
+.qa th,.qa td{border:1px solid var(--chalk-line);padding:.4rem .7rem;text-align:left}
+.qa .ok{color:var(--green);font-weight:700}.qa .fail{color:var(--pink);font-weight:700}
+.qa iframe{width:1px;height:1px;opacity:0;position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#ch1">Skip to the story</a>
+<ul class="trail" aria-label="Chapters"><li><a href="#top" data-for="top"><span>Start</span></a></li><li><a href="#ch1" data-for="ch1"><span>1 · All the way out</span></a></li><li><a href="#ch2" data-for="ch2"><span>2 · All the way in</span></a></li></ul>
+<nav class="levels" aria-label="Reading level">
+  <div class="wrap levels-in">
+    <a class="home" href="https://thedimension5.github.io/chalkboard/boards/">The Chalkboard</a>
+    <span class="levels-label">Who's reading?</span>
+    <div class="levels-btns" role="tablist">
+      <button role="tab" data-level="k5" aria-selected="true">Kids<small>K to 5th</small></button>
+      <button role="tab" data-level="g8" aria-selected="false">8th grade<small>middle school</small></button>
+      <button role="tab" data-level="hs" aria-selected="false">High school<small>physics class</small></button>
+      <button role="tab" data-level="col" aria-selected="false">College<small>major</small></button>
+      <button role="tab" data-level="max" aria-selected="false">Max<small>no limits</small></button>
+    </div>
+    <span class="mcount" id="mcount"></span>
+    <button class="lowpow" id="lowpow" type="button" aria-pressed="false" title="Fewer effects for older computers">Low power</button>
+  </div>
+</nav>
+<div class="wrap" id="top">
+<header class="hero">
+  <div class="text">
+    <p class="eyebrow">Scale: telescope and microscope in one</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <h1>The Eyepiece</h1>
+    <div class="lv lv-k5"><p class="lede">Look through the eyepiece. Turn the focus one way and you fly out past the Moon, the Sun, the stars, the galaxies, to the edge of everything we can see. Turn it the other way and you dive into your hand, into a cell, into an atom, and past the smallest thing anyone has ever measured. Every object is drawn at its real size compared to the others.</p></div><div class="lv lv-g8"><p class="lede">One instrument, two directions. Every click of the focus is one power of ten. Going out, it takes 27 of them to reach the edge of the observable universe. Going in, it takes 35 to reach the Planck length, and for the last fifteen there is nothing to draw, because nobody has ever seen anything there. Learn to read a size as a power of ten and the whole universe fits on one ruler.</p></div><div class="lv lv-hs"><p class="lede">Sixty-two orders of magnitude from 10⁻³⁵ m to 10²⁷ m, on a logarithmic focus. The instrument shows why the human scale sits near the middle, why light cannot resolve anything much below its own wavelength, why the atom is empty, and where measured physics stops. Each object carries its size in scientific notation; read them off and the exponents tell the story.</p></div><div class="lv lv-col"><p class="lede">A log-scale viewer across the full range of measured length, with the honest gaps: the desert between the electroweak scale and the Planck length, and the horizon beyond which the universe is unobservable. Use it to place cross-sections, wavelengths and resolution limits (Abbe, Rutherford, the LHC's reach) on one axis, and to see why the interesting physics clusters at particular exponents.</p></div><div class="lv lv-max"><p class="lede">Lengths are the one quantity we can lay out end to end across all of physics, and the layout is not uniform: structure at 10⁻¹⁵, 10⁻¹⁰, 10⁰, 10⁷, 10⁹, 10²¹ and 10²⁶ m, with near-emptiness between. The eyepiece is a map of where the fundamental constants, ħ, c, G, e and the masses, set the scales, and of the two edges, Planck and horizon, where the map stops being a map.</p></div>
+    <div class="hero-cta"><a class="btn primary" href="#ch1">Start the story</a></div>
+  </div>
+  <div class="panel hero-art"><svg viewBox="0 0 400 300" fill="none" stroke="#F1ECDF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="200" cy="150" r="118"/><circle cx="200" cy="150" r="128" opacity=".3" stroke-width="8"/><path d="M82 150h30M288 150h30M200 32v30M200 238v30" opacity=".35"/><g stroke="#F6D46B"><path d="M130 118c14-24 46-26 56-6s-6 48-32 42-34-22-24-36"/><circle cx="152" cy="132" r="4" fill="#F6D46B"/></g><g stroke="#8CC4EE"><circle cx="252" cy="188" r="30" stroke-dasharray="4 5"/><circle cx="252" cy="188" r="3" fill="#F596A8" stroke="#F596A8"/></g><g stroke="#9DDBA3" stroke-width="2.4"><path d="M236 92c-8 8-8 18 0 26s8 18 0 26"/><path d="M256 92c8 8 8 18 0 26s-8 18 0 26"/><path d="M239 104h14M239 118h14M239 132h14"/></g><g stroke="#F1ECDF" opacity=".7" stroke-width="2"><path d="M40 60v180M32 60h8M32 100h8M32 140h8M32 180h8M32 220h8M32 240h8"/><path d="M44 150l10-6v12z" fill="#F6D46B" stroke="#F6D46B"/></g><g stroke="#F1ECDF" opacity=".55" stroke-width="2"><path d="M360 240V60"/><path d="M354 72l6-12 6 12M354 228l6 12 6-12"/></g></svg></div>
+</header>
+<main>
+<section class="chapter" id="ch1">
+  <div class="text">
+    <p class="eyebrow">Chapter 1</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>How many times bigger than you is the Earth? Guess a number, then check it in the eyepiece.</p>
+    <div class="lv lv-k5"><h2>All the way out</h2><p>Start with you. Turn the focus and you get smaller and smaller as the world gets bigger: a whale, a mountain, the whole Earth, then the Sun, which is a hundred Earths wide. Keep going. The Sun becomes a dot among stars, the stars become a galaxy, the galaxies become specks. Then it stops. Not because space ends, but because light from farther away has not reached us yet.</p><p>Every turn of the focus makes the view ten times wider. Count the turns.</p></div>
+    <div class="lv lv-g8"><h2>Powers of ten, outward</h2><p>Each notch on the focus multiplies the field of view by ten. You are about 10⁰ m tall. The Earth is 10⁷ m across, the Sun 10⁹, the solar system 10¹³, the gap to the nearest star 10¹⁶, the Milky Way 10²¹, and the observable universe about 10²⁷. Twenty-seven notches, and most of them are empty: the universe is almost entirely nothing with a little something scattered through it.</p><p>The edge is not a wall. The universe is 13.8 billion years old, so we can only see things whose light has had that long to arrive. Every year the edge moves out by one light-year, and every observer, anywhere, is at the centre of their own.</p></div>
+    <div class="lv lv-hs"><h2>Reading the exponents</h2><p>Write a size as a × 10ⁿ and n does the work: the Earth (1.3 × 10⁷ m) and the Sun (1.4 × 10⁹ m) differ by two exponents, so a hundred Earths fit across the Sun. The Sun and the Milky Way differ by twelve, which is why a galaxy of 10¹¹ stars is still mostly empty: the stars are 10⁷ solar diameters apart.</p><p>Light-years are a convenience: 1 ly = 9.46 × 10¹⁵ m, which is just the speed of light times the seconds in a year. The observable universe, at 8.8 × 10²⁶ m across, is 93 billion light-years, larger than 2 × 13.8 billion because space has expanded while the light travelled.</p></div>
+    <div class="lv lv-col"><h2>Hierarchy and emptiness</h2><p>Structure is hierarchical and sparse: planets in systems (10¹³ m), systems in galaxies (10²¹ m), galaxies in groups (10²³ m), groups in superclusters and filaments (10²⁴ to 10²⁵ m), and above about 10²⁵ m the cosmic web becomes statistically uniform, which is the scale on which the cosmological principle holds and Friedmann's equations apply. Below it, gravity has had time to make lumps; above it, it has not.</p><p>The particle horizon, 46.5 billion light-years in comoving radius, is the current limit of observation, not of existence. The cosmic microwave background is the farthest light we can see, emitted when the universe was 380,000 years old; anything earlier is opaque to photons and reachable only through neutrinos or gravitational waves.</p></div>
+    <div class="lv lv-max"><h2>The horizon as an edge of knowledge</h2><p>Observability has its own hierarchy: the particle horizon (what could have reached us), the event horizon of an accelerating universe (what ever will), and the Hubble radius (where recession reaches c), none of which coincide. In a ΛCDM universe the event horizon is about 16 billion light-years away, so galaxies beyond it, already visible, will fade from view; the observable universe grows in comoving terms but the reachable universe shrinks.</p><p>Whether space is finite is undetermined: the curvature is consistent with zero to a fraction of a percent, which bounds the radius of any closed universe to far beyond the horizon. The eyepiece stops at 10²⁷ m because that is where measurement stops, which is a different statement from where space does.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>Let kids count notches out loud. The number that matters is not any one size but the count of tens between two things.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-tele" aria-label="A round eyepiece. Drag up and down or use the mouse wheel to change the field of view from a person out to the observable universe; objects are drawn at true relative size."></canvas></div>
+    <div class="controls"><button class="btn" id="te-in">Zoom in ×10</button><button class="btn primary" id="te-out">Zoom out ×10</button><label class="slider">Focus <input type="range" id="te-e" min="-34.5" max="27.3" step="0.05" value="0.7"><span class="val" id="te-e-val"></span></label><span class="lbl">Objectives</span><button class="btn" data-teobj="0.7">You</button><button class="btn" data-teobj="7.4">Earth</button><button class="btn" data-teobj="9.5">Sun</button><button class="btn" data-teobj="13.2">Solar system</button><button class="btn" data-teobj="16.8">Nearest star</button><button class="btn" data-teobj="21.3">Milky Way</button><button class="btn" data-teobj="23.3">Local Group</button><button class="btn" data-teobj="27.2">Universe</button></div>
+    <figcaption><b>Try this:</b> drag the eyepiece up, or roll the wheel, and count the powers of ten until the Earth fits. Keep going until the Sun is a dot, then until the galaxy is. Find the emptiest place on the way.</figcaption>
+    <ul class="missions" data-ch="ch1"></ul>
+    <div class="check" data-ch="ch1"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">The Earth is about 13,000 km across. The Sun is 100 times wider. How wide is the Sun?</p><form class="cf" data-a="1300000" data-u="km" data-tol="0.05" data-hint="100 times 13,000." data-ok="Right. About 1,300,000 km: 109 Earths in a row."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">The Milky Way is 10²¹ m across and the solar system is 10¹³ m. How many powers of ten bigger is the galaxy?</p><form class="cf" data-a="8" data-u="n" data-tol="0.02" data-hint="Subtract the exponents." data-ok="Right. Eight: a hundred million times wider."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Light travels 3 × 10⁸ m/s and a year has 3.15 × 10⁷ seconds. How far is one light-year, in metres?</p><form class="cf" data-a="9460000000000000.0" data-u="m" data-tol="0.03" data-hint="Speed times time." data-ok="Right. 9.46 × 10¹⁵ m."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">The observable universe is 8.8 × 10²⁶ m across; the Planck length is 1.6 × 10⁻³⁵ m. How many powers of ten separate them?</p><form class="cf" data-a="61.7" data-u="n" data-tol="0.02" data-hint="log₁₀ of the ratio." data-ok="Right. About 62 orders of magnitude, and you are near the middle."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">Andromeda is 2.5 million light-years away and approaching at 110 km/s. Ignoring acceleration, time to arrival in billions of years? (1 ly = 9.46 × 10¹² km)</p><form class="cf" data-a="6.8" data-u="Gyr" data-tol="0.05" data-hint="Distance in km over speed, then seconds to years." data-ok="Right. Roughly 7 billion years by this estimate; with gravity speeding it up, about 4.5."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> read a size as a power of ten and place anything from a person to the whole universe on one line.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>Why is most of the eyepiece empty on the way out?</li><li>The edge of the observable universe is not the edge of the universe. What is it?</li><li>Pick two things and say how many powers of ten apart they are. Was your guess close?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> Write the sizes of you, the Earth and the Sun as powers of ten in metres.</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/launch/#ch5">Launch Lab 5, Round and round</a></p>
+      
+      <p class="links std"><b>Standards</b> 5-ESS1-1, MS-ESS1-2, MS-ESS1-3, HS-ESS1-2 · Crosscutting: scale, proportion and quantity</p>
+      <div class="handin" data-ch="ch1" data-board="The Eyepiece" data-title="All the way out"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
+    </div>
+  </figure>
+</section>
+<section class="chapter" id="ch2">
+  <div class="text">
+    <p class="eyebrow">Chapter 2</p>
+    <button class="btn read" data-lv="k5 g8" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span>Read to me</span></button>
+    <p class="warmup"><b>Warm-up</b>What is the smallest thing you have ever seen with your eyes? What is the smallest thing there is?</p>
+    <div class="lv lv-k5"><h2>All the way in</h2><p>Turn the focus the other way. Your hand fills the view, then one hair, then things too small to see: a cell, a germ, a virus. Then the pieces cells are built from, then atoms, which are almost all empty space with a tiny heavy dot in the middle. Then inside that dot.</p><p>Then something strange: fifteen turns of the focus where nothing at all is drawn. Nobody has ever seen anything there. At the very end is the smallest length that means anything: the Planck length.</p></div>
+    <div class="lv lv-g8"><h2>Powers of ten, inward</h2><p>A hair is 10⁻⁴ m wide, a red blood cell 10⁻⁵, a bacterium 10⁻⁶, a virus 10⁻⁷, a molecule 10⁻⁹, an atom 10⁻¹⁰, a nucleus 10⁻¹⁴, a proton 10⁻¹⁵. Somewhere past 10⁻⁶ m you leave what a light microscope can show, because light itself is 5 × 10⁻⁷ m from wave to wave and cannot pick out anything much smaller than its own ripples. After that we look with electrons, X-rays, and finally with collisions.</p><p>The atom is a shock at this scale. If the nucleus were a pea in the middle of a football field, the electrons would be somewhere out in the stands, and everything between is empty. You are mostly nothing, held apart by electric forces.</p></div>
+    <div class="lv lv-hs"><h2>Resolution and the atom</h2><p>A microscope cannot resolve detail finer than about half the wavelength it uses (the Abbe limit, d ≈ λ ÷ 2NA), so visible light stops near 200 nm. Electron microscopes use electrons with de Broglie wavelengths of picometres and reach atoms; X-ray crystallography reads bond lengths; and to see inside a proton you need to hit it with something carrying enough energy that its wavelength is smaller than the proton: λ = h ÷ p. Higher energy, shorter wavelength, smaller view.</p><p>Rutherford found the nucleus in 1911 by firing alpha particles at gold foil: most passed through and one in 8,000 bounced back, which only makes sense if the atom's mass sits in a spot 10⁻⁴ of its diameter across.</p></div>
+    <div class="lv lv-col"><h2>The desert</h2><p>Below 10⁻¹⁸ m no structure has been found. Quarks and electrons behave as points down to the LHC's reach of about 10⁻¹⁹ m, and between there and the Planck length (1.6 × 10⁻³⁵ m) lie sixteen orders of magnitude that no experiment has entered. Theories fill it (grand unification near 10⁻³² m, strings near the Planck scale), but the eyepiece leaves it blank because that is the honest state of the evidence.</p><p>The Planck length is √(ħG/c³): the scale at which a photon energetic enough to resolve it would have enough energy to form a black hole of the same size. It is not a pixel size of space; it is where quantum mechanics and gravity both matter and no accepted theory covers both.</p></div>
+    <div class="lv lv-max"><h2>Where the constants set the scales</h2><p>Every notch on the inward focus corresponds to a physical constant. The Bohr radius ħ²/(m_e e² k) sets 10⁻¹⁰ m; the proton size comes from QCD's confinement scale, Λ_QCD ≈ 200 MeV, giving 10⁻¹⁵ m; the electroweak scale 1/(246 GeV) gives 10⁻¹⁸ m; the Planck length combines ħ, G and c. The lengths of chemistry and biology (10⁻⁹ to 10⁻⁵ m) follow from the Bohr radius times the counting of atoms, which is why life is the size it is.</p><p>The desert is the hierarchy problem stated in metres: nothing in the Standard Model explains why the electroweak scale sits seventeen decades above the Planck scale. Naturalness predicted new structure near 10⁻¹⁹ m; the LHC has not found it, and the eyepiece's blank band is the current shape of that ignorance.</p></div>
+    <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The empty band near the end is deliberate and true. If a child asks what is there, the honest answer is that nobody knows, and that is a good place to leave it.</p></details>
+  </div>
+  <figure class="lab">
+    <div class="panel"><canvas id="cv-micro" aria-label="A round eyepiece. Drag or use the wheel to change the field of view from a person down to the Planck length; objects are drawn at true relative size and the unexplored band is left blank."></canvas></div>
+    <div class="controls"><button class="btn primary" id="mi-in">Zoom in ×10</button><button class="btn" id="mi-out">Zoom out ×10</button><label class="slider">Focus <input type="range" id="mi-e" min="-34.5" max="27.3" step="0.05" value="0.3"><span class="val" id="mi-e-val"></span></label><span class="lbl">Objectives</span><button class="btn" data-miobj="0.3">You</button><button class="btn" data-miobj="-3.7">Hair</button><button class="btn" data-miobj="-5">Cell</button><button class="btn" data-miobj="-6.8">Virus</button><button class="btn" data-miobj="-8.6">DNA</button><button class="btn" data-miobj="-9.8">Atom</button><button class="btn" data-miobj="-13.7">Nucleus</button><button class="btn" data-miobj="-14.7">Proton</button><button class="btn" data-miobj="-34.5">Planck</button></div>
+    <figcaption><b>Try this:</b> dive into your hand until one cell fills the view, then a virus, then an atom. Find the wavelength of light on the way and notice what happens to the picture after it. Then cross the empty band.</figcaption>
+    <ul class="missions" data-ch="ch2"></ul>
+    <div class="check" data-ch="ch2"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">A hair is 100 micrometres wide. A blood cell is 10 times smaller. How wide is the blood cell?</p><form class="cf" data-a="10" data-u="µm" data-tol="0.02" data-hint="100 divided by 10." data-ok="Right. About 10 micrometres, close to the real 8."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A virus is 100 nanometres across and an atom is 0.1 nanometres. How many atoms would fit across the virus?</p><form class="cf" data-a="1000" data-u="n" data-tol="0.02" data-hint="100 ÷ 0.1." data-ok="Right. A thousand."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">Visible light can resolve about 250 nm at best. A ribosome is 25 nm. How many times too small to see with light?</p><form class="cf" data-a="10" data-u="n" data-tol="0.02" data-hint="250 ÷ 25." data-ok="Right. Ten times: that is why ribosomes were found with electrons."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">A gold nucleus is 1.5 × 10⁻¹⁴ m across inside an atom 3 × 10⁻¹⁰ m across. The nucleus is 1 part in how many of the atom's width?</p><form class="cf" data-a="20000" data-u="n" data-tol="0.05" data-hint="Divide the diameters." data-ok="Right. One in 20,000: a pea in a stadium."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">The Planck length is √(ħG/c³). With ħ = 1.05 × 10⁻³⁴ J·s, G = 6.67 × 10⁻¹¹ and c = 3 × 10⁸ m/s, what is it in metres?</p><form class="cf" data-a="1.6e-35" data-u="m" data-tol="0.06" data-hint="Multiply ħ by G, divide by c³, take the square root." data-ok="Right. About 1.6 × 10⁻³⁵ m."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="km">kilometres</option><option value="mm">millimetres</option><option value="µm">micrometres</option><option value="nm">nanometres</option><option value="ly">light-years</option><option value="Gyr">billion years</option><option value="n">a plain number or count</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
+    <div class="lesson-end">
+      <p class="skill"><b>You can now:</b> explain why light cannot show anything smaller than its wavelength, and what lies between the atom and the Planck length.</p>
+      <details class="discuss"><summary>Discuss</summary><ol><li>What happens to the picture when the view gets smaller than a wavelength of light?</li><li>If an atom is mostly empty, why can you not push your hand through a table?</li><li>Why is the last stretch of the focus blank, and is that a failure or an honest map?</li></ol></details>
+      <p class="exit"><b>Exit ticket</b> One sentence: why can a microscope that uses light never show an atom?</p>
+      <p class="links">After this: <a href="https://thedimension5.github.io/chalkboard/life/#ch1">How Life Changes 1, Copy me</a>, <a href="https://thedimension5.github.io/chalkboard/einstein/#ch8">One Rule for Everything 8, What we know now</a></p>
+      
+      <p class="links std"><b>Standards</b> 5-PS1-1, MS-PS1-1, HS-PS1-1, HS-PS4-3 · Crosscutting: scale, proportion and quantity</p>
+      <div class="handin" data-ch="ch2" data-board="The Eyepiece" data-title="All the way in"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
+    </div>
+  </figure>
+</section>
+</main>
+<footer class="closing">
+  <p class="eyebrow">The end, for now</p>
+  <p>From the Planck length to the edge of what light has had time to show us, everything sits on one ruler. Read the exponent and you know where you are.</p>
+  <p class="big" style="margin-left:auto;margin-right:auto">Sixty-two powers of ten, and you are near the middle.</p>
+  <div class="cert" id="cert" hidden data-board="The Eyepiece"><p class="mh">Certificate</p><p class="cert-note"></p><button class="btn primary" id="cert-go" type="button">Print my certificate</button><div class="certout" hidden></div></div>
+  <p class="teach"><a href="https://thedimension5.github.io/chalkboard/boards/">More boards at The Chalkboard</a></p>
+</footer>
+</div>
+<div class="tray" aria-hidden="true"></div>
+<script>window.Chalk=(function(){
+'use strict';
+const C={chalk:'#F1ECDF',yellow:'#F6D46B',blue:'#8CC4EE',pink:'#F596A8',green:'#9DDBA3',board:'#1B2923'};
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let LOWPOW=false;try{LOWPOW=localStorage.getItem('chalk:lowpow')==='1'}catch(e){}
+function setLowPow(v){LOWPOW=!!v;try{localStorage.setItem('chalk:lowpow',LOWPOW?'1':'0')}catch(e){}const b=$('lowpow');if(b){b.classList.toggle('is-on',LOWPOW);b.setAttribute('aria-pressed',String(LOWPOW))}document.querySelectorAll('canvas').forEach(c=>c.dispatchEvent(new Event('chalk-resize')))}
+const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>Number(v).toFixed(d);
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';const sup=n=>String(n).split('').map(c=>c==='-'?'⁻':(SUP[+c]||c)).join('');
+const pct=v=>Math.round(v*100)+'%';
+function text(ctx,str,x,y,o={}){const{size=20,color=C.chalk,align='center',fam='display',alpha=1,base='middle'}=o;ctx.save();ctx.globalAlpha=alpha;ctx.font=fam==='display'?`700 ${size}px Caveat, "Segoe Print", cursive`:fam==='mono'?`700 ${size}px "JetBrains Mono", Menlo, Consolas, monospace`:`900 ${size}px Nunito, system-ui, sans-serif`;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline=base;ctx.fillText(str,x,y);ctx.restore()}
+function circle(ctx,x,y,r,fill,stroke,lw=2){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function glow(ctx,x,y,r,color,a=.55){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(color,a));g.addColorStop(1,rgba(color,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function shade(ctx,x,y,r,a=.38){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function poly(ctx,pts,color,lw=1.2,alpha=1,close=false){if(pts.length<2)return;ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);if(close)ctx.closePath();ctx.stroke();ctx.restore()}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r)}else{ctx.rect(x,y,w,h)}}
+function box(ctx,x,y,w,h,fill,stroke,r=6,lw=2){rr(ctx,x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function marble(ctx,x,y,r,color){glow(ctx,x,y,r*2.6,color,.4);circle(ctx,x,y,r,color);circle(ctx,x-r*.3,y-r*.3,r*.3,'rgba(255,255,255,.55)')}
+function readout(ctx,lines,x,y,o={}){const{align='left',size=13,color=C.chalk,alpha=.94}=o;ctx.save();ctx.font=`700 ${size}px Nunito, system-ui, sans-serif`;const cw=ctx.canvas.clientWidth||ctx.canvas.width,chh=ctx.canvas.clientHeight||ctx.canvas.height;const maxW=Math.max(100,(align==='right'?x:align==='center'?Math.min(x,cw-x)*2:cw-x)-14);
+  const out=[];for(const t of lines){const words=String(t).split(' ');let cur='';for(const wd of words){const test=cur?cur+' '+wd:wd;if(ctx.measureText(test).width>maxW&&cur){out.push(cur);cur=wd}else cur=test}if(cur)out.push(cur)}
+  const total=out.length*(size+5)+6;if(y+total>chh-4)y=Math.max(4,chh-4-total);let mw=0;for(const t of out)mw=Math.max(mw,ctx.measureText(t).width);const bx=align==='right'?x-mw-8:align==='center'?x-mw/2-8:x-8;ctx.globalAlpha=.6;ctx.fillStyle=C.board;ctx.fillRect(bx,y-5,mw+16,total);ctx.globalAlpha=alpha;ctx.textAlign=align;ctx.textBaseline='top';ctx.fillStyle=color;out.forEach((t,i)=>ctx.fillText(t,x,y+i*(size+5)));ctx.restore()}
+function arrow(ctx,x,y,dx,dy,color,lw=2.2){const L=Math.hypot(dx,dy);if(L<3)return;ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();ctx.translate(x+dx,y+dy);ctx.rotate(Math.atan2(dy,dx));ctx.beginPath();ctx.moveTo(1,0);ctx.lineTo(-8,-4.5);ctx.lineTo(-8,4.5);ctx.closePath();ctx.fill();ctx.restore()}
+function rng(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let r=Math.imul(t^(t>>>15),1|t);r^=r+Math.imul(r^(r>>>7),61|r);return((r^(r>>>14))>>>0)/4294967296}}
+
+/* ---------- level ---------- */
+const LV=['k5','g8','hs','col','max'];const LR={k5:0,g8:1,hs:2,col:3,max:4};let LEVEL='k5';
+const at=l=>LR[LEVEL]>=LR[l];
+function keepPlace(fn){const secs=[...document.querySelectorAll('.hero,.chapter')];let ref=null;for(const s of secs){if(s.getBoundingClientRect().top<=90)ref=s}const before=ref?ref.getBoundingClientRect().top:0;fn();if(ref){const after=ref.getBoundingClientRect().top;window.scrollBy({top:after-before,left:0,behavior:'instant'})}}
+function setLevel(l,fromClick){if(!LV.includes(l))l='k5';LEVEL=l;keepPlace(()=>{document.documentElement.setAttribute('data-level',l);document.querySelectorAll('[data-lv]').forEach(el=>{el.hidden=!el.dataset.lv.split(' ').includes(l)})});
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.setAttribute('aria-selected',b.dataset.level===l?'true':'false'));
+  try{localStorage.setItem('one-rule-level',l)}catch(e){}
+  if(fromClick){try{const u=new URL(location.href);u.searchParams.set('level',l);history.replaceState(null,'',u)}catch(e){}}
+  stopSpeak();renderMissions()}
+
+/* ---------- sims ---------- */
+const sims=[];
+function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getContext('2d');const s=Object.assign({cv,ctx,w:0,h:0,visible:false,t:0,dt:0,pointer:null},def);
+  function resize(){const r=cv.getBoundingClientRect();if(r.width<2)return;const dpr=LOWPOW?1:Math.min(window.devicePixelRatio||1,2);const first=s.w===0;s.w=r.width;s.h=r.height;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);if(first){s.init&&s.init(s)}else{s.onResize&&s.onResize(s)}s.draw(s)}
+  new ResizeObserver(resize).observe(cv);resize();cv.addEventListener('chalk-resize',resize);
+  new IntersectionObserver(e=>{s.visible=e[0].isIntersecting},{rootMargin:'120px'}).observe(cv);
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);s.pointer=pos(e);s.down&&s.down(s.pointer,s,e)});
+  cv.addEventListener('pointermove',e=>{s.pointer=pos(e);s.move&&s.move(s.pointer,s,e)});
+  const up=e=>{s.up&&s.up(pos(e),s,e)};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('pointerleave',()=>{s.leave&&s.leave(s)});
+  sims.push(s);return s}
+let last=performance.now();
+let skip=false;function loop(now){const dt=Math.min(.05,(now-last)/1000);if(LOWPOW){skip=!skip;if(skip){requestAnimationFrame(loop);return}}last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+function tick(dt){for(const s of sims){if(!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}}
+const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
+const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=()=>{const v=parseFloat(el.value);if(out)out.textContent=f?f(v):v;fn(v)};el.addEventListener('input',go);go()};
+
+/* ---------- missions ---------- */
+let DEFS=[],CHECKS={},KEY='chalk',mdone=new Set();
+const mApplies=m=>m.lv.includes(LEVEL);
+function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:'';updateCert(all)}
+function updateCert(all){const box=$('cert');if(!box)return;const must=all.filter(m=>!m.try);const ok=must.length>0&&must.every(m=>mdone.has(m.id));box.hidden=!ok;if(ok){const left=all.filter(m=>m.try&&!mdone.has(m.id)).length;box.querySelector('.cert-note').textContent=left?`Every must-do mission at this level is done. ${left} try-your-best mission${left>1?'s':''} still open.`:'Every mission at this level is done.'}}
+function makeCert(){const box=$('cert');let name='';try{name=localStorage.getItem('chalk:name')||''}catch(e){}name=name||prompt('Name for the certificate?')||'';const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const lines=['THE CHALKBOARD',box.dataset.board,`${LVNAME[LEVEL]} level`,name||'(no name)',`${n} of ${all.length} missions`,new Date().toISOString().slice(0,10)];const code=fnv(lines.join('\n'));const out=box.querySelector('.certout');out.innerHTML=`<p class="c-eyebrow">The Chalkboard certifies that</p><p class="c-name">${name.replace(/</g,'&lt;')||'&nbsp;'}</p><p class="c-what">completed <b>${box.dataset.board}</b> at the ${LVNAME[LEVEL]} level</p><p class="c-meta">${n} of ${all.length} missions · ${lines[5]} · code ${code}</p>`;out.hidden=false;document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},80)}
+function renderMissions(){document.querySelectorAll('.missions').forEach(ul=>{const ms=DEFS.filter(m=>m.ch===ul.dataset.ch&&mApplies(m));ul.hidden=!ms.length;ul.innerHTML='<li class="mh">Mission'+(ms.length>1?'s':'')+'</li>'+ms.map(m=>`<li class="m${mdone.has(m.id)?' done':''}" data-m="${m.id}"><span class="box">✓</span><span>${m.text}</span></li>`).join('')});mcount()}
+function checkMissions(){let changed=false;for(const m of DEFS){if(mdone.has(m.id)||!mApplies(m))continue;let ok=false;try{ok=!!(CHECKS[m.id]&&CHECKS[m.id]())}catch(e){ok=false}
+    if(ok){mdone.add(m.id);changed=true;const li=document.querySelector(`.missions li[data-m="${m.id}"]`);if(li)li.classList.add('done','just')}}
+  if(changed){try{localStorage.setItem('chalk:'+KEY+':missions',JSON.stringify([...mdone]))}catch(e){}mcount()}}
+
+/* ---------- read aloud ---------- */
+const canSpeak='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
+let speaking=null;
+function stopSpeak(){if(!canSpeak)return;const was=speaking;speaking=null;try{speechSynthesis.cancel()}catch(e){}if(was){was.btn.classList.remove('is-on');was.btn.querySelector('span').textContent='Read to me';was.block.classList.remove('reading')}}
+function pickVoice(){const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));return vs.find(v=>/Samantha|Google US English|Karen|Daniel|Natural|Premium/i.test(v.name))||vs[0]||null}
+function wireRead(){if(!canSpeak){document.querySelectorAll('.read').forEach(b=>b.remove());return}
+  document.querySelectorAll('.read').forEach(btn=>btn.addEventListener('click',()=>{const sec=btn.closest('.text');const block=[...sec.querySelectorAll('.lv')].find(b=>b.offsetParent!==null);if(!block)return;
+    if(speaking&&speaking.btn===btn){stopSpeak();return}stopSpeak();
+    const parts=[];const h1=sec.querySelector('h1');if(h1)parts.push(h1.textContent.trim());[...block.querySelectorAll('h2,p')].forEach(e=>{const t=e.textContent.trim();if(t)parts.push(t)});
+    const cap=sec.parentElement.querySelector('figcaption');if(cap)parts.push(cap.textContent.replace(/\s+/g,' ').trim());
+    const voice=pickVoice();speaking={btn,block};btn.classList.add('is-on');btn.querySelector('span').textContent='Stop';block.classList.add('reading');
+    parts.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.rate=.95;u.pitch=1.05;if(voice)u.voice=voice;if(i===parts.length-1)u.onend=()=>{if(speaking&&speaking.btn===btn)stopSpeak()};speechSynthesis.speak(u)})}));
+  try{speechSynthesis.getVoices()}catch(e){}window.addEventListener('pagehide',()=>stopSpeak())}
+
+
+/* ---------- teach-back checks ---------- */
+let passed=new Set(),UNITWHY={};
+const uname=u=>{const o=document.querySelector(`form.cf select option[value="${u}"]`);return o?o.textContent:u};
+function checkPassed(ch){return passed.has(ch+':'+LEVEL)}
+function wireChecks(){document.querySelectorAll('form.cf').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const box=f.closest('.check');const fb=box.querySelector('.fb');
+    if(f.dataset.type==='choice'){const c=f.querySelector('input[type=radio]:checked');if(!c){fb.textContent='Pick one.';fb.className='fb bad';return}if(c.value!==f.dataset.a){fb.textContent='Not that one. Hint: '+f.dataset.hint;fb.className='fb bad';return}fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}return}
+    const v=parseFloat(String(f.querySelector('input').value).replace(/,/g,''));const u=f.querySelector('select').value;const a=parseFloat(f.dataset.a),want=f.dataset.u,tol=parseFloat(f.dataset.tol||'.02');
+    if(isNaN(v)){fb.textContent='Type a number first.';fb.className='fb bad';return}
+    if(!u){fb.textContent='Pick a unit. A number without a unit is not an answer.';fb.className='fb bad';return}
+    if(u!==want){fb.textContent=`Units first. You answered in ${uname(u)}, but this question wants ${uname(want)}: ${UNITWHY[want]||''}. Try again in ${want}.`;fb.className='fb bad';return}
+    const err=a===0?Math.abs(v):Math.abs(v-a)/Math.abs(a);
+    if(err>tol){fb.textContent='Right unit, wrong number. Hint: '+f.dataset.hint;fb.className='fb bad';return}
+    fb.textContent=f.dataset.ok;fb.className='fb ok';passed.add(box.dataset.ch+':'+LEVEL);try{localStorage.setItem('chalk:'+KEY+':checks',JSON.stringify([...passed]))}catch(e){}}))}
+
+
+/* ---------- hand it in: receipts ---------- */
+const LVNAME={k5:'Kids (K to 5th)',g8:'8th grade',hs:'High school',col:'College',max:'Max'};
+function fnv(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36).toUpperCase().padStart(7,'0').slice(-6)}
+function receiptFor(box){const ch=box.dataset.ch;const ms=DEFS.filter(m=>m.ch===ch&&mApplies(m));const done=ms.filter(m=>mdone.has(m.id));const name=(box.querySelector('.hi-name').value||'').trim()||'(no name)';const exit=(box.querySelector('.hi-exit').value||'').trim().replace(/\s+/g,' ')||'(blank)';
+  const lines=['THE CHALKBOARD RECEIPT',`Board: ${box.dataset.board}`,`Chapter: ${ch.replace('ch','')} · ${box.dataset.title}`,`Level: ${LVNAME[LEVEL]}`,`Name: ${name}`,`Date: ${new Date().toISOString().slice(0,10)}`,`Missions: ${done.length}/${ms.length}${done.length?' ('+done.map(m=>m.id).join(', ')+')':''}`,`Teach it back: ${passed.has(ch+':'+LEVEL)?'passed':'not yet'}`,`Exit ticket: ${exit}`];
+  return lines.join('\n')+'\nCode: '+fnv(lines.join('\n'))}
+function wireHandin(){let savedName='';try{savedName=localStorage.getItem('chalk:name')||''}catch(e){}
+  document.querySelectorAll('.handin').forEach(box=>{const nm=box.querySelector('.hi-name');if(savedName)nm.value=savedName;nm.addEventListener('change',()=>{try{localStorage.setItem('chalk:name',nm.value)}catch(e){}});
+    const out=box.querySelector('.receipt');box.querySelector('.hi-make').addEventListener('click',()=>{out.textContent=receiptFor(box);out.hidden=false;box.querySelector('.hi-tools').hidden=false});
+    box.querySelector('.hi-copy').addEventListener('click',async()=>{const t=out.textContent;try{await navigator.clipboard.writeText(t);box.querySelector('.hi-copy').textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents(out);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);box.querySelector('.hi-copy').textContent='Selected: press copy'}setTimeout(()=>box.querySelector('.hi-copy').textContent='Copy',1800)});
+    box.querySelector('.hi-print').addEventListener('click',()=>{document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},50)})})}
+
+/* ---------- start ---------- */
+function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
+  try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();wireHandin();
+  try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
+  document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
+  wireRead();const cb=$('cert-go');if(cb)cb.addEventListener('click',makeCert);const lp=$('lowpow');if(lp){lp.addEventListener('click',()=>setLowPow(!LOWPOW));setLowPow(LOWPOW)}
+  let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
+  setLevel(lv0||'k5',false);setInterval(checkMissions,300);
+  const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+})();
+</script>
+<script>
+const MISSION_DEFS=[{"id": "sc1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Zoom out until the whole Earth fits in the eyepiece."}, {"id": "sc1b", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Keep going until the Sun is a dot and the whole solar system is in view."}, {"id": "sc1c", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Find the emptiest place: the gap between the Sun and the nearest star."}, {"id": "sc1d", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Reach the edge of the observable universe."}, {"id": "sc1e", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Come back home: from the universe, land on Earth using only the focus, no objective buttons.", "try": true}, {"id": "sc2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Zoom in until a red blood cell fills the eyepiece."}, {"id": "sc2b", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Find the virus."}, {"id": "sc2c", "ch": "ch2", "lv": ["g8", "hs", "col", "max"], "text": "Find the wavelength of visible light: nothing much smaller than it can be seen with light."}, {"id": "sc2d", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Reach an atom."}, {"id": "sc2e", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Go inside: find the proton."}, {"id": "sc2f", "ch": "ch2", "lv": ["g8", "hs", "col", "max"], "text": "Cross the empty band all the way to the Planck length."}, {"id": "sc2g", "ch": "ch2", "lv": ["hs", "col", "max"], "text": "From you to the atom using only the focus, no objective buttons.", "try": true}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}];
+const UNIT_WHY={"m": "metres measure a length", "km": "kilometres measure a length: a thousand metres", "mm": "millimetres measure a length: a thousandth of a metre", "µm": "micrometres measure a length: a millionth of a metre", "nm": "nanometres measure a length: a billionth of a metre", "ly": "a light-year is a length: how far light goes in a year", "Gyr": "billion years measures a time", "n": "a count or a ratio, no unit"};
+const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
+const EMIN=-34.5,EMAX=27.3;
+const RAW=[
+['The observable universe',8.8e26,'web',C.chalk,'Everything whose light has had time to reach us. Beyond it we cannot say.'],
+['The Laniakea supercluster',5.2e24,'web',C.blue,'Our home supercluster: a hundred thousand galaxies flowing toward one point.'],
+['The Local Group',9.5e22,'group',C.blue,'Our small cluster of galaxies. Andromeda is the other big one.'],
+['The Andromeda galaxy',2.1e21,'galaxy',C.pink,'A trillion stars, on its way to merge with us in about four billion years.'],
+['The Milky Way',9.5e20,'galaxy',C.yellow,'Our galaxy: a few hundred billion stars. The Sun sits two-thirds of the way out.'],
+['The Orion Nebula',2.3e17,'cloud',C.pink,'A cloud where stars are being born right now, 24 light-years across.'],
+['The gap to the nearest star',4.0e16,'gap',C.chalk,'From the Sun to Proxima Centauri: 4.2 light-years of almost nothing.'],
+['The Oort cloud',1.5e16,'ring',C.chalk,'A shell of frozen comets marking the edge of the Sun’s grip.'],
+['Voyager 1’s distance',2.4e13,'dot',C.yellow,'The farthest human-made thing: 24 billion km out, still calling home.'],
+['The solar system',9.0e12,'orbits',C.yellow,'Out to Neptune. Light takes four hours to cross it.'],
+['Earth’s orbit',3.0e11,'ring',C.blue,'Our year, drawn as a circle. Light crosses it in 17 minutes.'],
+['The Sun',1.39e9,'sun',C.yellow,'109 Earths wide, and 99.8% of everything in the solar system.'],
+['Jupiter',1.4e8,'planet',C.pink,'Eleven Earths across; its Great Red Spot alone would swallow Earth.'],
+['The Earth',1.27e7,'earth',C.blue,'Home. 12,742 km across. Everything smaller than this is on it.'],
+['The Moon',3.5e6,'planet',C.chalk,'A quarter of Earth’s width, thirty Earths away.'],
+['Great Britain',1.0e6,'land',C.green,'About a thousand kilometres, top to bottom.'],
+['The Grand Canyon',4.5e5,'land',C.pink,'446 km long, and up to 29 km wide.'],
+['A neutron star',2.0e4,'sun',C.blue,'The mass of the Sun packed into a ball 20 km across.'],
+['Mount Everest',8.8e3,'mountain',C.chalk,'8,849 m: the top is above most of the air.'],
+['The Burj Khalifa',8.3e2,'building',C.chalk,'The tallest building: 828 m.'],
+['A football field',1.0e2,'field',C.green,'100 m: the length most people can picture.'],
+['A blue whale',3.0e1,'whale',C.blue,'The biggest animal that has ever lived: 30 m.'],
+['An elephant',6.0e0,'animal',C.chalk,'About 6 m, trunk to tail.'],
+['You',1.7e0,'person',C.yellow,'A person: 1.7 m. Near the middle of everything we can see.'],
+['A cat',4.6e-1,'cat',C.pink,'Half a metre of cat.'],
+['A hand',1.8e-1,'hand',C.yellow,'18 cm: the ruler you always have.'],
+['A golf ball',4.3e-2,'ball',C.chalk,'4.3 cm.'],
+['A pea',7.0e-3,'ball',C.green,'7 mm.'],
+['An ant',4.0e-3,'ant',C.chalk,'4 mm, and it lifts fifty times its own weight.'],
+['A grain of sand',5.0e-4,'sand',C.yellow,'Half a millimetre.'],
+['A dust mite',3.0e-4,'mite',C.chalk,'0.3 mm: too small to see, and there are thousands in your bed.'],
+['A paramecium',2.0e-4,'para',C.green,'One cell that swims: 0.2 mm, just visible as a speck.'],
+['A human egg cell',1.2e-4,'cell',C.pink,'The biggest cell in the body, barely visible to the eye.'],
+['A human hair',8.0e-5,'hair',C.chalk,'80 micrometres wide.'],
+['A red blood cell',8.0e-6,'rbc',C.pink,'8 micrometres. Your body makes 25 million of them every second.'],
+['A bacterium (E. coli)',2.0e-6,'rod',C.green,'2 micrometres long: a thousand in a row would span a sand grain.'],
+['A mitochondrion',1.0e-6,'rod',C.yellow,'A micrometre: the power plant inside your cells.'],
+['A wavelength of visible light',5.0e-7,'wave',C.yellow,'500 nanometres. Nothing much smaller than this can be seen with light.'],
+['A coronavirus',1.2e-7,'virus',C.pink,'120 nanometres.'],
+['A ribosome',2.5e-8,'blob',C.blue,'25 nanometres: the machine that reads the recipe and builds proteins.'],
+['An antibody',1.0e-8,'y',C.chalk,'10 nanometres, shaped like a Y.'],
+['The width of DNA',2.0e-9,'helix',C.green,'2 nanometres wide, and two metres long per cell if you unrolled it.'],
+['A glucose molecule',9.0e-10,'molecule',C.yellow,'Just under a nanometre: 24 atoms of sugar.'],
+['A water molecule',2.8e-10,'water',C.blue,'0.28 nanometres. Three atoms.'],
+['A hydrogen atom',1.1e-10,'atom',C.chalk,'A tenth of a nanometre: one proton, one electron, and mostly nothing.'],
+['A gamma-ray wavelength',1.0e-12,'wave',C.pink,'A picometre: the light that can see inside atoms.'],
+['A gold nucleus',1.5e-14,'nucleus',C.yellow,'15 femtometres: 20,000 times smaller than its atom.'],
+['A proton',1.7e-15,'proton',C.pink,'1.7 femtometres: three quarks and a great deal of energy.'],
+['A quark',1.0e-18,'question',C.chalk,'Smaller than a thousandth of a proton. No size has ever been measured.'],
+['The LHC’s reach',1.0e-19,'question',C.blue,'The smallest scale any experiment has probed: about 10⁻¹⁹ m.'],
+['The Planck length',1.6e-35,'planck',C.yellow,'1.6 × 10⁻³⁵ m: where our ideas of distance stop working.'],
+];
+const CONTAIN=new Set(['web','group','galaxy','cloud','orbits','sun','planet','earth','land','cell','rbc','rod','para','atom','nucleus','proton']);
+const OBJ=RAW.map(([name,size,kind,col,fact],i)=>{const a=i*2.399963,r=.28+.5*((i*7)%5)/4;return{name,size,kind,col,fact,E:Math.log10(size),u:Math.cos(a)*r,v:Math.sin(a)*r}});
+const NOTES=[{a:-34.6,b:-19.6,t:['Nothing has ever been seen here.','Fifteen powers of ten','with no known structure.']},{a:26.95,b:28,t:['Beyond this, light has not','had time to reach us.']}];
+const nice=v=>v>=100?Math.round(v).toLocaleString():v>=10?v.toFixed(0):v.toFixed(v%1?1:0);
+function friendly(S){if(S>=4.7e15)return nice(S/9.46e15)+' light-years';if(S>=1e3)return nice(S/1e3)+' km';if(S>=1)return nice(S)+' m';if(S>=1e-2)return nice(S*100)+' cm';if(S>=1e-3)return nice(S*1e3)+' mm';if(S>=1e-6)return nice(S*1e6)+' micrometres';if(S>=1e-9)return nice(S*1e9)+' nanometres';if(S>=1e-12)return nice(S*1e12)+' picometres';if(S>=1e-15)return nice(S*1e15)+' femtometres';return null}
+function sci(S){const e=Math.floor(Math.log10(S)),m=S/Math.pow(10,e);return `${m.toFixed(m<9.95?1:0)} × 10${sup(e)} m`}
+function sizeLabel(S){const f=friendly(S);if(!at('g8'))return f||sci(S);if(!at('hs'))return (f?f+' = ':'')+'10'+sup(Math.round(Math.log10(S)))+' m';return sci(S)+(f?' = '+f:'')}
+/* glyphs: (ctx,x,y,d,col,t) */
+const GL={};
+GL.dot=(c,x,y,d,col)=>circle(c,x,y,Math.max(1.5,d/2),col);
+GL.ball=(c,x,y,d,col)=>{const r=d/2;circle(c,x,y,r,rgba(col,.18),col,2);circle(c,x-r*.35,y-r*.35,Math.max(1,r*.12),rgba(C.chalk,.5))};
+GL.planet=GL.ball;
+GL.sun=(c,x,y,d,col)=>{const r=d/2;glow(c,x,y,r*1.6,col,.25);circle(c,x,y,r,rgba(col,.35),col,2);c.save();c.strokeStyle=col;c.globalAlpha=.6;c.lineWidth=1.5;for(let k=0;k<12;k++){const a=k*Math.PI/6;c.beginPath();c.moveTo(x+Math.cos(a)*r*1.12,y+Math.sin(a)*r*1.12);c.lineTo(x+Math.cos(a)*r*1.3,y+Math.sin(a)*r*1.3);c.stroke()}c.restore()};
+GL.earth=(c,x,y,d,col)=>{const r=d/2;circle(c,x,y,r,rgba(col,.2),col,2);c.save();c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.clip();c.fillStyle=rgba(C.green,.55);[[-.3,-.2,.45,.3,.4],[.25,.1,.3,.5,-.5],[-.1,.5,.35,.2,.2],[.4,-.5,.2,.15,.9]].forEach(([u,v,a,b,rot])=>{c.beginPath();c.ellipse(x+u*r,y+v*r,a*r,b*r,rot,0,Math.PI*2);c.fill()});c.restore()};
+GL.galaxy=(c,x,y,d,col)=>{const r=d/2;glow(c,x,y,r*.9,col,.14);circle(c,x,y,Math.max(1.5,r*.1),rgba(col,.9));for(let k=0;k<2;k++){const pts=[];for(let i=0;i<=40;i++){const th=i/40*2.3*Math.PI;const rr=r*.1+r*.9*(th/(2.3*Math.PI));pts.push([x+rr*Math.cos(th+k*Math.PI),y+rr*Math.sin(th+k*Math.PI)*.75])}poly(c,pts,col,Math.max(1,r*.05),.8)}};
+GL.group=(c,x,y,d,col)=>{const r=d/2,g=rng(21);for(let i=0;i<8;i++){const a=g()*6.28,rr=g()*r*.85,s=i<2?r*.18:r*.07;GL.galaxy(c,x+Math.cos(a)*rr,y+Math.sin(a)*rr,s*2,i<2?col:C.chalk)}};
+GL.web=(c,x,y,d,col)=>{const r=d/2,g=rng(33);const P=[];for(let i=0;i<26;i++){const a=g()*6.28,rr=Math.sqrt(g())*r;P.push([x+Math.cos(a)*rr,y+Math.sin(a)*rr])}c.save();c.strokeStyle=col;c.globalAlpha=.3;c.lineWidth=1;for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){if(Math.hypot(P[i][0]-P[j][0],P[i][1]-P[j][1])<r*.5){c.beginPath();c.moveTo(P[i][0],P[i][1]);c.lineTo(P[j][0],P[j][1]);c.stroke()}}c.restore();P.forEach(p=>circle(c,p[0],p[1],Math.max(1,r*.02),rgba(col,.8)));c.save();c.setLineDash([4,6]);circle(c,x,y,r,null,rgba(col,.4),1.5);c.restore()};
+GL.cloud=(c,x,y,d,col)=>{const r=d/2,g=rng(8);glow(c,x,y,r,col,.35);glow(c,x-r*.3,y+r*.2,r*.6,C.blue,.25);for(let i=0;i<9;i++)circle(c,x+(g()*2-1)*r*.7,y+(g()*2-1)*r*.7,Math.max(1,r*.03),C.chalk)};
+GL.gap=(c,x,y,d,col)=>{const r=d/2;c.save();c.setLineDash([3,9]);poly(c,[[x-r,y],[x+r,y]],col,1,.35);c.restore();circle(c,x-r,y,Math.max(1.5,r*.01),C.yellow);circle(c,x+r,y,Math.max(1.5,r*.01),C.pink);text(c,'Sun',x-r,y+14,{size:11,fam:'body',alpha:.6});text(c,'Proxima',x+r,y+14,{size:11,fam:'body',alpha:.6})};
+GL.ring=(c,x,y,d,col)=>{const r=d/2;c.save();c.setLineDash([6,6]);circle(c,x,y,r,null,col,1.5);c.restore();circle(c,x,y,Math.max(1.5,r*.02),C.yellow)};
+GL.orbits=(c,x,y,d,col)=>{const r=d/2;c.save();c.setLineDash([4,5]);[.06,.1,.14,.2,.34,.5,.7,1].forEach((f,i)=>{circle(c,x,y,r*f,null,rgba(col,.55),1);const a=i*1.3;circle(c,x+Math.cos(a)*r*f,y+Math.sin(a)*r*f,Math.max(1.2,r*.012),i===2?C.blue:C.chalk)});c.restore();circle(c,x,y,Math.max(2,r*.02),col)};
+GL.blob=(c,x,y,d,col,t)=>{const r=d/2,pts=[];for(let i=0;i<=28;i++){const th=i/28*6.283;const rr=r*(1+.1*Math.sin(3*th+t*1.5)+.05*Math.sin(5*th));pts.push([x+rr*Math.cos(th),y+rr*Math.sin(th)])}c.save();c.fillStyle=rgba(col,.15);c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill();c.restore();poly(c,pts,col,2,.9)};
+GL.para=(c,x,y,d,col,t)=>{const r=d/2;c.save();c.translate(x,y);c.rotate(-.4);c.fillStyle=rgba(col,.15);c.strokeStyle=col;c.lineWidth=2;c.beginPath();c.ellipse(0,0,r,r*.42,0,0,Math.PI*2);c.fill();c.stroke();c.globalAlpha=.6;c.lineWidth=1;for(let i=0;i<30;i++){const th=i/30*6.283;const px=Math.cos(th)*r,py=Math.sin(th)*r*.42;c.beginPath();c.moveTo(px,py);c.lineTo(px*1.1+Math.sin(t*6+i)*2,py*1.15);c.stroke()}c.restore();circle(c,x-r*.2,y,Math.max(1.5,r*.12),rgba(col,.5))};
+GL.cell=(c,x,y,d,col)=>{const r=d/2;circle(c,x,y,r,rgba(col,.12),col,2);circle(c,x,y,r*.3,rgba(col,.4),col,1.2);c.save();c.setLineDash([2,4]);circle(c,x,y,r*.85,null,rgba(col,.4),1);c.restore()};
+GL.rbc=(c,x,y,d,col)=>{const r=d/2;circle(c,x,y,r,rgba(col,.25),col,2);circle(c,x,y,r*.45,'rgba(0,0,0,.25)',rgba(col,.6),1)};
+GL.rod=(c,x,y,d,col,t)=>{const r=d/2,h=d*.42;c.save();c.translate(x,y);c.rotate(.3);box(c,-r,-h/2,d,h,rgba(col,.15),col,h/2,2);c.strokeStyle=col;c.globalAlpha=.6;c.lineWidth=1.2;for(let k=0;k<3;k++){c.beginPath();c.moveTo(r,(k-1)*h*.25);for(let i=1;i<=12;i++)c.lineTo(r+i*d*.06,(k-1)*h*.25+Math.sin(i*.9+t*4+k)*h*.18);c.stroke()}c.restore()};
+GL.virus=(c,x,y,d,col)=>{const r=d/2*.78;circle(c,x,y,r,rgba(col,.2),col,2);c.save();c.strokeStyle=col;c.lineWidth=Math.max(1,r*.06);for(let k=0;k<18;k++){const a=k*Math.PI/9;c.beginPath();c.moveTo(x+Math.cos(a)*r,y+Math.sin(a)*r);c.lineTo(x+Math.cos(a)*r*1.22,y+Math.sin(a)*r*1.22);c.stroke();circle(c,x+Math.cos(a)*r*1.27,y+Math.sin(a)*r*1.27,Math.max(1,r*.07),col)}c.restore()};
+GL.wave=(c,x,y,d,col)=>{const r=d/2,A=Math.max(3,r*.35);for(const[k,al]of[[-1,.3],[0,.95],[1,.3]]){const pts=[];for(let i=0;i<=40;i++){const px=x+(k*d)-r+d*i/40;pts.push([px,y-Math.sin(i/40*6.283)*A])}poly(c,pts,col,2,al)}arrow(c,x-r,y+A+12,d,0,rgba(col,.7),1.5);arrow(c,x+r,y+A+12,-d,0,rgba(col,.7),1.5);text(c,'one wavelength',x,y+A+26,{size:11,fam:'body',alpha:.7})};
+GL.y=(c,x,y,d,col)=>{const r=d/2;poly(c,[[x,y+r],[x,y]],col,Math.max(2,r*.12));poly(c,[[x,y],[x-r*.6,y-r*.9]],col,Math.max(2,r*.12));poly(c,[[x,y],[x+r*.6,y-r*.9]],col,Math.max(2,r*.12))};
+GL.helix=(c,x,y,d,col)=>{const r=d/2,H=d*6;const a=[],b=[];for(let i=0;i<=120;i++){const yy=y-H/2+H*i/120,ph=i/120*6.283*3;a.push([x+Math.sin(ph)*r,yy]);b.push([x-Math.sin(ph)*r,yy]);if(i%6===0)poly(c,[[x+Math.sin(ph)*r,yy],[x-Math.sin(ph)*r,yy]],rgba(col,.5),1.2)}poly(c,a,col,2.2);poly(c,b,C.blue,2.2)};
+GL.molecule=(c,x,y,d,col)=>{const r=d/2*.75;const P=[];for(let k=0;k<6;k++){const a=k*Math.PI/3;P.push([x+Math.cos(a)*r,y+Math.sin(a)*r])}for(let k=0;k<6;k++)poly(c,[P[k],P[(k+1)%6]],col,2,.8);P.forEach((p,k)=>circle(c,p[0],p[1],Math.max(2,r*.22),k%2?C.chalk:col));circle(c,x+r*1.3,y,Math.max(2,r*.22),C.pink);poly(c,[P[0],[x+r*1.3,y]],col,2,.8)};
+GL.water=(c,x,y,d,col)=>{const r=d/2;const h=[[x-r*.62,y+r*.35],[x+r*.62,y+r*.35]];h.forEach(p=>{poly(c,[[x,y-r*.1],p],col,2,.7);circle(c,p[0],p[1],r*.3,C.chalk)});circle(c,x,y-r*.1,r*.48,col)};
+GL.atom=(c,x,y,d,col)=>{const r=d/2;c.save();c.setLineDash([3,5]);circle(c,x,y,r,rgba(col,.07),rgba(col,.7),1.5);c.restore();glow(c,x,y,r*.9,col,.12);circle(c,x,y,Math.max(1.5,r*.004),C.pink);text(c,'nucleus (too small to draw)',x,y+16,{size:10,fam:'body',alpha:.55})};
+GL.nucleus=(c,x,y,d,col)=>{const r=d/2,g=rng(4);for(let i=0;i<20;i++){const a=g()*6.28,rr=Math.sqrt(g())*r*.72;circle(c,x+Math.cos(a)*rr,y+Math.sin(a)*rr,r*.26,i%2?rgba(col,.8):rgba(C.pink,.8),C.board,1)}};
+GL.proton=(c,x,y,d,col)=>{const r=d/2;c.save();c.setLineDash([4,5]);circle(c,x,y,r,rgba(col,.06),rgba(col,.7),1.5);c.restore();const Q=[0,1,2].map(k=>[x+Math.cos(k*2.094-1.57)*r*.42,y+Math.sin(k*2.094-1.57)*r*.42]);for(let k=0;k<3;k++){const A=Q[k],B=Q[(k+1)%3],pts=[];for(let i=0;i<=16;i++){const t=i/16;pts.push([A[0]+(B[0]-A[0])*t+Math.sin(i*1.2)*r*.05,A[1]+(B[1]-A[1])*t+Math.cos(i*1.2)*r*.05])}poly(c,pts,C.blue,1.5,.7)}Q.forEach((p,k)=>{circle(c,p[0],p[1],r*.12,k?C.yellow:C.pink);text(c,k?'u':'d',p[0],p[1],{size:r*.16,color:C.board,fam:'body'})})};
+GL.question=(c,x,y,d,col)=>{const r=d/2;c.save();c.setLineDash([3,6]);circle(c,x,y,r,null,rgba(col,.6),1.5);c.restore();text(c,'?',x,y,{size:Math.max(14,r*.9),color:col,alpha:.7})};
+GL.planck=(c,x,y,d,col,t)=>{const r=d/2;c.save();c.setLineDash([2,4]);c.lineDashOffset=-t*20;circle(c,x,y,r,rgba(col,.08),col,2);c.restore();for(let k=0;k<4;k++){const a=t*.8+k*1.571;poly(c,[[x+Math.cos(a)*r*.3,y+Math.sin(a)*r*.3],[x+Math.cos(a)*r*.7,y+Math.sin(a)*r*.7]],rgba(col,.5),1.2)}};
+GL.mountain=(c,x,y,d,col)=>{const r=d/2;c.save();c.fillStyle=rgba(col,.12);c.beginPath();c.moveTo(x-r*1.1,y+r*.6);c.lineTo(x-r*.2,y-r*.6);c.lineTo(x+r*.1,y-r*.3);c.lineTo(x+r*.3,y-r*.55);c.lineTo(x+r*1.1,y+r*.6);c.closePath();c.fill();c.strokeStyle=col;c.lineWidth=2;c.stroke();c.fillStyle=rgba(C.chalk,.7);c.beginPath();c.moveTo(x-r*.2,y-r*.6);c.lineTo(x-r*.05,y-r*.4);c.lineTo(x+r*.1,y-r*.3);c.lineTo(x+r*.3,y-r*.55);c.lineTo(x+r*.2,y-r*.35);c.closePath();c.fill();c.restore()};
+GL.building=(c,x,y,d,col)=>{const r=d/2;[[1,.16],[.7,.11],[.4,.07]].forEach(([f,wf])=>box(c,x-r*wf,y+r-2*r*f,2*r*wf,2*r*f,rgba(col,.12),col,2,1.5));poly(c,[[x,y-r],[x,y-r*1.15]],col,1.5)};
+GL.field=(c,x,y,d,col)=>{const r=d/2,h=d*.53;box(c,x-r,y-h/2,d,h,rgba(col,.12),col,2,2);poly(c,[[x,y-h/2],[x,y+h/2]],col,1,.6);for(let k=1;k<10;k++)poly(c,[[x-r+d*k/10,y-h/2],[x-r+d*k/10,y+h/2]],col,1,.25)};
+GL.whale=(c,x,y,d,col)=>{const r=d/2;c.save();c.fillStyle=rgba(col,.2);c.strokeStyle=col;c.lineWidth=2;c.beginPath();c.ellipse(x,y,r*.85,r*.22,0,0,Math.PI*2);c.fill();c.stroke();c.beginPath();c.moveTo(x+r*.8,y);c.lineTo(x+r*1.05,y-r*.22);c.lineTo(x+r*.95,y);c.lineTo(x+r*1.05,y+r*.22);c.closePath();c.fill();c.stroke();c.restore();circle(c,x-r*.55,y-r*.05,Math.max(1,r*.03),C.board)};
+GL.animal=(c,x,y,d,col)=>{const r=d/2;c.save();c.strokeStyle=col;c.fillStyle=rgba(col,.15);c.lineWidth=2;c.beginPath();c.ellipse(x,y-r*.1,r*.55,r*.35,0,0,Math.PI*2);c.fill();c.stroke();circle(c,x-r*.7,y-r*.3,r*.22,rgba(col,.15),col,2);c.beginPath();c.moveTo(x-r*.85,y-r*.2);c.quadraticCurveTo(x-r*1.05,y+r*.2,x-r*.9,y+r*.5);c.stroke();[-.35,-.15,.15,.35].forEach(f=>{c.beginPath();c.moveTo(x+f*r,y+r*.2);c.lineTo(x+f*r,y+r*.6);c.stroke()});c.restore()};
+GL.person=(c,x,y,d,col)=>{const r=d/2,hr=Math.max(2,r*.12);circle(c,x,y-r+hr,hr,null,col,2);poly(c,[[x,y-r+hr*2],[x,y+r*.15]],col,2.2);poly(c,[[x-r*.3,y-r*.25],[x,y-r+hr*2.6],[x+r*.3,y-r*.25]],col,2.2);poly(c,[[x-r*.28,y+r],[x,y+r*.15],[x+r*.28,y+r]],col,2.2)};
+GL.cat=(c,x,y,d,col)=>{const r=d/2;c.save();c.strokeStyle=col;c.fillStyle=rgba(col,.15);c.lineWidth=2;c.beginPath();c.ellipse(x+r*.1,y+r*.05,r*.55,r*.28,0,0,Math.PI*2);c.fill();c.stroke();circle(c,x-r*.55,y-r*.15,r*.2,rgba(col,.15),col,2);c.beginPath();c.moveTo(x-r*.7,y-r*.3);c.lineTo(x-r*.72,y-r*.5);c.lineTo(x-r*.58,y-r*.36);c.moveTo(x-r*.4,y-r*.3);c.lineTo(x-r*.38,y-r*.5);c.lineTo(x-r*.52,y-r*.36);c.stroke();c.beginPath();c.moveTo(x+r*.62,y);c.quadraticCurveTo(x+r*.95,y-r*.1,x+r*.85,y-r*.45);c.stroke();[-.15,.05,.3,.45].forEach(f=>{c.beginPath();c.moveTo(x+f*r,y+r*.25);c.lineTo(x+f*r,y+r*.5);c.stroke()});c.restore()};
+GL.hand=(c,x,y,d,col)=>{const r=d/2;c.save();c.strokeStyle=col;c.fillStyle=rgba(col,.15);c.lineWidth=2;c.beginPath();c.ellipse(x,y+r*.3,r*.42,r*.5,0,0,Math.PI*2);c.fill();c.stroke();[[-.38,-.35,.55],[-.16,-.2,.95],[.05,-.2,1],[.25,-.25,.9],[.52,.05,.35]].forEach(([fx,fy,L])=>{c.beginPath();c.moveTo(x+fx*r,y+fy*r);c.lineTo(x+fx*r*1.15,y+fy*r-L*r);c.stroke()});c.restore()};
+GL.ant=(c,x,y,d,col)=>{const r=d/2;c.save();c.strokeStyle=col;c.lineWidth=1.5;[[-.65,.18],[-.15,.2],[.5,.32]].forEach(([fx,f])=>circle(c,x+fx*r,y,r*f,rgba(col,.35),col,1.5));for(let k=-1;k<=1;k++){c.beginPath();c.moveTo(x-r*.15+k*r*.15,y);c.lineTo(x-r*.15+k*r*.35,y+r*.45);c.moveTo(x-r*.15+k*r*.15,y);c.lineTo(x-r*.15+k*r*.35,y-r*.45);c.stroke()}c.beginPath();c.moveTo(x-r*.8,y-r*.1);c.lineTo(x-r*1.05,y-r*.4);c.moveTo(x-r*.8,y-r*.1);c.lineTo(x-r*1,y-r*.05);c.stroke();c.restore()};
+GL.sand=(c,x,y,d,col)=>{const r=d/2,g=rng(9),pts=[];for(let i=0;i<8;i++){const th=i/8*6.283,rr=r*(.7+g()*.3);pts.push([x+Math.cos(th)*rr,y+Math.sin(th)*rr])}c.save();c.fillStyle=rgba(col,.25);c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill();c.restore();poly(c,pts,col,1.5,1,true)};
+GL.mite=(c,x,y,d,col)=>{const r=d/2;c.save();c.strokeStyle=col;c.fillStyle=rgba(col,.15);c.lineWidth=1.5;c.beginPath();c.ellipse(x,y,r*.6,r*.45,0,0,Math.PI*2);c.fill();c.stroke();circle(c,x-r*.7,y,r*.18,rgba(col,.15),col,1.5);for(let k=0;k<4;k++){const yy=y-r*.3+k*r*.2;c.beginPath();c.moveTo(x-r*.3+k*r*.15,yy);c.lineTo(x-r*.5+k*r*.15,yy+r*.5);c.moveTo(x-r*.3+k*r*.15,yy);c.lineTo(x-r*.5+k*r*.15,yy-r*.5);c.stroke()}c.restore()};
+GL.hair=(c,x,y,d,col)=>{const H=d*8;c.save();c.strokeStyle=rgba(col,.35);c.lineWidth=d;c.lineCap='round';c.beginPath();c.moveTo(x,y-H/2);c.quadraticCurveTo(x+d*.6,y,x,y+H/2);c.stroke();c.strokeStyle=rgba(col,.8);c.lineWidth=1.5;c.beginPath();c.moveTo(x-d/2,y-H/2);c.quadraticCurveTo(x+d*.1,y,x-d/2,y+H/2);c.moveTo(x+d/2,y-H/2);c.quadraticCurveTo(x+d*1.1,y,x+d/2,y+H/2);c.stroke();c.restore()};
+GL.land=(c,x,y,d,col)=>{const r=d/2,g=rng(13),pts=[];for(let i=0;i<14;i++){const th=i/14*6.283,rr=r*(.55+g()*.45)*(i%2?1:.7);pts.push([x+Math.cos(th)*rr*.8,y+Math.sin(th)*rr])}c.save();c.fillStyle=rgba(col,.18);c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill();c.restore();poly(c,pts,col,2,1,true)};
+/* viewer */
+function makeViewer(id,px,E0){
+  const s=makeSim(id,{
+    init(s){s.E=E0;s.target=E0;s.maxE=E0;s.minE=E0;s.gapSeen=false;s.lightSeen=false;s.fromUni=false;s.pu=true;s.fromYou=false;s.py=true;s.homeFine=false;s.atomFine=false;s.drag=null;s.pinch=null;s.sync(s)},
+    setE(s,e,jump){s.target=clamp(e,EMIN,EMAX);if(jump)s.E=s.target;s.sync(s)},
+    preset(s,e){s.pu=true;s.py=true;s.setE(s,e,false)},
+    sync(s){const sl=$(px+'-e');if(sl&&Math.abs(parseFloat(sl.value)-s.target)>.001)sl.value=s.target.toFixed(2);const o=$(px+'-e-val');if(o)o.textContent='10'+sup(Math.round(s.E))+' m across'},
+    down(p,s){if(s.pinch)return;s.drag={y:p.y,E:s.target}},move(p,s){if(s.drag&&!s.pinch)s.setE(s,s.drag.E-(p.y-s.drag.y)/45)},up(p,s){s.drag=null},leave(s){s.drag=null},
+    step(dt,s){const k=1-Math.exp(-dt*6);s.E+=(s.target-s.E)*k;if(Math.abs(s.target-s.E)<.002)s.E=s.target;s.maxE=Math.max(s.maxE,s.E);s.minE=Math.min(s.minE,s.E);
+      if(s.E>=27&&s.target>=27){s.fromUni=true;s.pu=false}if(s.E>=0&&s.E<=1&&s.target>=0&&s.target<=1){s.fromYou=true;s.py=false}
+      if(s.fromUni&&!s.pu&&s.E>=7&&s.E<=7.6)s.homeFine=true;if(s.fromYou&&!s.py&&s.E<=-9.9)s.atomFine=true;
+      if(s.E>=16.2&&s.E<=17.2)s.gapSeen=true;if(s.E>=-6.5&&s.E<=-5.8)s.lightSeen=true;s.sync(s)},
+    draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const wide=w>=520;const cx=w/2,cy=h*.47,Rv=Math.min(w*.5,h*.47)*(wide?.82:.86);const W=Math.pow(10,s.E);
+      circle(ctx,cx,cy,Rv+7,null,rgba(C.chalk,.18),10);circle(ctx,cx,cy,Rv,'rgba(0,0,0,.18)',C.chalk,2);
+      ctx.save();ctx.beginPath();ctx.arc(cx,cy,Rv,0,Math.PI*2);ctx.clip();poly(ctx,[[cx-Rv,cy],[cx+Rv,cy]],C.chalk,1,.1);poly(ctx,[[cx,cy-Rv],[cx,cy+Rv]],C.chalk,1,.1);
+      let focus=null,fq=0,bg=null,bq=1e9;const labels=[];
+      for(const o of OBJ){const q=o.size/W;if(q>1.5&&q<400&&CONTAIN.has(o.kind)&&q<bq){bq=q;bg=o}if(q<.004||q>4)continue;const d=q*2*Rv;let a=1,b=0;if(q<.02){a=(q-.004)/.016;b=3.5*(1-a)}else if(q>1.5){a=1-(q-1.5)/2.5;b=3.5*(1-a)}a=clamp(a,0,1);
+        const m=Math.max(0,Rv-d/2);const x=cx+o.u*m*.95,y=cy+o.v*m*.95;ctx.save();ctx.globalAlpha=a;if(b>.4&&'filter' in ctx)ctx.filter=`blur(${b.toFixed(1)}px)`;GL[o.kind](ctx,x,y,d,o.col,s.t);ctx.restore();
+        if(q>=.02&&q<=1.5){labels.push({o,x,y:d>=Rv*1.5?cy+Rv-30:y+d/2+13,a});if(q>fq){fq=q;focus=o}}}
+      for(const L of labels){text(ctx,L.o.name,clamp(L.x,cx-Rv+40,cx+Rv-40),L.y,{size:Math.min(16,Rv*.1),color:L.o.col,alpha:L.a});text(ctx,sizeLabel(L.o.size),clamp(L.x,cx-Rv+40,cx+Rv-40),L.y+14,{size:11,fam:'body',alpha:.8*L.a})}
+      for(const n of NOTES)if(s.E>=n.a&&s.E<=n.b)n.t.forEach((ln,i)=>text(ctx,ln,cx,cy-((n.t.length-1)/2-i)*20,{size:16,alpha:.75}));
+      ctx.restore();
+      if(bg)text(ctx,'inside: '+bg.name,cx+Rv-6,cy-Rv+10,{size:11,fam:'body',align:'right',color:bg.col,alpha:.75});
+      // rail
+      if(wide){const rx=Math.max(40,cx-Rv-30),top=cy-Rv,bot=cy+Rv;poly(ctx,[[rx,top],[rx,bot]],C.chalk,1.5,.5);for(let e=Math.ceil(EMIN);e<=EMAX;e++){const y=bot-(e-EMIN)/(EMAX-EMIN)*(bot-top);const big=e%10===0;poly(ctx,[[rx-(big?8:4),y],[rx,y]],C.chalk,1,big?.7:.35);if(big)text(ctx,'10'+sup(e),rx-11,y,{size:11,align:'right',fam:'body',alpha:.7})}
+        const y=bot-(s.E-EMIN)/(EMAX-EMIN)*(bot-top);ctx.save();ctx.fillStyle=C.yellow;ctx.beginPath();ctx.moveTo(rx+3,y);ctx.lineTo(rx+11,y-5);ctx.lineTo(rx+11,y+5);ctx.closePath();ctx.fill();ctx.restore();text(ctx,'focus',rx,top-12,{size:11,fam:'body',alpha:.6});
+        const RX=cx+Rv+22;text(ctx,'out',RX,top+6,{size:11,fam:'body',alpha:.6});text(ctx,'in',RX,bot-6,{size:11,fam:'body',alpha:.6});arrow(ctx,RX,bot-18,0,-(bot-top-40),rgba(C.chalk,.35),1.2)}
+      // readouts
+      const f=friendly(W);text(ctx,!at('g8')?`the view is ${f||sci(W)} wide`:!at('hs')?`field of view ${f||''}${f?' = ':''}10${sup(Math.round(s.E))} m`:`field of view ${sci(W)}${f?' = '+f:''}`,8,12,{size:12,align:'left',fam:'body',alpha:.85});
+      if(at('hs'))text(ctx,`log₁₀ = ${s.E.toFixed(2)}`,w-8,h-10,{size:11,align:'right',fam:'body',alpha:.6});
+      const nin=OBJ.filter(o=>o.size/W<.02).sort((a,b)=>b.size-a.size)[0],nout=OBJ.filter(o=>o.size/W>1.5).sort((a,b)=>a.size-b.size)[0];
+      text(ctx,nin?'↓ '+nin.name:'',8,h-10,{size:11,align:'left',fam:'body',alpha:.6});if(!at('hs'))text(ctx,nout?'↑ '+nout.name:'',w-8,h-10,{size:11,align:'right',fam:'body',alpha:.6});
+      if(focus)readout(ctx,[focus.fact],cx,cy+Rv+12,{align:'center',size:12});
+      if(s.t<6&&s.E===E0)text(ctx,'drag up and down, or roll the wheel',cx,cy+Rv*.75,{size:15,alpha:.6})}
+  });
+  if(!s)return null;const cv=s.cv;
+  cv.addEventListener('wheel',e=>{e.preventDefault();s.setE(s,s.target+e.deltaY*.004)},{passive:false});
+  cv.addEventListener('touchmove',e=>{if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(s.pinch)s.setE(s,s.target-Math.log10(d/s.pinch)*1.6);s.pinch=d;s.drag=null}},{passive:false});
+  cv.addEventListener('touchend',()=>{s.pinch=null});
+  hook(px+'-in',()=>s.setE(s,s.target-1));hook(px+'-out',()=>s.setE(s,s.target+1));
+  slide(px+'-e',v=>{if(Math.abs(v-s.target)>.001)s.setE(s,v)},v=>'10'+sup(Math.round(v))+' m across');
+  document.querySelectorAll(`[data-${px}obj]`).forEach(b=>b.addEventListener('click',()=>s.preset(s,parseFloat(b.getAttribute(`data-${px}obj`)))));
+  return s}
+const te=makeViewer('cv-tele','te',0.7),mi=makeViewer('cv-micro','mi',0.3);
+const both=f=>(te&&f(te))||(mi&&f(mi));
+Chalk.start({key:'scale',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
+  sc1:()=>both(s=>s.maxE>=7.3),sc1b:()=>both(s=>s.maxE>=13),sc1c:()=>both(s=>s.gapSeen),sc1d:()=>both(s=>s.maxE>=27),sc1e:()=>both(s=>s.homeFine),
+  sc2:()=>both(s=>s.minE<=-5),sc2b:()=>both(s=>s.minE<=-6.9),sc2c:()=>both(s=>s.lightSeen),sc2d:()=>both(s=>s.minE<=-9.9),sc2e:()=>both(s=>s.minE<=-14.8),sc2f:()=>both(s=>s.minE<=-34.3),sc2g:()=>both(s=>s.atomFine)
+},Object.fromEntries(Array.from({length:2},(_,i)=>[`tb${i+1}`,()=>Chalk.checkPassed(`ch${i+1}`)])))});
+
+</script>
+<script>if("serviceWorker" in navigator&&location.hostname.endsWith("github.io")){addEventListener("load",()=>navigator.serviceWorker.register("https://thedimension5.github.io/chalkboard/sw.js").catch(()=>{}))}</script>
+</body>
+</html>
