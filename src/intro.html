@@ -1,0 +1,107 @@
+<meta charset="utf-8">
+<title>The Chalkboard</title>
+<meta name="description" content="Hard ideas, made playable. Enter the Chalkboard to play, or the Classroom to teach.">
+__FONTS__
+<style>
+:root{--board:#1B2923;--chalk:#F1ECDF;--chalk-dim:rgba(241,236,223,.66);--chalk-faint:rgba(241,236,223,.32);--yellow:#F6D46B;--blue:#8CC4EE;--pink:#F596A8;--green:#9DDBA3;--wood:#6b4a2b;--wood2:#3e2919;--display:'Caveat','Segoe Print','Bradley Hand',cursive;--body:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#2a1c11;color:var(--chalk);font-family:var(--body);overflow:hidden}
+.frame{position:fixed;inset:0;padding:clamp(10px,2.2vw,26px);background:linear-gradient(135deg,#7a5634,#4b3320 40%,#6b4a2b 70%,#3e2919)}
+.board{position:relative;width:100%;height:100%;border-radius:6px;overflow:hidden;background-color:var(--board);
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E"),radial-gradient(ellipse at 15% 10%,rgba(255,255,255,.06),transparent 50%),radial-gradient(ellipse at 85% 90%,rgba(255,255,255,.05),transparent 50%),radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,0,.35));
+  box-shadow:inset 0 0 80px rgba(0,0,0,.55)}
+.smudge{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 30% 70%,rgba(241,236,223,.05),transparent 35%),radial-gradient(ellipse at 70% 30%,rgba(241,236,223,.04),transparent 30%)}
+.doodles{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.doodles path,.doodles circle,.doodles ellipse,.doodles line,.doodles polyline{fill:none;stroke:var(--chalk);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:.8;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.1s ease-out forwards;animation-delay:var(--d,1s)}
+.doodles .y{stroke:var(--yellow)}.doodles .b{stroke:var(--blue)}.doodles .p{stroke:var(--pink)}.doodles .g{stroke:var(--green)}
+.doodles text{font-family:var(--display);font-size:38px;fill:var(--chalk);opacity:0;animation:fade .8s ease forwards;animation-delay:var(--d,2s)}
+canvas#write{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.center{position:absolute;left:0;right:0;top:50%;transform:translateY(-6%);display:flex;flex-direction:column;align-items:center;gap:1.4rem;padding:0 1rem;text-align:center}
+.sr{position:absolute;left:-9999px}
+.tag{font-family:var(--display);font-size:clamp(1.6rem,3.2vw,2.4rem);color:var(--chalk-dim);margin:0;opacity:0;animation:fade .8s ease forwards;animation-delay:2.7s}
+.doors{display:flex;flex-wrap:wrap;justify-content:center;gap:1.2rem 1.8rem;margin-top:.4rem}
+.door{position:relative;display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:1.1rem 2rem 1.2rem;min-width:min(300px,80vw);text-decoration:none;color:var(--chalk);border-radius:14px;transition:background .2s,transform .2s}
+.door:hover,.door:focus-visible{background:rgba(246,212,107,.09);transform:translateY(-2px);outline:none}
+.door .fr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.door .fr rect{fill:none;stroke:var(--yellow);stroke-width:3;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw .9s ease-out forwards;animation-delay:3.1s}
+.door.alt .fr rect{stroke:var(--blue);animation-delay:3.4s}
+.door .big{font-family:var(--display);font-size:clamp(1.7rem,3vw,2.3rem);font-weight:700;line-height:1.05;opacity:0;animation:fade .6s ease forwards;animation-delay:3.7s}
+.door .small{font-size:.86rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--chalk-dim);opacity:0;animation:fade .6s ease forwards;animation-delay:3.9s}
+.skip{position:absolute;bottom:2.4rem;left:0;right:0;text-align:center;font-family:var(--display);font-size:1.15rem;color:var(--chalk-faint);opacity:0;animation:fade 1s ease forwards;animation-delay:1.2s;pointer-events:none}
+.tray{position:absolute;left:8%;right:8%;bottom:0;height:18px;background:linear-gradient(var(--wood),var(--wood2));border-radius:6px 6px 0 0;border-top:2px solid rgba(255,255,255,.14)}
+.tray::before,.tray::after{content:"";position:absolute;top:-8px;height:8px;width:56px;border-radius:3px;background:var(--chalk);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tray::before{left:14%}.tray::after{left:calc(14% + 72px);width:38px;background:var(--pink)}
+.eraser{position:absolute;top:-16px;right:12%;width:70px;height:16px;border-radius:3px;background:#3a2a1c;border:1px solid rgba(255,255,255,.2)}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fade{to{opacity:1}}
+.done .doodles *,.done .door *,.done .tag,.done .skip{animation-duration:0s!important;animation-delay:0s!important}
+.done .skip{opacity:0!important}
+@media (prefers-reduced-motion:reduce){.doodles *,.door *,.tag{animation-duration:0s!important;animation-delay:0s!important}.skip{display:none}}
+@media (max-width:700px),(max-height:560px){
+  .doodles .lower,.doodles text{display:none}
+  .doodles{opacity:.7}
+  .center{top:38%;transform:none;gap:.9rem;padding:0 .8rem}
+  .tag{font-size:1.5rem}
+  .doors{gap:.8rem;margin-top:.1rem;width:100%}
+  .door{padding:.75rem 1rem .85rem;min-width:0;width:min(360px,100%)}
+  .door .big{font-size:1.55rem}
+  .door .small{font-size:.66rem;letter-spacing:.05em}
+  .skip{bottom:2rem;font-size:.95rem}
+  .tray{left:6%;right:6%}
+  .eraser{width:52px}
+}
+@media (max-height:560px) and (min-width:560px){
+  .center{top:30%}
+  .doors{flex-direction:row;flex-wrap:nowrap}
+  .door{width:auto;min-width:min(280px,44vw)}
+}
+</style>
+<div class="frame"><div class="board" id="board">
+  <div class="smudge"></div>
+  <svg class="doodles" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g class="y" style="--d:1.0s"><path pathLength="1" d="M150 100 l28 58 v66 h-56 v-66 z"/><path pathLength="1" d="M122 224 l-22 26 h24 M178 224 l22 26 h-24"/><path pathLength="1" class="p" d="M138 226 q12 40 24 0"/></g>
+    <g class="b" style="--d:1.25s"><circle pathLength="1" cx="1030" cy="150" r="42"/><ellipse pathLength="1" cx="1030" cy="150" rx="86" ry="22" transform="rotate(-18 1030 150)"/><circle pathLength="1" class="y" cx="1108" cy="128" r="4"/></g>
+    <g class="p lower" style="--d:1.5s"><path pathLength="1" d="M92 470 v64 a34 34 0 0 0 68 0 v-64"/><path pathLength="1" d="M84 470 h26 M150 470 h26"/><path pathLength="1" class="b" d="M100 448 v-14 M160 448 v-14"/></g>
+    <g class="y lower" style="--d:1.7s"><path pathLength="1" d="M960 540 C960 496 1030 496 1040 540 C1050 584 1120 584 1120 540 C1120 496 1050 496 1040 540 C1030 584 960 584 960 540Z"/></g>
+    <g style="--d:1.9s"><circle pathLength="1" cx="600" cy="72" r="30"/><path pathLength="1" d="M584 100 h32 v14 h-32z"/><path pathLength="1" class="y" d="M590 88 l8-16 4 16 4-16 4 16"/></g>
+    <g class="p lower" style="--d:2.1s"><path pathLength="1" d="M330 560 c-34 36 -34 80 0 92 c34 -12 34 -56 0 -92"/><path pathLength="1" class="y" d="M330 604 c-12 14 -12 30 0 36 c12 -6 12 -22 0 -36"/></g>
+    <g class="lower" style="--d:2.3s"><circle pathLength="1" class="p" cx="880" cy="610" r="26"/><path pathLength="1" d="M880 584 v-14 M880 580 q16-16 26-6"/></g>
+    <g class="g lower" style="--d:2.5s"><path pathLength="1" d="M420 640 h80 M420 654 h80 M420 668 h80"/></g><g class="g" style="--d:2.5s"><path pathLength="1" d="M760 120 q40 0 40 40 q0 40 -40 40"/></g>
+    <text x="905" y="92" style="--d:2.6s">E = mc²</text>
+    <text x="150" y="640" style="--d:2.8s">P ∝ ΔT²</text>
+    <text x="700" y="640" style="--d:3.0s">v = √(2gh)</text>
+  </svg>
+  <canvas id="write" aria-hidden="true"></canvas>
+  <div class="center">
+    <h1 class="sr">The Chalkboard</h1>
+    <p class="tag">Hard ideas, made playable.</p>
+    <div class="doors">
+      <a class="door" href="__BOARDS__"><svg class="fr" viewBox="0 0 320 92" preserveAspectRatio="none" aria-hidden="true"><rect pathLength="1" x="3" y="3" width="314" height="86" rx="14"/></svg><span class="big">Enter the Chalkboard</span><span class="small">for curious kids and grown-ups</span></a>
+      <a class="door alt" href="__MAP__"><svg class="fr" viewBox="0 0 320 92" preserveAspectRatio="none" aria-hidden="true"><rect pathLength="1" x="3" y="3" width="314" height="86" rx="14"/></svg><span class="big">Enter the Classroom</span><span class="small">for teachers: units, standards, the map</span></a>
+    </div>
+  </div>
+  <p class="skip">click anywhere to skip the chalk</p>
+  <div class="tray"><div class="eraser"></div></div>
+</div></div>
+<script>
+(function(){
+const cv=document.getElementById('write'),ctx=cv.getContext('2d'),board=document.getElementById('board');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0;const svg=document.querySelector('.doodles');function size(){const r=board.getBoundingClientRect();const dpr=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);svg.setAttribute('preserveAspectRatio',(W<700||H<560)?'xMidYMin meet':'xMidYMid slice')}
+size();addEventListener('resize',()=>{size();if(finished)paint(1,0,0)});
+const title='The Chalkboard';let start=null,last=0,done=reduce,finished=false;const dust=[];
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)}
+function paint(p,t,dt){ctx.clearRect(0,0,W,H);const fs=Math.min(W*.115,128,W<700?W*.13:999);ctx.font=`700 ${fs}px Caveat, "Segoe Print", cursive`;ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(title).width;const x0=W/2-tw/2,y=H<560?H*.17:(W<700?H*.27:H*.34);
+  ctx.save();ctx.beginPath();ctx.rect(0,0,x0+tw*p+8,H);ctx.clip();ctx.fillStyle='rgba(241,236,223,.94)';ctx.fillText(title,W/2,y);ctx.fillStyle='rgba(241,236,223,.28)';ctx.fillText(title,W/2+1.6,y+1.2);ctx.restore();
+  if(p<1){const tipX=x0+tw*p,tipY=y+Math.sin(t/55)*fs*.22+fs*.1;ctx.save();ctx.translate(tipX,tipY);ctx.rotate(-.75);ctx.fillStyle='#F1ECDF';rr(-4,-2,9,44,3);ctx.fill();ctx.fillStyle='rgba(0,0,0,.15)';rr(-4,-2,9,6,2);ctx.fill();ctx.restore();
+    for(let i=0;i<3;i++)dust.push({x:tipX+(Math.random()-.5)*6,y:tipY+6,vx:(Math.random()-.5)*26,vy:14+Math.random()*30,age:0,dur:.7+Math.random()*.7,s:1+Math.random()*1.6})}
+  for(const d of dust){d.age+=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;const a=1-d.age/d.dur;ctx.fillStyle=`rgba(241,236,223,${.55*a})`;ctx.beginPath();ctx.arc(d.x,d.y,d.s,0,Math.PI*2);ctx.fill()}
+  for(let i=dust.length-1;i>=0;i--)if(dust[i].age>=dust[i].dur)dust.splice(i,1)}
+function frame(t){if(start==null){start=t;last=t}const dt=Math.min(.05,(t-last)/1000);last=t;let p=done?1:Math.max(0,Math.min(1,(t-start-450)/2500));paint(p,t,dt);if(p>=1&&!dust.length){finished=true;return}requestAnimationFrame(frame)}
+function skip(){if(done)return;done=true;board.classList.add('done')}
+board.addEventListener('click',e=>{if(!e.target.closest('a'))skip()});addEventListener('keydown',e=>{if(e.key==='Escape'||e.key===' ')skip()});
+const go=()=>requestAnimationFrame(frame);
+if(document.fonts&&document.fonts.load){Promise.race([document.fonts.load('700 100px Caveat'),new Promise(r=>setTimeout(r,900))]).then(go)}else go();
+})();
+</script>
