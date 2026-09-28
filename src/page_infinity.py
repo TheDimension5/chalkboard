@@ -77,6 +77,7 @@ MISSIONS=[
  ('inf1b','ch1',['g8','hs','col','max'],"Pair as many as you can and find the one left over."),
  ('inf2','ch2',ALL,"Make room for the new guest."),
  ('inf2b','ch2',ALL,"Make room for the whole bus."),
+ ('inf2c','ch2',['k5','g8','hs','col','max'],"Bet on the new guest, then on the infinite bus."),
  ('inf3','ch3',ALL,"Number 20 fractions with the zigzag."),
  ('inf3b','ch3',['hs','col','max'],"Number 30 fractions and watch the repeats get skipped."),
  ('inf4','ch4',ALL,"Flip the diagonal to make a number that is not on the list."),
@@ -85,3 +86,6 @@ MISSIONS=[
  ('inf5b','ch5',['hs','col','max'],"Flip the continuum hypothesis both ways."),
 ]
 CLOSING=("Cantor's ladder has no top.","Cantor spent his last years in and out of hospital, sure he was right and mostly alone. He was right. The next rung is still waiting for someone to say what it looks like.")
+
+from bets import bet
+FIG[2]=bet('inf-bet',"Every room in the hotel is full. One more guest walks in. Can they get a room?",[('no',"No, it's full"),('leave','Only if someone leaves'),('yes','Yes, somehow')])+FIG[2]

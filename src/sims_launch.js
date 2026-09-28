@@ -128,7 +128,7 @@ function lnReveal(s){const out=$('ln-reveal');if(!out||!s.race)return;const r=s.
   out.innerHTML=`<b>${head}</b> ${body}${next?` <button class="btn" id="ln-airrace" type="button">Race with air on</button>`:''}`;out.hidden=false;
   const ar=$('ln-airrace');if(ar)ar.addEventListener('click',()=>{s.air=true;const b=$('ln-air');if(b){b.classList.add('is-on');b.setAttribute('aria-pressed','true');b.textContent='Air: on'}s.startRace(s,'air');lnShow()})}
 document.querySelectorAll('[data-bet]').forEach(b=>b.addEventListener('click',()=>{if(!ln)return;document.querySelectorAll('[data-bet]').forEach(x=>x.classList.toggle('is-on',x===b));const out=$('ln-reveal');if(out){out.hidden=false;out.innerHTML='<b>Bet placed.</b> Watch them go.'}ln.startRace(ln,b.dataset.bet);lnShow()}));
-function lnShow(){const cv=$('cv-launch');if(!cv)return;const r=cv.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)cv.scrollIntoView({behavior:Chalk.REDUCE?'auto':'smooth',block:'center'})}
+function lnShow(){const cv=$('cv-launch');if(!cv)return;const r=cv.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)cv.scrollIntoView({behavior:Chalk.REDUCE?'auto':'smooth',block:'end'})}
 hook('ln-go',()=>{if(!ln||ln.phase!=='ready')return;ln.race=null;ln.go(ln)});hook('ln-newt',()=>{if(!ln)return;ln.race=null;ln.newTarget(ln)});slide('ln-h',v=>{if(ln)ln.hr=v},v=>v.toFixed(1)+' m');slide('ln-a',v=>{if(ln)ln.ang=v},v=>v+'°');slide('ln-m',v=>{if(ln)ln.m=v},v=>v.toFixed(1)+' kg');slide('ln-mu',v=>{if(ln)ln.mu=v},v=>v.toFixed(2));toggle('ln-air',()=>ln.air,v=>{ln.air=v},v=>'Air: '+(v?'on':'off'));
 
 /* ---------- CH4: the crash lab ---------- */

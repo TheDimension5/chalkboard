@@ -467,6 +467,7 @@ html.classroom .mode-link .mode-off{display:inline}
     <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The hotel is a picture of the fact that the even numbers are 'as many' as all the whole numbers. Kids often find this outrageous. That is the right reaction; Cantor's contemporaries had it too.</p></details>
   </div>
   <figure class="lab">
+    <div class="bet" id="inf-bet"><p class="bet-q"><b>Place your bet</b><span>Every room in the hotel is full. One more guest walks in. Can they get a room?</span></p><div class="row"><button class="btn" type="button" data-bet="no">No, it&#x27;s full</button><button class="btn" type="button" data-bet="leave">Only if someone leaves</button><button class="btn" type="button" data-bet="yes">Yes, somehow</button></div><p class="bet-out" aria-live="polite" hidden></p></div>
     <div class="panel"><canvas id="cv-hotel" aria-label="A row of numbered hotel rooms with a guest in each. Buttons bring a new guest or an infinite bus."></canvas></div>
     <div class="controls"><button class="btn" id="hotel-guest">A new guest arrives</button><button class="btn blue" id="hotel-bus">An infinite bus arrives</button><button class="btn" id="hotel-reset">Fill the hotel again</button></div>
     <figcaption><b>Try this:</b> the hotel is full. Make room for one more, then for a whole busload. <span data-lv="hs col max">The bus is the map n ↦ 2n.</span></figcaption>
@@ -701,6 +702,16 @@ function wireHandin(){let savedName='';try{savedName=localStorage.getItem('chalk
     box.querySelector('.hi-copy').addEventListener('click',async()=>{const t=out.textContent;try{await navigator.clipboard.writeText(t);box.querySelector('.hi-copy').textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents(out);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);box.querySelector('.hi-copy').textContent='Selected: press copy'}setTimeout(()=>box.querySelector('.hi-copy').textContent='Copy',1800)});
     box.querySelector('.hi-print').addEventListener('click',()=>{document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},50)})})}
 
+/* ---------- place-your-bet moments ---------- */
+function bet(id,o){const root=$(id);if(!root)return null;const q=root.querySelector('.bet-q span'),row=root.querySelector('.row'),out=root.querySelector('.bet-out');
+  const api={busy:false,onPick:o.pick,say(html){out.innerHTML=html;out.hidden=false},
+    ask(question,opts,onPick){if(q)q.textContent=question;row.innerHTML=opts.map(([v,l])=>`<button class="btn" type="button" data-bet="${v}">${l}</button>`).join('');out.hidden=true;out.innerHTML='';api.onPick=onPick},
+    show(){const cv=o.canvas&&$(o.canvas);if(!cv)return;const r=cv.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)cv.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'end'})},
+    next(label,key){return ` <button class="btn" type="button" data-next="${key}">${label}</button>`}};
+  root.addEventListener('click',e=>{if(api.busy)return;const b=e.target.closest('[data-bet]');if(b){row.querySelectorAll('[data-bet]').forEach(x=>x.classList.toggle('is-on',x===b));api.say('<b>Bet placed.</b> '+(o.placed||'Watch.'));api.show();api.onPick&&api.onPick(b.dataset.bet,api);return}
+    const n=e.target.closest('[data-next]');if(n&&o.next){api.show();o.next(n.dataset.next,api)}});
+  return api}
+
 /* ---------- start ---------- */
 function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||!/^tb\d+$/.test(m.id));CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
   try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();wireHandin();
@@ -710,11 +721,11 @@ function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,bet,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();
 </script>
 <script>
-const MISSION_DEFS=[{"id": "inf1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Pair every apple with a cup."}, {"id": "inf1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Pair as many as you can and find the one left over."}, {"id": "inf2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the new guest."}, {"id": "inf2b", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the whole bus."}, {"id": "inf3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Number 20 fractions with the zigzag."}, {"id": "inf3b", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Number 30 fractions and watch the repeats get skipped."}, {"id": "inf4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Flip the diagonal to make a number that is not on the list."}, {"id": "inf4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Add the new number to the list, then flip again."}, {"id": "inf5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Show all 16 subsets of a four-thing set."}, {"id": "inf5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Flip the continuum hypothesis both ways."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}];
+const MISSION_DEFS=[{"id": "inf1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Pair every apple with a cup."}, {"id": "inf1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Pair as many as you can and find the one left over."}, {"id": "inf2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the new guest."}, {"id": "inf2b", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make room for the whole bus."}, {"id": "inf2c", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Bet on the new guest, then on the infinite bus."}, {"id": "inf3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Number 20 fractions with the zigzag."}, {"id": "inf3b", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Number 30 fractions and watch the repeats get skipped."}, {"id": "inf4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Flip the diagonal to make a number that is not on the list."}, {"id": "inf4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Add the new number to the list, then flip again."}, {"id": "inf5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Show all 16 subsets of a four-thing set."}, {"id": "inf5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Flip the continuum hypothesis both ways."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below."}];
 const UNIT_WHY={};
 const TB_CHECKS={tb1:()=>Chalk.checkPassed('ch1'),tb2:()=>Chalk.checkPassed('ch2'),tb3:()=>Chalk.checkPassed('ch3'),tb4:()=>Chalk.checkPassed('ch4'),tb5:()=>Chalk.checkPassed('ch5')};
 const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
@@ -745,18 +756,28 @@ hook('match-reset',()=>match&&match.reset(match));
 /* ---------- CH2: Hilbert's Hotel ---------- */
 const hotel=makeSim('cv-hotel',{
   init(s){s.reset(s)},
-  reset(s){s.g=[];for(let r=1;r<=14;r++)s.g.push({room:r,x:s.rx(s,r),y:s.h*.62,c:C.yellow});s.msg='every room is full';s.guestDone=false;s.busDone=false;s.busy=0},
+  reset(s){s.g=[];for(let r=1;r<=14;r++)s.g.push({room:r,x:s.rx(s,r),y:s.h*.62,c:C.yellow});s.msg='every room is full';s.guestDone=false;s.busDone=false;s.busy=0;s.flash=null},
   rx(s,r){return 34+(r-1)*(s.w-60)/12},
-  newGuest(s){if(s.busy>0)return;for(const g of s.g)g.room+=1;s.g.push({room:1,x:-30,y:s.h*.2,c:C.pink});s.msg='everyone moves up one room. Room 1 is free!';s.guestDone=true;s.busy=1.4},
-  bus(s){if(s.busy>0)return;for(const g of s.g)g.room*=2;for(let k=0;k<7;k++)s.g.push({room:2*k+1,x:s.w*.1+k*30,y:-30,c:C.blue});s.msg='everyone doubles their room number. All the odd rooms are free!';s.busDone=true;s.busy=1.6},
-  step(dt,s){s.busy=Math.max(0,s.busy-dt);for(const g of s.g){const tx=s.rx(s,g.room),ty=s.h*.62;g.x+=(tx-g.x)*Math.min(1,dt*4);g.y+=(ty-g.y)*Math.min(1,dt*4)}s.g=s.g.filter(g=>g.room<=40)},
+  newGuest(s){if(s.busy>0)return;for(const g of s.g)g.room+=1;s.g.push({room:1,x:-30,y:s.h*.2,c:C.pink});s.msg='everyone moves up one room. Room 1 is free!';s.flash={t:0,text:'Room 1 is free!',color:C.pink};s.guestDone=true;s.busy=1.4},
+  bus(s){if(s.busy>0)return;for(const g of s.g)g.room*=2;for(let k=0;k<7;k++)s.g.push({room:2*k+1,x:s.w*.1+k*30,y:-30,c:C.blue});s.msg='everyone doubles their room number. All the odd rooms are free!';s.flash={t:0,text:'Every odd room is free!',color:C.blue};s.busDone=true;s.busy=1.6},
+  step(dt,s){s.busy=Math.max(0,s.busy-dt);if(s.flash){s.flash.t+=dt;if(s.flash.t>2.2)s.flash=null}for(const g of s.g){const tx=s.rx(s,g.room),ty=s.h*.62;g.x+=(tx-g.x)*Math.min(1,dt*4);g.y+=(ty-g.y)*Math.min(1,dt*4)}s.g=s.g.filter(g=>g.room<=40)},
   draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);
     for(let r=1;r<=13;r++){const x=s.rx(s,r);box(ctx,x-18,h*.44,36,h*.36,null,C.chalk,4,1.5);text(ctx,r<13?String(r):'…',x,h*.34,{size:22,alpha:.85});if(r<13)box(ctx,x-7,h*.62,14,h*.18,rgba(C.chalk,.12),null,2)}
     poly(ctx,[[10,h*.8],[w-10,h*.8]],C.chalk,2,.5);text(ctx,'HOTEL INFINITY',w/2,h*.14,{size:30,color:C.yellow});
-    for(const g of s.g)marble(ctx,g.x,g.y,9,g.c);
+    for(const g of s.g){const hop=Math.min(46,Math.abs(s.rx(s,g.room)-g.x)*.45);marble(ctx,g.x,g.y-hop,9,g.c)}
+    if(s.flash){const u=s.flash.t/2.2,sc=u<.12?.6+u/.12*.5:1.1-Math.min(.1,u-.12);text(ctx,s.flash.text,w/2,h*.25,{size:34*sc,color:s.flash.color,alpha:u<.75?1:Math.max(0,1-(u-.75)/.25)})}
     text(ctx,s.msg,w/2,h*.92,{size:20,alpha:.85});
     if(at('g8')){const lines=[];if(s.busDone)lines.push(at('hs')?'n ↦ 2n pairs all the rooms with the even rooms':'all the guests fit into just the even rooms');if(s.guestDone&&!s.busDone)lines.push(at('hs')?'n ↦ n + 1: the hotel matches a part of itself':'a full hotel matched with part of itself');if(at('col'))lines.push('countable union of countable sets: (n, m) ↦ 2ⁿ·3ᵐ');if(lines.length)readout(ctx,lines,w*.03,h*.03,{size:12})}}
 });
+const hotelBet=Chalk.bet('inf-bet',{canvas:'cv-hotel',placed:'Knock knock.',
+  pick(p,api){if(!hotel)return;hotel.reset(hotel);api.busy=true;setTimeout(()=>{hotel.newGuest(hotel);setTimeout(()=>{api.busy=false;const lv=Chalk.level();
+    const head=p==='yes'?'You called it. The new guest gets a room.':'Nobody leaves, and the new guest still gets a room.';
+    const body=lv==='k5'?'Everyone moves up one room: 1 goes to 2, 2 goes to 3, and so on forever. There is no last room, so nobody runs out of places to move to, and room 1 is free.':lv==='g8'?'Every guest moves up one. Every guest has a next room because there is no last room. A full infinite hotel always has room for one more, which no real hotel could ever say.':'The map n ↦ n + 1 matches the whole set of rooms with a part of itself. No finite set can do that; Dedekind made it the definition of infinite.';
+    api.say(`<b>${head}</b> ${body}`+api.next('An infinite bus pulls up','bus'));hotel.betDone=true},1700)},350)},
+  next(k,api){api.ask('A bus with infinitely many people pulls up. How many of them can get a room?',[['none','None, it is full'],['some','Some of them'],['all','Every one of them']],(p,api)=>{api.busy=true;hotel.bus(hotel);setTimeout(()=>{api.busy=false;const lv=Chalk.level();
+    const head=p==='all'?'You called it. Every one of them.':'Every single one of them.';
+    const body=lv==='k5'?'Everyone moves to double their room number: 1 goes to 2, 2 goes to 4, 3 goes to 6. Now the guests only use the even rooms, and all the odd rooms, forever, are empty for the bus.':lv==='g8'?'Doubling sends every guest to an even room and frees every odd room. There are just as many odd rooms as people on the bus. The hotel, the bus, and the hotel plus the bus are all the same size.':'n ↦ 2n sends the guests to the evens and leaves the odds free. ℕ, the evens, and ℕ plus a countable bus all have size ℵ₀. The next chapters ask whether anything is bigger. (Something is.)';
+    api.say(`<b>${head}</b> ${body}`);hotel.busBet=true},1900)})}});
 hook('hotel-guest',()=>hotel&&hotel.newGuest(hotel));hook('hotel-bus',()=>hotel&&hotel.bus(hotel));hook('hotel-reset',()=>hotel&&hotel.reset(hotel));
 
 /* ---------- CH3: zigzag through the fractions ---------- */
@@ -820,7 +841,7 @@ const ladder=makeSim('cv-ladder',{
 slide('ladder-n',v=>{if(ladder)ladder.n=Math.round(v)},v=>String(Math.round(v)));
 hook('ladder-ch',()=>{if(!ladder)return;ladder.ch=!ladder.ch;ladder.chSeen[ladder.ch]=true;const b=$('ladder-ch');b.textContent='Continuum hypothesis: '+(ladder.ch?'true':'false');b.setAttribute('aria-pressed',String(ladder.ch))});
 
-Chalk.start({key:'infinity',missions:MISSION_DEFS,checks:Object.assign(TB_CHECKS,{
+Chalk.start({key:'infinity',missions:MISSION_DEFS,checks:Object.assign(TB_CHECKS,{inf2c:()=>hotel&&hotel.busBet,
   inf1:()=>match&&match.na===match.nb&&match.paired(match)===match.na,
   inf1b:()=>match&&match.na>match.nb&&match.paired(match)===match.nb,
   inf2:()=>hotel&&hotel.guestDone,inf2b:()=>hotel&&hotel.busDone,

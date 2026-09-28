@@ -965,6 +965,16 @@ function wireHandin(){let savedName='';try{savedName=localStorage.getItem('chalk
     box.querySelector('.hi-copy').addEventListener('click',async()=>{const t=out.textContent;try{await navigator.clipboard.writeText(t);box.querySelector('.hi-copy').textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents(out);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);box.querySelector('.hi-copy').textContent='Selected: press copy'}setTimeout(()=>box.querySelector('.hi-copy').textContent='Copy',1800)});
     box.querySelector('.hi-print').addEventListener('click',()=>{document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},50)})})}
 
+/* ---------- place-your-bet moments ---------- */
+function bet(id,o){const root=$(id);if(!root)return null;const q=root.querySelector('.bet-q span'),row=root.querySelector('.row'),out=root.querySelector('.bet-out');
+  const api={busy:false,onPick:o.pick,say(html){out.innerHTML=html;out.hidden=false},
+    ask(question,opts,onPick){if(q)q.textContent=question;row.innerHTML=opts.map(([v,l])=>`<button class="btn" type="button" data-bet="${v}">${l}</button>`).join('');out.hidden=true;out.innerHTML='';api.onPick=onPick},
+    show(){const cv=o.canvas&&$(o.canvas);if(!cv)return;const r=cv.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)cv.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'end'})},
+    next(label,key){return ` <button class="btn" type="button" data-next="${key}">${label}</button>`}};
+  root.addEventListener('click',e=>{if(api.busy)return;const b=e.target.closest('[data-bet]');if(b){row.querySelectorAll('[data-bet]').forEach(x=>x.classList.toggle('is-on',x===b));api.say('<b>Bet placed.</b> '+(o.placed||'Watch.'));api.show();api.onPick&&api.onPick(b.dataset.bet,api);return}
+    const n=e.target.closest('[data-next]');if(n&&o.next){api.show();o.next(n.dataset.next,api)}});
+  return api}
+
 /* ---------- start ---------- */
 function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||!/^tb\d+$/.test(m.id));CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
   try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();wireHandin();
@@ -974,7 +984,7 @@ function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,bet,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();
 </script>
 <script>

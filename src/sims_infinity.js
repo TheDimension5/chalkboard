@@ -26,18 +26,28 @@ hook('match-reset',()=>match&&match.reset(match));
 /* ---------- CH2: Hilbert's Hotel ---------- */
 const hotel=makeSim('cv-hotel',{
   init(s){s.reset(s)},
-  reset(s){s.g=[];for(let r=1;r<=14;r++)s.g.push({room:r,x:s.rx(s,r),y:s.h*.62,c:C.yellow});s.msg='every room is full';s.guestDone=false;s.busDone=false;s.busy=0},
+  reset(s){s.g=[];for(let r=1;r<=14;r++)s.g.push({room:r,x:s.rx(s,r),y:s.h*.62,c:C.yellow});s.msg='every room is full';s.guestDone=false;s.busDone=false;s.busy=0;s.flash=null},
   rx(s,r){return 34+(r-1)*(s.w-60)/12},
-  newGuest(s){if(s.busy>0)return;for(const g of s.g)g.room+=1;s.g.push({room:1,x:-30,y:s.h*.2,c:C.pink});s.msg='everyone moves up one room. Room 1 is free!';s.guestDone=true;s.busy=1.4},
-  bus(s){if(s.busy>0)return;for(const g of s.g)g.room*=2;for(let k=0;k<7;k++)s.g.push({room:2*k+1,x:s.w*.1+k*30,y:-30,c:C.blue});s.msg='everyone doubles their room number. All the odd rooms are free!';s.busDone=true;s.busy=1.6},
-  step(dt,s){s.busy=Math.max(0,s.busy-dt);for(const g of s.g){const tx=s.rx(s,g.room),ty=s.h*.62;g.x+=(tx-g.x)*Math.min(1,dt*4);g.y+=(ty-g.y)*Math.min(1,dt*4)}s.g=s.g.filter(g=>g.room<=40)},
+  newGuest(s){if(s.busy>0)return;for(const g of s.g)g.room+=1;s.g.push({room:1,x:-30,y:s.h*.2,c:C.pink});s.msg='everyone moves up one room. Room 1 is free!';s.flash={t:0,text:'Room 1 is free!',color:C.pink};s.guestDone=true;s.busy=1.4},
+  bus(s){if(s.busy>0)return;for(const g of s.g)g.room*=2;for(let k=0;k<7;k++)s.g.push({room:2*k+1,x:s.w*.1+k*30,y:-30,c:C.blue});s.msg='everyone doubles their room number. All the odd rooms are free!';s.flash={t:0,text:'Every odd room is free!',color:C.blue};s.busDone=true;s.busy=1.6},
+  step(dt,s){s.busy=Math.max(0,s.busy-dt);if(s.flash){s.flash.t+=dt;if(s.flash.t>2.2)s.flash=null}for(const g of s.g){const tx=s.rx(s,g.room),ty=s.h*.62;g.x+=(tx-g.x)*Math.min(1,dt*4);g.y+=(ty-g.y)*Math.min(1,dt*4)}s.g=s.g.filter(g=>g.room<=40)},
   draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);
     for(let r=1;r<=13;r++){const x=s.rx(s,r);box(ctx,x-18,h*.44,36,h*.36,null,C.chalk,4,1.5);text(ctx,r<13?String(r):'…',x,h*.34,{size:22,alpha:.85});if(r<13)box(ctx,x-7,h*.62,14,h*.18,rgba(C.chalk,.12),null,2)}
     poly(ctx,[[10,h*.8],[w-10,h*.8]],C.chalk,2,.5);text(ctx,'HOTEL INFINITY',w/2,h*.14,{size:30,color:C.yellow});
-    for(const g of s.g)marble(ctx,g.x,g.y,9,g.c);
+    for(const g of s.g){const hop=Math.min(46,Math.abs(s.rx(s,g.room)-g.x)*.45);marble(ctx,g.x,g.y-hop,9,g.c)}
+    if(s.flash){const u=s.flash.t/2.2,sc=u<.12?.6+u/.12*.5:1.1-Math.min(.1,u-.12);text(ctx,s.flash.text,w/2,h*.25,{size:34*sc,color:s.flash.color,alpha:u<.75?1:Math.max(0,1-(u-.75)/.25)})}
     text(ctx,s.msg,w/2,h*.92,{size:20,alpha:.85});
     if(at('g8')){const lines=[];if(s.busDone)lines.push(at('hs')?'n ↦ 2n pairs all the rooms with the even rooms':'all the guests fit into just the even rooms');if(s.guestDone&&!s.busDone)lines.push(at('hs')?'n ↦ n + 1: the hotel matches a part of itself':'a full hotel matched with part of itself');if(at('col'))lines.push('countable union of countable sets: (n, m) ↦ 2ⁿ·3ᵐ');if(lines.length)readout(ctx,lines,w*.03,h*.03,{size:12})}}
 });
+const hotelBet=Chalk.bet('inf-bet',{canvas:'cv-hotel',placed:'Knock knock.',
+  pick(p,api){if(!hotel)return;hotel.reset(hotel);api.busy=true;setTimeout(()=>{hotel.newGuest(hotel);setTimeout(()=>{api.busy=false;const lv=Chalk.level();
+    const head=p==='yes'?'You called it. The new guest gets a room.':'Nobody leaves, and the new guest still gets a room.';
+    const body=lv==='k5'?'Everyone moves up one room: 1 goes to 2, 2 goes to 3, and so on forever. There is no last room, so nobody runs out of places to move to, and room 1 is free.':lv==='g8'?'Every guest moves up one. Every guest has a next room because there is no last room. A full infinite hotel always has room for one more, which no real hotel could ever say.':'The map n ↦ n + 1 matches the whole set of rooms with a part of itself. No finite set can do that; Dedekind made it the definition of infinite.';
+    api.say(`<b>${head}</b> ${body}`+api.next('An infinite bus pulls up','bus'));hotel.betDone=true},1700)},350)},
+  next(k,api){api.ask('A bus with infinitely many people pulls up. How many of them can get a room?',[['none','None, it is full'],['some','Some of them'],['all','Every one of them']],(p,api)=>{api.busy=true;hotel.bus(hotel);setTimeout(()=>{api.busy=false;const lv=Chalk.level();
+    const head=p==='all'?'You called it. Every one of them.':'Every single one of them.';
+    const body=lv==='k5'?'Everyone moves to double their room number: 1 goes to 2, 2 goes to 4, 3 goes to 6. Now the guests only use the even rooms, and all the odd rooms, forever, are empty for the bus.':lv==='g8'?'Doubling sends every guest to an even room and frees every odd room. There are just as many odd rooms as people on the bus. The hotel, the bus, and the hotel plus the bus are all the same size.':'n ↦ 2n sends the guests to the evens and leaves the odds free. ℕ, the evens, and ℕ plus a countable bus all have size ℵ₀. The next chapters ask whether anything is bigger. (Something is.)';
+    api.say(`<b>${head}</b> ${body}`);hotel.busBet=true},1900)})}});
 hook('hotel-guest',()=>hotel&&hotel.newGuest(hotel));hook('hotel-bus',()=>hotel&&hotel.bus(hotel));hook('hotel-reset',()=>hotel&&hotel.reset(hotel));
 
 /* ---------- CH3: zigzag through the fractions ---------- */
@@ -101,7 +111,7 @@ const ladder=makeSim('cv-ladder',{
 slide('ladder-n',v=>{if(ladder)ladder.n=Math.round(v)},v=>String(Math.round(v)));
 hook('ladder-ch',()=>{if(!ladder)return;ladder.ch=!ladder.ch;ladder.chSeen[ladder.ch]=true;const b=$('ladder-ch');b.textContent='Continuum hypothesis: '+(ladder.ch?'true':'false');b.setAttribute('aria-pressed',String(ladder.ch))});
 
-Chalk.start({key:'infinity',missions:MISSION_DEFS,checks:{
+Chalk.start({key:'infinity',missions:MISSION_DEFS,checks:{inf2c:()=>hotel&&hotel.busBet,
   inf1:()=>match&&match.na===match.nb&&match.paired(match)===match.na,
   inf1b:()=>match&&match.na>match.nb&&match.paired(match)===match.nb,
   inf2:()=>hotel&&hotel.guestDone,inf2b:()=>hotel&&hotel.busDone,

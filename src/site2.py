@@ -263,10 +263,10 @@ cards_html='\n'.join([
  card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 30 missions"),ICONS['heat']),
  card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 23 missions"),ICONS['elec']),
  card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 31 missions"),ICONS['phys']),
- card('infinity',("Some infinities are bigger than others. Prove it yourself.","5 chapters · 15 missions"),ICONS['math']),
+ card('infinity',("Some infinities are bigger than others. Prove it yourself.","5 chapters · 16 missions"),ICONS['math']),
  card('history',("How the past reaches us, from scribes and dead scripts to bit rot.","6 chapters · 18 missions"),ICONS['hist']),
- card('life',("Copy a recipe, hunt moths as the bird, flip peas, race germs, then rebuild the tree of life.","6 chapters · 29 missions"),ICONS['life'],'New'),
- card('scale',("Telescope and microscope in one eyepiece: from the edge of the universe to the Planck length.","2 chapters · 14 missions"),ICONS['scale'],'New')])
+ card('life',("Copy a recipe, hunt moths as the bird, flip peas, race germs, then rebuild the tree of life.","6 chapters · 30 missions"),ICONS['life'],'New'),
+ card('scale',("Telescope and microscope in one eyepiece: from the edge of the universe to the Planck length.","2 chapters · 15 missions"),ICONS['scale'],'New')])
 units_html=''.join(f'''<div class="unit" data-unit="{u["id"]}"><h3>{u["title"]}</h3><p>{u["blurb"]}</p><ol>'''+''.join(f'<li><a href="{chapter_url(*st)}">{TITLES[st]}</a> <small>{BOARDS[st[0]]["title"]}, chapter {st[1]}</small></li>' for st in u['steps'])+'</ol></div>' for u in UNITS)
 qlist=''.join(f'<li><a href="{chapter_url(b,n)}">{LESSON[(b,n)]["warm"]}</a><small>{BOARDS[b]["title"]} {n}</small></li>' for (b,n) in sorted(LESSON,key=lambda k:(list(BOARDS).index(k[0]),k[1])))
 grade='<div class="grade"><span class="lbl">Who\'s reading?</span><button class="btn" data-glevel="k5">Kids</button><button class="btn" data-glevel="g8">8th grade</button><button class="btn" data-glevel="hs">High school</button><button class="btn" data-glevel="col">College</button><button class="btn" data-glevel="max">Max</button><span class="hint" id="gnote"></span></div>'
