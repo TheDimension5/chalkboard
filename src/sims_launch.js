@@ -44,34 +44,92 @@ const fl=makeSim('cv-fall',{
 hook('fl-drop',()=>fl&&fl.drop(fl));toggle('fl-air',()=>fl.air,v=>{fl.air=v},v=>'Air: '+(v?'on':'off'));group('data-g',v=>{if(fl){fl.g=v;fl.reset(fl)}});
 
 /* ---------- CH3: the launch ---------- */
+/* Play: hit the box, it moves farther. Bet: a toy car and a truck race off the same ramp; without air they land together. */
+const LN_CARS={one:{m:null,w:26,h:15,color:C.pink,label:''},toy:{m:.2,w:20,h:11,color:C.pink,label:'toy car 0.2 kg'},truck:{m:5,w:46,h:26,color:C.blue,label:'truck 5 kg'}};
 const ln=makeSim('cv-launch',{
-  init(s){s.hr=4;s.ang=20;s.m=1;s.air=false;s.mu=0;s.phase='ready';s.D=8;s.bw=1.2;s.streak=0;s.hits=0;s.best=0;s.trail=[];s.pred=null;s.predErr=null;s.hitAir=false;s.res=''},
-  ppm(s){return s.w/30},
+  init(s){s.hr=4;s.ang=20;s.m=1;s.air=false;s.mu=0;s.phase='ready';s.D=8;s.bw=1.2;s.boxFrom=null;s.streak=0;s.hits=0;s.best=0;s.shots=0;s.pred=null;s.predErr=null;s.hitAir=false;s.res='';
+    s.cars=[];s.ghosts=[];s.marks=[];s.parts=[];s.pops=[];s.shake=0;s.race=null;s.raced=false;s.racedAir=false;s.view=16},
+  ppm(s){return s.w/s.view},
+  frame(s){const pr=s.predict(s);let apex=s.hr;for(const p of pr.pts)apex=Math.max(apex,p[1]);let far=s.race||!s.cars.length?pr.range+3:0;if(!s.race)far=Math.max(far,s.D+s.bw+3);for(const c of s.cars)far=Math.max(far,c.px+3);const room=Math.max(80,s.h*.82-56);return clamp(Math.max(14,far,s.w*(apex+.6)/room),14,34)},
   lip(s){return{x:4,y:1+Math.sin(s.ang*Math.PI/180)*.5}},
   v0(s){const L=s.lip(s);const Lr=Math.hypot(3,s.hr-1);const v2=2*G*(s.hr-L.y)-2*s.mu*G*Lr*(3/Lr);return v2>0?Math.sqrt(v2):0},
   predict(s){const v=s.v0(s),L=s.lip(s),th=s.ang*Math.PI/180;const vy=v*Math.sin(th),vx=v*Math.cos(th);const t=(vy+Math.sqrt(vy*vy+2*G*L.y))/G;const pts=[];for(let k=0;k<=30;k++){const tt=t*k/30;pts.push([L.x+vx*tt,L.y+vy*tt-.5*G*tt*tt])}return{range:L.x+vx*t,t,pts}},
-  go(s){if(s.phase!=='ready')return;const pv=parseFloat(($('ln-pred')||{}).value);s.pred=isNaN(pv)?null:pv;s.phase='ramp';s.sp=0;s.trail=[];s.res=''},
-  newTarget(s){s.D=5+Math.random()*10;s.bw=1.2;s.streak=0},
-  step(dt,s){if(s.phase==='ramp'){const v=s.v0(s);if(v<=0){s.phase='ready';s.res='not enough height: the car stopped on the ramp';return}const Lr=Math.hypot(3,s.hr-1);s.sp+=dt*(v/2+1)/Lr;if(s.sp>=1){s.sp=1;const L=s.lip(s),th=s.ang*Math.PI/180;s.px=L.x;s.py=L.y;s.vx=v*Math.cos(th);s.vy=v*Math.sin(th);s.phase='flight';s.ft=0}}
-    else if(s.phase==='flight'){const sub=6,h=dt/sub;for(let k=0;k<sub;k++){const sp=Math.hypot(s.vx,s.vy);const kd=s.air?.03:0;s.vx+=-(kd/s.m)*sp*s.vx*h;s.vy+=(-G-(kd/s.m)*sp*s.vy)*h;s.px+=s.vx*h;s.py+=s.vy*h;s.ft+=h;if(s.py<=0){s.py=0;s.land(s);break}}s.trail.push([s.px,s.py])}
-    else if(s.phase==='landed'){s.wait-=dt;if(s.wait<=0)s.phase='ready'}},
-  land(s){s.phase='landed';s.wait=1.8;const x=s.px;const hit=Math.abs(x-s.D)<s.bw/2;s.best=Math.max(s.best,x);
-    if(s.pred!=null){s.predErr=Math.abs(x-s.pred)/x;s.res=`you predicted ${s.pred.toFixed(1)} m, it landed at ${x.toFixed(1)} m: ${(s.predErr*100).toFixed(0)}% off. `}else s.res=`landed at ${x.toFixed(1)} m. `;
-    if(hit){s.hits++;s.streak++;if(s.air&&s.m>=3)s.hitAir=true;s.res+=`HIT! streak ${s.streak}. The box moves farther.`;s.D=Math.min(27,s.D*1.25+1);s.bw=Math.max(.7,s.bw*.93)}else{s.streak=0;s.res+=x<s.D?'short.':'too far.'}},
+  launch(s,kinds){if(s.phase!=='ready')return false;if(s.v0(s)<=0){s.res='not enough height: the car stops on the ramp';s.pop(s,'too low to roll!',2.5,s.hr+1,C.pink,22);return false}
+    s.ghosts=s.cars.filter(c=>c.trail.length).map(c=>({trail:c.trail,color:c.color}));
+    s.cars=kinds.map(k=>{const d=LN_CARS[k];return{kind:k,m:d.m==null?s.m:d.m,w:d.w,h:d.h,color:d.color,label:d.label,sp:0,px:1,py:s.hr,vx:0,vy:0,rot:0,trail:[],tt:0,landed:false}});
+    s.phase='ramp';s.res='';return true},
+  go(s){const pv=parseFloat(($('ln-pred')||{}).value);if(s.launch(s,['one'])){s.race=null;s.pred=isNaN(pv)?null:pv}},
+  startRace(s,pick){s.phase=s.phase==='landed'?'ready':s.phase;if(s.launch(s,['truck','toy']))s.race={pick,air:s.air,done:false}},
+  newTarget(s){s.boxFrom=null;s.D=5+Math.random()*10;s.bw=1.2;s.streak=0},
+  pop(s,t,x,y,color,size=30){s.pops.push({t,x,y,color,size,age:0})},
+  burst(s,x,n,colors,up=4){for(let i=0;i<n;i++){const a=Math.PI*(.1+.8*Math.random());const sp=up*(.4+Math.random());s.parts.push({x,y:.05,vx:Math.cos(a)*sp*(Math.random()<.5?-1:1),vy:Math.sin(a)*sp,life:.7+Math.random()*.6,age:0,color:colors[i%colors.length],r:1.5+Math.random()*2.5})}},
+  down(p,s){if(s.phase==='ready'){s.race=null;s.go(s)}},
+  step(dt,s){
+    s.view+=(s.frame(s)-s.view)*Math.min(1,dt*2.5);
+    s.shake=Math.max(0,s.shake-dt*30);
+    for(const q of s.parts){q.age+=dt;q.vy-=G*.6*dt;q.x+=q.vx*dt;q.y=Math.max(0,q.y+q.vy*dt)}s.parts=s.parts.filter(q=>q.age<q.life);
+    for(const q of s.pops)q.age+=dt;s.pops=s.pops.filter(q=>q.age<1.6);
+    if(s.boxFrom){s.boxFrom.t+=dt*1.6;if(s.boxFrom.t>=1)s.boxFrom=null}
+    if(s.phase==='ramp'){const v=s.v0(s);const Lr=Math.hypot(3,s.hr-1);let sp=0;for(const c of s.cars){c.sp+=dt*(v/2+1)/Lr;sp=c.sp}
+      if(sp>=1){const L=s.lip(s),th=s.ang*Math.PI/180;for(const c of s.cars){c.px=L.x;c.py=L.y;c.vx=v*Math.cos(th);c.vy=v*Math.sin(th)}s.phase='flight'}}
+    else if(s.phase==='flight'){const sub=6,h=dt/sub;
+      for(const c of s.cars){if(c.landed)continue;for(let k=0;k<sub;k++){const sp=Math.hypot(c.vx,c.vy);const kd=s.air?.03:0;c.vx+=-(kd/c.m)*sp*c.vx*h;c.vy+=(-G-(kd/c.m)*sp*c.vy)*h;c.px+=c.vx*h;c.py+=c.vy*h;if(c.py<=0){c.py=0;s.touch(s,c);break}}
+        c.rot=Math.atan2(c.vy,c.vx);c.tt+=dt;if(c.tt>.035){c.tt=0;c.trail.push([c.px,c.py])}}
+      if(s.cars.every(c=>c.landed))s.land(s)}
+    else if(s.phase==='landed'){s.wait-=dt;for(const c of s.cars)c.rot*=.8;if(s.wait<=0)s.phase='ready'}},
+  touch(s,c){c.landed=true;c.trail.push([c.px,c.py]);const imp=Math.abs(c.vy);if(!Chalk.REDUCE)s.shake=Math.max(s.shake,Math.min(12,imp*.9*(c.m>=5?1.4:1)));s.burst(s,c.px,c.kind==='truck'?22:12,[C.chalk,rgba(C.chalk,.6)],Math.min(6,imp*.4))},
+  land(s){s.phase='landed';s.wait=s.race?1.2:1.4;s.shots++;
+    if(s.race){const tr=s.cars.find(c=>c.kind==='truck'),toy=s.cars.find(c=>c.kind==='toy');const gap=tr.px-toy.px;s.race.gap=gap;s.race.done=true;
+      if(Math.abs(gap)<.05){s.pop(s,'SAME SPOT!',tr.px,5,C.yellow,44);s.burst(s,tr.px,40,[C.yellow,C.pink,C.blue,C.green],7);s.raced=true}
+      else{s.pop(s,(gap>0?'truck':'toy car')+' wins by '+Math.abs(gap).toFixed(1)+' m',Math.max(tr.px,toy.px),4.5,C.blue,30);if(s.race.air)s.racedAir=true}
+      lnReveal(s);return}
+    const c=s.cars[0],x=c.px;const hit=Math.abs(x-s.D)<s.bw/2;s.best=Math.max(s.best,x);s.marks.push({x,hit});if(s.marks.length>8)s.marks.shift();
+    if(s.pred!=null){s.predErr=Math.abs(x-s.pred)/x;s.res=`you predicted ${s.pred.toFixed(1)} m, it landed at ${x.toFixed(1)} m: ${(s.predErr*100).toFixed(0)}% off`}else s.res='';
+    if(hit){s.hits++;s.streak++;if(s.air&&s.m>=3)s.hitAir=true;const words=['HIT!','AGAIN!','THREE!','FOUR!!','UNSTOPPABLE'];s.pop(s,s.streak>1?words[Math.min(s.streak,5)-1]:'HIT!',s.D,3.2,C.green,s.streak>=3?46:38);
+      s.burst(s,s.D,s.streak>=3?46:24,s.streak>=3?[C.yellow,C.pink,C.blue,C.green]:[C.green,C.chalk],s.streak>=3?8:5);
+      s.boxFrom={x:s.D,t:0};s.D=Math.min(27,s.D*1.25+1);s.bw=Math.max(.7,s.bw*.93)}
+    else{s.streak=0;const off=x-s.D;s.pop(s,(off<0?'short by ':'over by ')+Math.abs(off).toFixed(1)+' m',x,2.4,C.chalk,22)}},
   draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const P=s.ppm(s),gy=h*.82;const X=x=>x*P,Y=y=>gy-y*P;
-    poly(ctx,[[0,gy],[w,gy]],C.chalk,2,.6);for(let m=0;m<=30;m+=5)text(ctx,m+' m',X(m),gy+16,{size:12,alpha:.5});
+    ctx.save();if(s.shake>0)ctx.translate((Math.random()-.5)*s.shake,(Math.random()-.5)*s.shake);
+    poly(ctx,[[0,gy],[w,gy]],C.chalk,2,.6);const tk=s.view>22?5:2;for(let m=0;m<=s.view;m+=tk)text(ctx,m+' m',m?X(m):2,gy+16,{size:12,alpha:.45,align:m?'center':'left'});
+    // landing marks: every experiment stays on the board
+    for(const k of s.marks){const mx=X(k.x);ctx.save();ctx.globalAlpha=.55;ctx.strokeStyle=k.hit?C.green:C.chalk;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mx-5,gy-5);ctx.lineTo(mx+5,gy+5);ctx.moveTo(mx+5,gy-5);ctx.lineTo(mx-5,gy+5);ctx.stroke();ctx.restore()}
     const L=s.lip(s);const ramp=[[X(1),Y(s.hr)],[X(3),Y(1)],[X(L.x),Y(L.y)]];poly(ctx,[[X(1),gy],[X(1),Y(s.hr)]],C.chalk,2,.4);poly(ctx,ramp,C.yellow,4,.9);poly(ctx,[[X(3),Y(1)],[X(3),gy]],C.chalk,2,.4);
     text(ctx,`${s.hr.toFixed(1)} m`,X(1)-6,Y(s.hr/2),{size:14,align:'right',alpha:.7});
-    box(ctx,X(s.D-s.bw/2),gy-8,s.bw*P,12,rgba(C.green,.3),C.green,2,2);text(ctx,`${s.D.toFixed(1)} m`,X(s.D),gy+32,{size:15,color:C.green});
-    if(at('hs')&&s.phase==='ready'){const pr=s.predict(s);ctx.save();ctx.setLineDash([3,6]);poly(ctx,pr.pts.map(p=>[X(p[0]),Y(p[1])]),C.chalk,1.2,.5);ctx.restore()}
-    if(s.trail.length)poly(ctx,s.trail.map(p=>[X(p[0]),Y(p[1])]),C.blue,2,.8);
-    let cx,cy;if(s.phase==='ramp'){const t=s.sp;const a=[1,s.hr],b=[3,1],c=[L.x,L.y];const seg1=Math.hypot(2,s.hr-1),seg2=Math.hypot(1,L.y-1);const tot=seg1+seg2;const d=t*tot;if(d<seg1){const u=d/seg1;cx=a[0]+(b[0]-a[0])*u;cy=a[1]+(b[1]-a[1])*u}else{const u=(d-seg1)/seg2;cx=b[0]+(c[0]-b[0])*u;cy=b[1]+(c[1]-b[1])*u}}else if(s.phase==='flight'||s.phase==='landed'){cx=s.px;cy=s.py}else{cx=1;cy=s.hr}
-    car(ctx,X(cx),Y(cy)-2,26,15,C.pink);
-    const v=s.v0(s),pr=s.predict(s);
-    const lines=[`streak ${s.streak}   hits ${s.hits}   best ${s.best.toFixed(1)} m`];if(s.res)lines.push(s.res);
-    if(at('g8'))lines.push(`speed at the lip ≈ ${v.toFixed(1)} m/s${s.air?'':'   (mass does nothing without air)'}`);if(at('hs'))lines.push(`v = √(2g·Δh) = ${v.toFixed(2)} m/s;  no-drag range ${pr.range.toFixed(1)} m, flight ${pr.t.toFixed(2)} s`);if(at('col')&&s.air)lines.push(`drag on: a = −(k/m)|v|v with k = 0.03 kg/m, m = ${s.m} kg`);readout(ctx,lines,16,12,{size:12})}
+    // target box (slides to its new spot after a hit)
+    if(!s.race){let bx=s.D;if(s.boxFrom){const u=s.boxFrom.t,e=1-Math.pow(1-u,3);bx=s.boxFrom.x+(s.D-s.boxFrom.x)*e}const lift=s.boxFrom?Math.sin(s.boxFrom.t*Math.PI)*1.4:0;
+      box(ctx,X(bx-s.bw/2),gy-8-lift*P,s.bw*P,12,rgba(C.green,.3),C.green,2,2);if(!s.boxFrom)text(ctx,`${s.D.toFixed(1)} m`,X(bx),gy+32,{size:15,color:C.green})}
+    if(at('hs')&&s.phase==='ready'&&!s.race){const pr=s.predict(s);ctx.save();ctx.setLineDash([3,6]);poly(ctx,pr.pts.map(p=>[X(p[0]),Y(p[1])]),C.chalk,1.2,.5);ctx.restore()}
+    // chalk-dot trails: the last shot fades, the current one is bright
+    const dots=(tr,color,a)=>{ctx.save();ctx.fillStyle=color;ctx.globalAlpha=a;for(const p of tr){ctx.beginPath();ctx.arc(X(p[0]),Y(p[1]),2,0,Math.PI*2);ctx.fill()}ctx.restore()};
+    for(const g of s.ghosts)dots(g.trail,g.color,.22);for(const c of s.cars)dots(c.trail,c.color,.85);
+    // cars
+    const k=clamp(P/20,1,2.4);const drawCar=(c,cx,cy,rot)=>{ctx.save();ctx.translate(X(cx),Y(cy)-2);ctx.rotate(-rot);car(ctx,0,0,c.w*k,c.h*k,c.color);ctx.restore();if(s.race&&c.label){const up=c.kind==='truck';text(ctx,c.label,X(cx),up?Y(cy)-c.h*k-16:gy+36,{size:14,color:c.color,alpha:.9})}};
+    const rampAt=t=>{const a=[1,s.hr],b=[3,1],c=[L.x,L.y];const seg1=Math.hypot(2,s.hr-1),seg2=Math.hypot(1,L.y-1),d=Math.min(1,t)*(seg1+seg2);if(d<seg1){const u=d/seg1;return[a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,Math.atan2(b[1]-a[1],b[0]-a[0])]}const u=(d-seg1)/seg2;return[b[0]+(c[0]-b[0])*u,b[1]+(c[1]-b[1])*u,Math.atan2(c[1]-b[1],c[0]-b[0])]};
+    const order=s.phase==='ready'&&!s.race?[LN_CARS.one]:[...s.cars].sort((a,b)=>b.w-a.w);
+    for(const c of order){if(s.phase==='ramp'){const r=rampAt(c.sp);drawCar(c,r[0],r[1],r[2])}else if(s.phase==='flight'||s.phase==='landed'||(s.race&&s.cars.length)){drawCar(c,c.px,c.py,c.landed?c.rot*.3:c.rot)}else drawCar(LN_CARS.one,1,s.hr,0)}
+    if(s.phase==='ready'&&!s.race&&s.shots===0)text(ctx,'tap the car or press Launch',X(1)+20,Y(s.hr)-34,{size:17,color:C.yellow,align:'left',alpha:.6+.3*Math.sin(s.t*3)});
+    // dust and confetti
+    for(const q of s.parts){ctx.save();ctx.globalAlpha=Math.max(0,1-q.age/q.life);ctx.fillStyle=q.color;ctx.beginPath();ctx.arc(X(q.x),Y(q.y),q.r,0,Math.PI*2);ctx.fill();ctx.restore()}
+    ctx.restore();
+    for(const q of s.pops){const u=q.age/1.6,sc=u<.15?.6+u/.15*.55:1.15-Math.min(.15,(u-.15));text(ctx,q.t,clamp(X(q.x),90,w-90),Y(q.y)-u*30,{size:q.size*sc,color:q.color,alpha:u<.7?1:Math.max(0,1-(u-.7)/.3)})}
+    const v=s.v0(s),pr=s.predict(s);const lines=[];
+    if(s.shots&&!s.race)lines.push(`hits ${s.hits}${s.streak>1?'   streak '+s.streak:''}   best ${s.best.toFixed(1)} m`);if(s.res)lines.push(s.res);
+    if(at('g8'))lines.push(`speed at the lip ≈ ${v.toFixed(1)} m/s`);if(at('hs'))lines.push(`v = √(2g·Δh) = ${v.toFixed(2)} m/s;  no-drag range ${pr.range.toFixed(1)} m, flight ${pr.t.toFixed(2)} s`);if(at('col')&&s.air)lines.push(`drag on: a = −(k/m)|v|v with k = 0.03 kg/m`);
+    if(lines.length)readout(ctx,lines,16,12,{size:12})}
 });
-hook('ln-go',()=>ln&&ln.go(ln));hook('ln-newt',()=>ln&&ln.newTarget(ln));slide('ln-h',v=>{if(ln)ln.hr=v},v=>v.toFixed(1)+' m');slide('ln-a',v=>{if(ln)ln.ang=v},v=>v+'°');slide('ln-m',v=>{if(ln)ln.m=v},v=>v.toFixed(1)+' kg');slide('ln-mu',v=>{if(ln)ln.mu=v},v=>v.toFixed(2));toggle('ln-air',()=>ln.air,v=>{ln.air=v},v=>'Air: '+(v?'on':'off'));
+function lnReveal(s){const out=$('ln-reveal');if(!out||!s.race)return;const r=s.race,same=Math.abs(r.gap)<.05;const lv=Chalk.level();let head,body,next='';
+  if(!r.air&&same){head=r.pick==='same'?'You called it. They land on the same spot.':r.pick==='truck'?'Same spot. Most people bet on the truck.':'Same spot. Being light does not help either.';
+    body=lv==='k5'?'Gravity pulls the truck much harder. But the truck is also much harder to get moving. The two cancel out exactly, so the truck and the toy car fly together.':lv==='g8'?'Gravity pulls 25 times harder on the truck, but the truck has 25 times more mass to speed up. The two cancel exactly. Galileo figured this out rolling balls down ramps four hundred years ago.':'In mgh = ½mv² the mass is on both sides and cancels: v = √(2gh) for any mass. Same launch speed, same g, same path. The only term that would keep m is air drag.';
+    next='Now turn the air on and race them again.'}
+  else if(r.air){head=r.gap>0?`With air on, the truck wins by ${r.gap.toFixed(1)} m.`:'With air on, the toy car wins?';
+    body=lv==='k5'?'Air pushes back on both cars. The toy car is so light that the push slows it way down. That is why a feather floats and a hammer drops. On the Moon there is no air, and when an astronaut dropped a hammer and a feather, they hit the ground together.':'Drag depends on size and speed, not mass, so the same push costs the 0.2 kg toy 25 times more slowing than the 5 kg truck. Turn the air off and the difference vanishes. In 1971 astronaut David Scott dropped a hammer and a feather on the Moon: they landed together.'}
+  else{head='The truck and toy car split up.';body='Something on the ramp is not the same for both. Try again with the air off.'}
+  out.innerHTML=`<b>${head}</b> ${body}${next?` <button class="btn" id="ln-airrace" type="button">Race with air on</button>`:''}`;out.hidden=false;
+  const ar=$('ln-airrace');if(ar)ar.addEventListener('click',()=>{s.air=true;const b=$('ln-air');if(b){b.classList.add('is-on');b.setAttribute('aria-pressed','true');b.textContent='Air: on'}s.startRace(s,'air');lnShow()})}
+document.querySelectorAll('[data-bet]').forEach(b=>b.addEventListener('click',()=>{if(!ln)return;document.querySelectorAll('[data-bet]').forEach(x=>x.classList.toggle('is-on',x===b));const out=$('ln-reveal');if(out){out.hidden=false;out.innerHTML='<b>Bet placed.</b> Watch them go.'}ln.startRace(ln,b.dataset.bet);lnShow()}));
+function lnShow(){const cv=$('cv-launch');if(!cv)return;const r=cv.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)cv.scrollIntoView({behavior:Chalk.REDUCE?'auto':'smooth',block:'center'})}
+hook('ln-go',()=>{if(!ln||ln.phase!=='ready')return;ln.race=null;ln.go(ln)});hook('ln-newt',()=>{if(!ln)return;ln.race=null;ln.newTarget(ln)});slide('ln-h',v=>{if(ln)ln.hr=v},v=>v.toFixed(1)+' m');slide('ln-a',v=>{if(ln)ln.ang=v},v=>v+'°');slide('ln-m',v=>{if(ln)ln.m=v},v=>v.toFixed(1)+' kg');slide('ln-mu',v=>{if(ln)ln.mu=v},v=>v.toFixed(2));toggle('ln-air',()=>ln.air,v=>{ln.air=v},v=>'Air: '+(v?'on':'off'));
 
 /* ---------- CH4: the crash lab ---------- */
 const cr=makeSim('cv-crash',{
@@ -129,7 +187,7 @@ hook('rk-go',()=>rk&&rk.go(rk));slide('rk-fuel',v=>{if(rk){rk.fuel=v;rk.reset(rk
 Chalk.start({key:'launch',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
   l1:()=>ps&&ps.hit,l1b:()=>ps&&ps.hit&&ps.mu<.05,
   l2:()=>fl&&!fl.air&&fl.obj[0].down&&fl.obj[1].down&&Math.abs(fl.obj[0].t-fl.obj[1].t)<.05,l2b:()=>fl&&fl.g===1.62&&fl.obj[0].down,
-  l3:()=>ln&&ln.hits>0,l3b:()=>ln&&ln.streak>=3,l3c:()=>ln&&ln.predErr!=null&&ln.predErr<=.05,l3d:()=>ln&&ln.hitAir,
+  l3:()=>ln&&ln.hits>0,l3b:()=>ln&&ln.streak>=3,l3c:()=>ln&&ln.predErr!=null&&ln.predErr<=.05,l3d:()=>ln&&ln.hitAir,l3r:()=>ln&&ln.raced,l3s:()=>ln&&ln.racedAir,
   l4:()=>cr&&cr.stopped,l4b:()=>cr&&cr.stuckDone,
   l5:()=>cn&&cn.orbited,l5b:()=>cn&&cn.escaped,
   l6:()=>rk&&rk.apex>=1000,l6b:()=>rk&&rk.apex>=3000,l6c:()=>rk&&rk.bestStaged>0&&rk.bestSingle>0&&rk.bestStaged>rk.bestSingle

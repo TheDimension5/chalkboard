@@ -4,6 +4,9 @@ const C={chalk:'#F1ECDF',yellow:'#F6D46B',blue:'#8CC4EE',pink:'#F596A8',green:'#
 const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let LOWPOW=false;try{LOWPOW=localStorage.getItem('chalk:lowpow')==='1'}catch(e){}
 function setLowPow(v){LOWPOW=!!v;try{localStorage.setItem('chalk:lowpow',LOWPOW?'1':'0')}catch(e){}const b=$('lowpow');if(b){b.classList.toggle('is-on',LOWPOW);b.setAttribute('aria-pressed',String(LOWPOW))}document.querySelectorAll('canvas').forEach(c=>c.dispatchEvent(new Event('chalk-resize')))}
+/* explorer by default: quizzes, exit tickets, receipts and certificates only show in classroom mode (?classroom=1, remembered) */
+let CLASSROOM=false;try{const q=new URL(location.href).searchParams.get('classroom');if(q!==null)CLASSROOM=q!=='0';try{if(q!==null)localStorage.setItem('chalk:classroom',CLASSROOM?'1':'0');else CLASSROOM=localStorage.getItem('chalk:classroom')==='1'}catch(e){}}catch(e){}
+document.documentElement.classList.toggle('classroom',CLASSROOM);
 const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -58,7 +61,7 @@ const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=(
 let DEFS=[],CHECKS={},KEY='chalk',mdone=new Set();
 const mApplies=m=>m.lv.includes(LEVEL);
 function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:'';updateCert(all)}
-function updateCert(all){const box=$('cert');if(!box)return;const must=all.filter(m=>!m.try);const ok=must.length>0&&must.every(m=>mdone.has(m.id));box.hidden=!ok;if(ok){const left=all.filter(m=>m.try&&!mdone.has(m.id)).length;box.querySelector('.cert-note').textContent=left?`Every must-do mission at this level is done. ${left} try-your-best mission${left>1?'s':''} still open.`:'Every mission at this level is done.'}}
+function updateCert(all){const box=$('cert');if(!box)return;if(!CLASSROOM){box.hidden=true;return}const must=all.filter(m=>!m.try);const ok=must.length>0&&must.every(m=>mdone.has(m.id));box.hidden=!ok;if(ok){const left=all.filter(m=>m.try&&!mdone.has(m.id)).length;box.querySelector('.cert-note').textContent=left?`Every must-do mission at this level is done. ${left} try-your-best mission${left>1?'s':''} still open.`:'Every mission at this level is done.'}}
 function makeCert(){const box=$('cert');let name='';try{name=localStorage.getItem('chalk:name')||''}catch(e){}name=name||prompt('Name for the certificate?')||'';const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const lines=['THE CHALKBOARD',box.dataset.board,`${LVNAME[LEVEL]} level`,name||'(no name)',`${n} of ${all.length} missions`,new Date().toISOString().slice(0,10)];const code=fnv(lines.join('\n'));const out=box.querySelector('.certout');out.innerHTML=`<p class="c-eyebrow">The Chalkboard certifies that</p><p class="c-name">${name.replace(/</g,'&lt;')||'&nbsp;'}</p><p class="c-what">completed <b>${box.dataset.board}</b> at the ${LVNAME[LEVEL]} level</p><p class="c-meta">${n} of ${all.length} missions · ${lines[5]} · code ${code}</p>`;out.hidden=false;document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},80)}
 function renderMissions(){document.querySelectorAll('.missions').forEach(ul=>{const ms=DEFS.filter(m=>m.ch===ul.dataset.ch&&mApplies(m));ul.hidden=!ms.length;ul.innerHTML='<li class="mh">Mission'+(ms.length>1?'s':'')+'</li>'+ms.map(m=>`<li class="m${mdone.has(m.id)?' done':''}" data-m="${m.id}"><span class="box">✓</span><span>${m.text}</span></li>`).join('')});mcount()}
 function checkMissions(){let changed=false;for(const m of DEFS){if(mdone.has(m.id)||!mApplies(m))continue;let ok=false;try{ok=!!(CHECKS[m.id]&&CHECKS[m.id]())}catch(e){ok=false}
@@ -108,7 +111,7 @@ function wireHandin(){let savedName='';try{savedName=localStorage.getItem('chalk
     box.querySelector('.hi-print').addEventListener('click',()=>{document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},50)})})}
 
 /* ---------- start ---------- */
-function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
+function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||!/^tb\d+$/.test(m.id));CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
   try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();wireHandin();
   try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
   document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
@@ -116,5 +119,5 @@ function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNI
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();

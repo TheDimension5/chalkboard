@@ -192,3 +192,25 @@ html:not([data-level]) .discuss ol.lv-k5,html[data-level="k5"] .discuss ol.lv-k5
 .qa th,.qa td{border:1px solid var(--chalk-line);padding:.4rem .7rem;text-align:left}
 .qa .ok{color:var(--green);font-weight:700}.qa .fail{color:var(--pink);font-weight:700}
 .qa iframe{width:1px;height:1px;opacity:0;position:absolute;left:-9999px}
+/* explorer mode (default) vs classroom mode */
+.levels-btns button small.g{display:none}
+html.classroom .levels-btns button small.g{display:block}html.classroom .levels-btns button small.d{display:none}
+html:not(.classroom) .check,html:not(.classroom) .teach-only,html:not(.classroom) .mcount,html:not(.classroom) #cert,html:not(.classroom) .lesson-end.no-holes{display:none!important}
+html:not(.classroom) .lesson-end{border:0;padding:.2rem 0 0}
+.holes{font-size:.95rem;color:var(--chalk-dim)}
+.holes b{display:block;color:var(--pink);font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.15rem}
+.holes a{color:var(--yellow)}
+.mode-link .mode-off,html.classroom .mode-link .mode-on{display:none}
+html.classroom .mode-link .mode-off{display:inline}
+.mode-link a{font-size:.9rem;color:var(--chalk-dim)}
+/* place-your-bet moments */
+.bet{margin:0 0 .9rem;padding:.8rem 1rem .9rem;border:2px dashed var(--yellow);border-radius:12px;display:grid;gap:.6rem;background:rgba(246,212,107,.05)}
+.bet-q{margin:0;font-size:1.02rem}
+.bet-q b{display:block;font-family:var(--display);font-size:1.7rem;line-height:1;color:var(--yellow);margin-bottom:.2rem}
+.bet .row{display:flex;flex-wrap:wrap;gap:.5rem}
+.bet [data-bet].is-on{background:var(--yellow);color:var(--board);border-color:var(--yellow)}
+.bet-out{margin:0;font-size:1rem;animation:betin .35s ease-out}
+.bet-out b{color:var(--yellow)}
+.bet-out .btn{margin-top:.6rem;display:table}
+@keyframes betin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.bet-out{animation:none}}

@@ -23,19 +23,21 @@ UNITS_OF={}
 for u in UNITS:
     for i,st in enumerate(u['steps']): UNITS_OF.setdefault(st,[]).append((u,i+1))
 def chapter_url(bid,n): return BOARDS[bid]['url']+f'#ch{n}'
+MODE_LINK='<p class="teach mode-link"><a class="mode-on" href="?classroom=1">Teaching a class? Turn on classroom mode</a><a class="mode-off" href="?classroom=0">Classroom mode is on. Turn it off</a></p>'
+LEVELBTNS='''    <span class="levels-label">How deep?</span>
+    <div class="levels-btns" role="tablist">
+      <button role="tab" data-level="k5" aria-selected="true">First look<small class="d">the big idea</small><small class="g">K to 5th</small></button>
+      <button role="tab" data-level="g8" aria-selected="false">Closer<small class="d">how it works</small><small class="g">middle school</small></button>
+      <button role="tab" data-level="hs" aria-selected="false">Deeper<small class="d">with the numbers</small><small class="g">high school</small></button>
+      <button role="tab" data-level="col" aria-selected="false">Deepest<small class="d">the real math</small><small class="g">college</small></button>
+      <button role="tab" data-level="max" aria-selected="false">Max<small class="d">no limits</small><small class="g">no limits</small></button>
+    </div>
+'''
 def levelbar():
     return f'''<nav class="levels" aria-label="Reading level">
   <div class="wrap levels-in">
     <a class="home" href="{BOARDS_URL}">The Chalkboard</a>
-    <span class="levels-label">Who's reading?</span>
-    <div class="levels-btns" role="tablist">
-      <button role="tab" data-level="k5" aria-selected="true">Kids<small>K to 5th</small></button>
-      <button role="tab" data-level="g8" aria-selected="false">8th grade<small>middle school</small></button>
-      <button role="tab" data-level="hs" aria-selected="false">High school<small>physics class</small></button>
-      <button role="tab" data-level="col" aria-selected="false">College<small>major</small></button>
-      <button role="tab" data-level="max" aria-selected="false">Max<small>no limits</small></button>
-    </div>
-    <span class="mcount" id="mcount"></span>
+{LEVELBTNS}    <span class="mcount" id="mcount"></span>
     <button class="lowpow" id="lowpow" type="button" aria-pressed="false" title="Fewer effects for older computers">Low power</button>
   </div>
 </nav>'''
@@ -47,26 +49,28 @@ for bi,band in enumerate(re.findall(r'<section class="band">(.*?)</section>',tg,
         m=re.search(r'<h3>(\d+) ·',chap); qs=re.findall(r'<li>(.*?)</li>',re.search(r'<ol class="qs">(.*?)</ol>',chap,re.S).group(1)) if '<ol class="qs">' in chap else None
         if m and qs: EIN_DISCUSS.setdefault(int(m.group(1)),{})[bi]=qs
 def warmup(bid,n):
-    L=LESSON[(bid,n)]; return f'<p class="warmup"><b>Warm-up</b>{L["warm"]}</p>'
+    L=LESSON[(bid,n)]; return f'<p class="warmup"><b>Wonder</b>{L["warm"]}</p>'
 def lesson_end(bid,n):
     L=LESSON[(bid,n)]
     if L['discuss'] is None:
         d=EIN_DISCUSS.get(n,{});ol=''.join(f'<ol class="lv lv-{l}">'+''.join(f'<li>{q}</li>' for q in d.get(BAND[l],[]))+'</ol>' for l in LV)
     else: ol='<ol>'+''.join(f'<li>{q}</li>' for q in L['discuss'])+'</ol>'
     before=[a for a,b in EDGES if b==(bid,n)]; after=[b for a,b in EDGES if a==(bid,n)]
-    links=[]
-    if before: links.append('Before this: '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]} {x[1]}, {TITLES[x]}</a>' for x in before))
-    if after: links.append('After this: '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]} {x[1]}, {TITLES[x]}</a>' for x in after))
     badges=''.join(f'<span class="unitbadge">{u["title"]} · step {i}</span>' for u,i in UNITS_OF.get((bid,n),[]))
     std=STD.get((bid,n))
-    return f'''<div class="lesson-end">
+    holes=[]
+    if before: holes.append('Comes from '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]}: {TITLES[x]}</a>' for x in before))
+    if after: holes.append('Leads to '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]}: {TITLES[x]}</a>' for x in after))
+    return f'''<div class="lesson-end{'' if holes else ' no-holes'}">
+      {('<p class="holes"><b>Rabbit holes</b>'+' · '.join(holes)+'</p>') if holes else ''}
+      <div class="teach-only">
       <p class="skill"><b>You can now:</b> {L["skill"]}.</p>
       <details class="discuss"><summary>Discuss</summary>{ol}</details>
       <p class="exit"><b>Exit ticket</b> {L["exit"]}</p>
-      {('<p class="links">'+' · '.join(links)+'</p>') if links else ''}
       {('<p class="links">'+badges+'</p>') if badges else ''}
       {('<p class="links std"><b>Standards</b> '+std+'</p>') if std else ''}
       <div class="handin" data-ch="ch{n}" data-board="{_h.escape(BOARDS[bid]['title'],True)}" data-title="{_h.escape(TITLES[(bid,n)],True)}"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
+      </div>
     </div>'''
 def checkbox_numeric(P,n):
     CK=P.CHECK; opts='<option value="">unit…</option>'+''.join(f'<option value="{u}">{nm}</option>' for u,nm in P.UNITS); parts=[]
@@ -152,6 +156,7 @@ def build_page(mod,sims):
   <p class="big" style="margin-left:auto;margin-right:auto">{P.CLOSING[0]}</p>
   <div class="cert" id="cert" hidden data-board="{_h.escape(BOARDS[bid]["title"],True)}"><p class="mh">Certificate</p><p class="cert-note"></p><button class="btn primary" id="cert-go" type="button">Print my certificate</button><div class="certout" hidden></div></div>
   <p class="teach"><a href="{BOARDS_URL}">More boards at The Chalkboard</a></p>
+  {MODE_LINK}
 </footer>
 </div>
 <div class="tray" aria-hidden="true"></div>
@@ -204,6 +209,9 @@ Chalk.start({key:'einstein',missions:MISSION_DEFS,checks:Object.assign(MCHECK,{'
     h=h.replace('</style>',open('extra.css',encoding='utf-8').read()+'</style>',1)
     h=h.replace('<a class="home" href="https://thedimension5.github.io/chalkboard/">','<a class="home" href="'+BOARDS_URL+'">',1)
     h=h.replace('https://thedimension5.github.io/one-rule-for-everything/teachers.html',HUB+'einstein/teachers.html')
+    a1=h.index('    <span class="levels-label">');a2=h.index('    <span class="mcount" id="mcount"></span>')
+    h=h[:a1]+LEVELBTNS+h[a2:]
+    h=h.replace('</footer>','  '+MODE_LINK+'\n</footer>',1)
     h=h.replace('<p class="teach">','<div class=\"cert\" id=\"cert\" hidden data-board=\"One Rule for Everything\"><p class=\"mh\">Certificate</p><p class=\"cert-note\"></p><button class=\"btn primary\" id=\"cert-go\" type=\"button\">Print my certificate</button><div class=\"certout\" hidden></div></div><p class="teach">',1)
     return h,defs
 # ================= build =================
@@ -251,7 +259,7 @@ def card(b,meta,svg,badge=''):
     B=BOARDS[b];bd=f'<span class="badge">{badge}</span>' if badge else '';return f'<a class="card" href="{B["url"]}">{bd}<span class="subj">{B["subject"]}</span>{svg}<h2>{B["title"]}</h2><p>{meta[0]}</p><span class="meta">{meta[1]}</span><span class="go">Open the board →</span></a>'
 ICONS=json.load(open('icons.json',encoding='utf-8'))
 cards_html='\n'.join([
- card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 21 missions"),ICONS['launch'],'Good first board'),
+ card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 23 missions"),ICONS['launch'],'Good first board'),
  card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 30 missions"),ICONS['heat']),
  card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 23 missions"),ICONS['elec']),
  card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 31 missions"),ICONS['phys']),
