@@ -13,7 +13,7 @@ FONTS='<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="p
 SPEAKER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>'
 READ=f'<button class="btn read" data-lv="k5 g8" type="button">{SPEAKER}<span>Read to me</span></button>'
 STD={}
-SKILL={'launch':{'l1','l1b','l3','l3b','l3c','l3d','l5','l5b'},'heat':{'ht3','ht6','bo1','bo2','bo3','bo4','bo5'},'einstein':{'ch2a','ch2b','ch2c','ch2d','ch6c','ch7a','ch7b','ch9c','ch10a','ch10c'},'electricity':set(),'infinity':set(),'history':set(),'life':{'lf2d','lf4d','lf4e','lf5d','lf6c'},'scale':{'sc1e','sc2g'},'time':{'t1d','t2c'}}
+SKILL={'launch':{'l1','l1b','l3','l3b','l3c','l3d','l5','l5b'},'heat':{'ht3','ht6','bo1','bo2','bo3','bo4','bo5'},'einstein':{'ch2a','ch2b','ch2c','ch2d','ch6c','ch7a','ch7b','ch9c','ch10a','ch10c'},'electricity':set(),'infinity':set(),'history':set(),'life':{'lf2d','lf4d','lf4e','lf5d','lf6c'},'scale':{'sc1e','sc2g'},'time':{'p1d','p2e'}}
 EIN_STD={1:"3-PS2-3, 5-PS2-1, MS-PS2-3, MS-PS2-4",2:"5-PS2-1, MS-PS2-4, HS-PS2-4",3:"3-PS2-3, MS-PS2-5, HS-PS2-5",4:"MS-PS2-5, HS-PS2-4",5:"HS-PS2-4",6:"HS-PS2-4",7:"HS-PS2-4",8:"MS-PS2-4, HS-PS1-8",9:"HS-ETS1-1",10:"MS-PS2-4, HS-PS2-4"}
 for n,v in EIN_STD.items(): STD[('einstein',n)]=v
 CARDS={'boards':[]}
@@ -269,7 +269,7 @@ cards_html='\n'.join([
  card('history',("How the past reaches us, from scribes and dead scripts to bit rot.","6 chapters · 19 missions"),ICONS['hist']),
  card('life',("Copy a recipe, hunt moths as the bird, flip peas, race germs, then rebuild the tree of life.","6 chapters · 30 missions"),ICONS['life'],'New'),
  card('scale',("Telescope and microscope in one eyepiece: from the edge of the universe to the Planck length.","2 chapters · 15 missions"),ICONS['scale'],'New'),
- card('time',("Slow motion and time-lapse in one stopwatch: from trillions of years down to the Planck time.","2 chapters · 13 missions"),ICONS['time'],'New')])
+ card('time',("Everything has a heartbeat. Dive inside yours, or rise to the tide, the seasons and the galaxy.","2 chapters · 12 missions"),ICONS['time'],'New')])
 units_html=''.join(f'''<div class="unit" data-unit="{u["id"]}"><h3>{u["title"]}</h3><p>{u["blurb"]}</p><ol>'''+''.join(f'<li><a href="{chapter_url(*st)}">{TITLES[st]}</a> <small>{BOARDS[st[0]]["title"]}, chapter {st[1]}</small></li>' for st in u['steps'])+'</ol></div>' for u in UNITS)
 qlist=''.join(f'<li><a href="{chapter_url(b,n)}">{LESSON[(b,n)]["warm"]}</a><small>{BOARDS[b]["title"]} {n}</small></li>' for (b,n) in sorted(LESSON,key=lambda k:(list(BOARDS).index(k[0]),k[1])))
 grade='<div class="grade"><span class="lbl">Who\'s reading?</span><button class="btn" data-glevel="k5">Kids</button><button class="btn" data-glevel="g8">8th grade</button><button class="btn" data-glevel="hs">High school</button><button class="btn" data-glevel="col">College</button><button class="btn" data-glevel="max">Max</button><span class="hint" id="gnote"></span></div>'
