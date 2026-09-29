@@ -98,9 +98,9 @@ CHECK={
     'max':("Two stages of mass ratio e each versus one stage of ratio e², same v_e. Ratio of the Δv's?",1,'n',.02,"ln adds: 1 + 1 = 2.","Right. Equal in the ideal case; staging wins only because real tanks have mass.")},
 }
 FIG={
- 1:'''<div class="panel"><canvas id="cv-push" aria-label="A car on a floor with a target box. Press and hold behind the car to push it, in front to pull it."></canvas></div>
-    <div class="controls"><label class="slider">Push strength <input type="range" id="ps-f" min="10" max="300" step="10" value="80"><span class="val" id="ps-f-val">80 N</span></label><label class="slider">Car mass <input type="range" id="ps-m" min="1" max="20" step="1" value="5"><span class="val" id="ps-m-val">5 kg</span></label><label class="slider">Floor roughness <input type="range" id="ps-mu" min="0.02" max="0.6" step="0.02" value="0.2"><span class="val" id="ps-mu-val">0.20</span></label><button class="btn" id="ps-reset">New box</button></div>
-    <figcaption><b>Try this:</b> press and hold on the floor: the car is pushed away from where you press. Stop it inside the box. Then make the floor icy and try again.</figcaption>''',
+ 1:'''<div class="panel"><canvas id="cv-push" aria-label="A street of pavement, grass, sand and ice. A kid pushes a car toward a parking box; use the arrow buttons or keys to push and let go to coast."></canvas></div>
+    <details class="bench"><summary>Tinker</summary><div class="controls"><label class="slider">How hard the kid pushes <input type="range" id="ps-f" min="20" max="150" step="5" value="50"><span class="val" id="ps-f-val">50 N</span></label></div></details>
+    <figcaption><b>Try this:</b> park in the box. Then find some ice and try to park on it. Load two crates and see where the kid can still push and where the car will not budge.</figcaption>''',
  2:'''<div class="panel"><canvas id="cv-fall" aria-label="A hammer and a feather dropped from a tower, with air on or off, on a chosen world."></canvas></div>
     <div class="controls"><button class="btn primary" id="fl-drop">Drop</button><button class="btn is-on" id="fl-air" aria-pressed="true">Air: on</button><span class="lbl">World</span><button class="btn is-on" data-g="9.8">Earth</button><button class="btn" data-g="1.62">Moon</button><button class="btn" data-g="3.71">Mars</button><button class="btn" data-g="24.8">Jupiter</button></div>
     <figcaption><b>Try this:</b> drop them with air, then without. Then change worlds and watch the fall times.</figcaption>''',
@@ -120,8 +120,9 @@ FIG={
 }
 ALL=['k5','g8','hs','col','max']
 MISSIONS=[
- ('l1','ch1',ALL,"Stop the car inside the box."),
- ('l1b','ch1',['g8','hs','col','max'],"Make the floor icy (roughness under 0.05) and stop it in the box anyway."),
+ ('l1','ch1',ALL,"Park the car in the box."),
+ ('l1b','ch1',['g8','hs','col','max'],"Park in a box that sits on ice."),
+ ('l1c','ch1',['k5','g8','hs','col','max'],"Park three in a row without sliding past a box."),
  ('l2','ch2',ALL,"Turn the air off and drop both: they land together."),
  ('l2b','ch2',['g8','hs','col','max'],"Drop on the Moon and read the fall time."),
  ('l3','ch3',ALL,"Hit the target."),

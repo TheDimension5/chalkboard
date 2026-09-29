@@ -390,6 +390,39 @@ html.classroom .mode-link .mode-off{display:inline}
 .bet-out .btn{margin-top:.6rem;display:table}
 @keyframes betin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.bet-out{animation:none}}
+
+/* game pad */
+.pad{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.8rem 1rem;margin:.1rem 0 .3rem;padding:.9rem 1.1rem;border:2px solid var(--chalk-faint);border-radius:18px 18px 40px 18px;background:linear-gradient(180deg,rgba(241,236,223,.06),rgba(241,236,223,.02));user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pad button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pad button:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.pad-d{position:relative;width:126px;height:126px}
+.pad-d .pk,.pad-hub{position:absolute;width:42px;height:42px;background:#101c17;border:2px solid var(--chalk-dim);padding:0}
+.pad-hub{left:42px;top:42px;border:0;border-radius:4px}
+.pk-up{left:42px;top:0;border-bottom:0!important;border-radius:9px 9px 0 0}.pk-down{left:42px;bottom:0;border-top:0!important;border-radius:0 0 9px 9px}
+.pk-left{left:0;top:42px;border-right:0!important;border-radius:9px 0 0 9px}.pk-right{right:0;top:42px;border-left:0!important;border-radius:0 9px 9px 0}
+.pad-d .pk::after{content:"";position:absolute;left:50%;top:50%;border:8px solid transparent;transform:translate(-50%,-50%)}
+.pk-up::after{border-bottom-color:var(--chalk)!important;margin-top:-4px}.pk-down::after{border-top-color:var(--chalk)!important;margin-top:4px}
+.pk-left::after{border-right-color:var(--chalk)!important;margin-left:-4px}.pk-right::after{border-left-color:var(--chalk)!important;margin-left:4px}
+.pad-d .pk.on{background:var(--yellow)}.pad-d .pk.on::after{filter:brightness(0)}
+.pad-d .pk:disabled{opacity:.28;cursor:default}
+.pad-mid{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.pk-wrap{display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.pk-wrap small{font-size:.66rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim);white-space:nowrap}
+.pk-s{font:900 .6rem/1 var(--body);letter-spacing:.16em;color:var(--chalk-dim);background:#101c17;border:2px solid var(--chalk-faint);border-radius:999px;padding:.45rem .85rem;transform:rotate(-20deg)}
+.pk-s.on{background:var(--chalk-dim);color:var(--board)}.pk-s:disabled{opacity:.3;cursor:default}
+.pad-ab{display:flex;gap:1rem;align-items:flex-end}
+.pad-ab .pk-wrap:first-child{margin-bottom:-.4rem}.pad-ab .pk-wrap:last-child{margin-bottom:1.2rem}
+.pk-r{width:58px;height:58px;border-radius:50%;border:0;font:700 1.7rem/1 var(--display);color:var(--board);box-shadow:0 5px 0 rgba(0,0,0,.4);transition:transform .05s,box-shadow .05s}
+.pk-a{background:var(--pink)}.pk-b{background:var(--blue)}
+.pk-r.on{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.4)}.pk-r:disabled{opacity:.3;cursor:default}
+.pad-help{grid-column:1/-1;margin:0;font-size:.85rem;color:var(--chalk-dim);text-align:center}
+.pad-help kbd{font:700 .75rem var(--body);border:1px solid var(--chalk-faint);border-radius:4px;padding:.05rem .35rem;color:var(--chalk)}
+@media (max-width:520px){.pad{gap:.6rem .5rem;padding:.8rem .7rem}.pad-d{width:114px;height:114px}.pad-d .pk,.pad-hub{width:38px;height:38px}.pad-hub{left:38px;top:38px}.pk-up,.pk-down{left:38px}.pk-left,.pk-right{top:38px}.pk-r{width:54px;height:54px}.pad-mid{flex-direction:column;gap:.9rem}.pad-help .keys{display:none}}
+@media (hover:none){.pad-help .keys{display:none}}
+/* tinker drawer: sliders live here, closed by default */
+details.bench{border:2px dashed var(--chalk-faint);border-radius:10px;padding:.4rem .9rem}
+details.bench>summary{cursor:pointer;font-weight:900;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);padding:.3rem 0}
+details.bench[open]>summary{margin-bottom:.5rem}
 </style>
 </head>
 <body>
@@ -436,9 +469,9 @@ html.classroom .mode-link .mode-off{display:inline}
     <details class="grownups lv lv-k5 lv-g8"><summary>For grown-ups</summary><p>The mistake almost everyone makes: thinking motion needs a force. It does not; changing motion does. A push that ends does not stop the car; friction does.</p></details>
   </div>
   <figure class="lab">
-    <div class="panel"><canvas id="cv-push" aria-label="A car on a floor with a target box. Press and hold behind the car to push it, in front to pull it."></canvas></div>
-    <div class="controls"><label class="slider">Push strength <input type="range" id="ps-f" min="10" max="300" step="10" value="80"><span class="val" id="ps-f-val">80 N</span></label><label class="slider">Car mass <input type="range" id="ps-m" min="1" max="20" step="1" value="5"><span class="val" id="ps-m-val">5 kg</span></label><label class="slider">Floor roughness <input type="range" id="ps-mu" min="0.02" max="0.6" step="0.02" value="0.2"><span class="val" id="ps-mu-val">0.20</span></label><button class="btn" id="ps-reset">New box</button></div>
-    <figcaption><b>Try this:</b> press and hold on the floor: the car is pushed away from where you press. Stop it inside the box. Then make the floor icy and try again.</figcaption>
+    <div class="panel"><canvas id="cv-push" aria-label="A street of pavement, grass, sand and ice. A kid pushes a car toward a parking box; use the arrow buttons or keys to push and let go to coast."></canvas></div>
+    <details class="bench"><summary>Tinker</summary><div class="controls"><label class="slider">How hard the kid pushes <input type="range" id="ps-f" min="20" max="150" step="5" value="50"><span class="val" id="ps-f-val">50 N</span></label></div></details>
+    <figcaption><b>Try this:</b> park in the box. Then find some ice and try to park on it. Load two crates and see where the kid can still push and where the car will not budge.</figcaption>
     <ul class="missions" data-ch="ch1"></ul>
     <div class="check" data-ch="ch1"><p class="mh">Teach it back</p><div class="lv lv-k5"><p class="q">You push a wagon with 20 newtons and your friend pulls it the same way with 10 newtons. Total push?</p><form class="cf" data-a="30" data-u="N" data-tol="0.02" data-hint="Pushes in the same direction add." data-ok="Right. 30 N."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-g8"><p class="q">A 2 kg cart gets a net push of 6 N. How fast does its speed change each second?</p><form class="cf" data-a="3" data-u="m/s²" data-tol="0.02" data-hint="Acceleration = force ÷ mass." data-ok="Right. 3 m/s², every second."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-hs"><p class="q">A 4 kg cart slides on a floor with μ = 0.25. How big is the friction force? (g = 9.8)</p><form class="cf" data-a="9.8" data-u="N" data-tol="0.03" data-hint="f = μ m g." data-ok="Right. 0.25 × 4 × 9.8 = 9.8 N."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-col"><p class="q">A cart at 6 m/s slides to a stop on μ = 0.3. Stopping distance? (g = 9.8)</p><form class="cf" data-a="6.12" data-u="m" data-tol="0.04" data-hint="d = v²/(2μg)." data-ok="Right. 36 ÷ (2 × 0.3 × 9.8) ≈ 6.1 m, for any mass."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><div class="lv lv-max"><p class="q">On a train at a steady 30 m/s, a 2 kg cart is pushed with 10 N. Its acceleration relative to the train?</p><form class="cf" data-a="5" data-u="m/s²" data-tol="0.02" data-hint="Galilean invariance: the train&#x27;s speed does not enter." data-ok="Right. 5 m/s², same as on the ground."><input type="number" step="any" inputmode="decimal" placeholder="number" required aria-label="your answer"><select aria-label="unit"><option value="">unit…</option><option value="m">metres</option><option value="cm">centimetres</option><option value="km">kilometres</option><option value="s">seconds</option><option value="min">minutes</option><option value="m/s">metres per second</option><option value="km/s">kilometres per second</option><option value="m/s²">metres per second squared</option><option value="N">newtons</option><option value="kg">kilograms</option><option value="kg·m/s">kilogram-metres per second</option><option value="J">joules</option><option value="n">a plain number</option></select><button class="btn" type="submit">Check</button></form></div><p class="fb" aria-live="polite"></p></div>
     <div class="lesson-end no-holes">
@@ -736,6 +769,31 @@ function wireHandin(){let savedName='';try{savedName=localStorage.getItem('chalk
     box.querySelector('.hi-copy').addEventListener('click',async()=>{const t=out.textContent;try{await navigator.clipboard.writeText(t);box.querySelector('.hi-copy').textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents(out);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);box.querySelector('.hi-copy').textContent='Selected: press copy'}setTimeout(()=>box.querySelector('.hi-copy').textContent='Copy',1800)});
     box.querySelector('.hi-print').addEventListener('click',()=>{document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},50)})})}
 
+/* ---------- game pad: d-pad, A/B, SELECT (sound), START; keyboard and touch ---------- */
+const PADS=[];let AC=null,SOUND=null;
+function sndOn(){if(SOUND===null){let v=null;try{v=localStorage.getItem('chalk:sound')}catch(e){}SOUND=v===null?!CLASSROOM:v==='1'}return SOUND}
+function setSound(v){SOUND=!!v;try{localStorage.setItem('chalk:sound',SOUND?'1':'0')}catch(e){}PADS.forEach(p=>p.syncSound())}
+const SFX={blip:[[660,.05]],push:[[196,.05],[247,.05]],thud:[[110,.12,'triangle']],park:[[523,.08],[659,.08],[784,.08],[1047,.18]],tick:[[988,.03]],no:[[180,.09],[150,.12]],big:[[392,.08],[523,.08],[659,.08],[784,.08],[1047,.08],[1319,.22]]};
+function sfx(kind){if(!sndOn())return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();let at=AC.currentTime+.01;for(const [f,d,type] of (SFX[kind]||SFX.blip)){const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.value=f;g.gain.setValueAtTime(.05,at);g.gain.exponentialRampToValueAtTime(.0001,at+d);o.connect(g);g.connect(AC.destination);o.start(at);o.stop(at+d+.02);at+=d*.9}}catch(e){}}
+function pad(s,o){if(!s||!s.cv)return null;const panel=s.cv.closest('.panel');if(!panel)return null;const L=o.labels||{},has=k=>k in L;
+  const el=document.createElement('div');el.className='pad';el.setAttribute('role','group');el.setAttribute('aria-label','game controls');
+  el.innerHTML=`<div class="pad-d">${['up','left','right','down'].map(k=>`<button type="button" class="pk pk-${k}" data-k="${k}"${has(k)?'':' disabled'} aria-label="${L[k]||k}"></button>`).join('')}<span class="pad-hub"></span></div>`+
+   `<div class="pad-mid"><span class="pk-wrap"><button type="button" class="pk-s" data-k="select" aria-label="sound on or off">SELECT</button><small class="pad-snd"></small></span><span class="pk-wrap"><button type="button" class="pk-s" data-k="start"${has('start')?'':' disabled'} aria-label="${L.start||'start'}">START</button><small>${L.start||''}</small></span></div>`+
+   `<div class="pad-ab">${['b','a'].map(k=>`<span class="pk-wrap"><button type="button" class="pk-r pk-${k}" data-k="${k}"${has(k)?'':' disabled'} aria-label="${L[k]||k}">${k.toUpperCase()}</button><small>${L[k]||''}</small></span>`).join('')}</div>`+
+   (o.help?`<p class="pad-help">${o.help}</p>`:'');
+  panel.after(el);const held=new Set();
+  const api={s,el,held,has:k=>k==='select'||has(k),
+    press(k,down){if(down){if(held.has(k))return;held.add(k)}else{if(!held.has(k))return;held.delete(k)}const b=el.querySelector(`[data-k="${k}"]`);if(b)b.classList.toggle('on',down);if(k==='select'){if(down){setSound(!sndOn());sfx('blip')}return}o.on&&o.on(k,down)},
+    syncSound(){el.querySelector('.pad-snd').textContent=sndOn()?'sound on':'sound off'}};
+  el.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',e=>{if(b.disabled)return;e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}api.press(k,true)});const up=()=>api.press(k,false);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);b.addEventListener('contextmenu',e=>e.preventDefault());
+    b.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();e.stopPropagation();api.press(k,true)}});b.addEventListener('keyup',e=>{if(e.key==='Enter'||e.key===' '){e.stopPropagation();api.press(k,false)}})});
+  api.syncSound();PADS.push(api);return api}
+const PADKEYS={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',KeyA:'left',KeyD:'right',KeyW:'up',KeyS:'down',KeyZ:'a',Space:'a',KeyX:'b',Enter:'start'};
+function activePad(){let best=null,bd=1e9;for(const p of PADS){const r=p.s.cv.getBoundingClientRect();if(r.bottom<80||r.top>innerHeight-80)continue;const d=Math.abs((r.top+r.bottom)/2-innerHeight/2);if(d<bd){bd=d;best=p}}return best}
+addEventListener('keydown',e=>{const t=e.target;if(t&&t.closest&&t.closest('input,textarea,select,button,a,summary,[contenteditable]'))return;if(e.metaKey||e.ctrlKey||e.altKey)return;const k=PADKEYS[e.code];if(!k)return;const p=activePad();if(!p||!p.has(k))return;e.preventDefault();if(!e.repeat)p.press(k,true)});
+addEventListener('keyup',e=>{const k=PADKEYS[e.code];if(k)PADS.forEach(p=>p.press(k,false))});
+addEventListener('blur',()=>PADS.forEach(p=>[...p.held].forEach(k=>p.press(k,false))));
+
 /* ---------- place-your-bet moments ---------- */
 function bet(id,o){const root=$(id);if(!root)return null;const q=root.querySelector('.bet-q span'),row=root.querySelector('.row'),out=root.querySelector('.bet-out');
   const api={busy:false,onPick:o.pick,say(html){out.innerHTML=html;out.hidden=false},
@@ -755,11 +813,11 @@ function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,bet,flash,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,bet,flash,pad,sfx,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();
 </script>
 <script>
-const MISSION_DEFS=[{"id": "l1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Stop the car inside the box.", "try": true}, {"id": "l1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Make the floor icy (roughness under 0.05) and stop it in the box anyway.", "try": true}, {"id": "l2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Turn the air off and drop both: they land together."}, {"id": "l2b", "ch": "ch2", "lv": ["g8", "hs", "col", "max"], "text": "Drop on the Moon and read the fall time."}, {"id": "l3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Hit the target.", "try": true}, {"id": "l3b", "ch": "ch3", "lv": ["g8", "hs", "col", "max"], "text": "Hit three targets in a row.", "try": true}, {"id": "l3c", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Predict the landing spot within 5% before launching.", "try": true}, {"id": "l3d", "ch": "ch3", "lv": ["col", "max"], "text": "Turn the air on and hit a target with a mass of 3 kg or more.", "try": true}, {"id": "l3r", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Place a bet and race the toy car against the truck."}, {"id": "l3s", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Race them again with the air on."}, {"id": "l4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make the moving cart stop dead."}, {"id": "l4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Make the carts stick and read the shared speed."}, {"id": "l5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Put the cannonball into orbit.", "try": true}, {"id": "l5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Fire it fast enough to escape.", "try": true}, {"id": "l6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Reach 1,000 m."}, {"id": "l6b", "ch": "ch6", "lv": ["g8", "hs", "col", "max"], "text": "Reach 3,000 m."}, {"id": "l6c", "ch": "ch6", "lv": ["hs", "col", "max"], "text": "Stage the rocket and beat your best single-stage altitude."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}];
+const MISSION_DEFS=[{"id": "l1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Park the car in the box.", "try": true}, {"id": "l1b", "ch": "ch1", "lv": ["g8", "hs", "col", "max"], "text": "Park in a box that sits on ice.", "try": true}, {"id": "l1c", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Park three in a row without sliding past a box."}, {"id": "l2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Turn the air off and drop both: they land together."}, {"id": "l2b", "ch": "ch2", "lv": ["g8", "hs", "col", "max"], "text": "Drop on the Moon and read the fall time."}, {"id": "l3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Hit the target.", "try": true}, {"id": "l3b", "ch": "ch3", "lv": ["g8", "hs", "col", "max"], "text": "Hit three targets in a row.", "try": true}, {"id": "l3c", "ch": "ch3", "lv": ["hs", "col", "max"], "text": "Predict the landing spot within 5% before launching.", "try": true}, {"id": "l3d", "ch": "ch3", "lv": ["col", "max"], "text": "Turn the air on and hit a target with a mass of 3 kg or more.", "try": true}, {"id": "l3r", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Place a bet and race the toy car against the truck."}, {"id": "l3s", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Race them again with the air on."}, {"id": "l4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Make the moving cart stop dead."}, {"id": "l4b", "ch": "ch4", "lv": ["g8", "hs", "col", "max"], "text": "Make the carts stick and read the shared speed."}, {"id": "l5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Put the cannonball into orbit.", "try": true}, {"id": "l5b", "ch": "ch5", "lv": ["hs", "col", "max"], "text": "Fire it fast enough to escape.", "try": true}, {"id": "l6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Reach 1,000 m."}, {"id": "l6b", "ch": "ch6", "lv": ["g8", "hs", "col", "max"], "text": "Reach 3,000 m."}, {"id": "l6c", "ch": "ch6", "lv": ["hs", "col", "max"], "text": "Stage the rocket and beat your best single-stage altitude."}, {"id": "tb1", "ch": "ch1", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb2", "ch": "ch2", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb3", "ch": "ch3", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb4", "ch": "ch4", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb5", "ch": "ch5", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}, {"id": "tb6", "ch": "ch6", "lv": ["k5", "g8", "hs", "col", "max"], "text": "Teach it back: answer the check question below with the right unit."}];
 const UNIT_WHY={"m": "metres measure a distance", "cm": "centimetres measure a distance", "km": "kilometres measure a distance", "s": "seconds measure a time", "min": "minutes measure a time", "m/s": "metres per second is a speed", "km/s": "kilometres per second is a speed", "m/s²": "metres per second squared is how fast speed changes", "N": "newtons measure a force, a push or pull", "kg": "kilograms measure mass", "kg·m/s": "kilogram-metres per second is momentum: mass times speed", "J": "joules measure energy", "n": "a ratio, no unit"};
 const {C,rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,makeSim,hook,slide}=Chalk;
 const G=9.8;
@@ -767,26 +825,91 @@ const group=(attr,fn)=>document.querySelectorAll(`[${attr}]`).forEach(b=>b.addEv
 const toggle=(id,get,set,label)=>hook(id,()=>{set(!get());const b=$(id);b.classList.toggle('is-on',get());b.setAttribute('aria-pressed',String(get()));b.textContent=label(get())});
 function car(ctx,x,y,w,h,color){box(ctx,x-w/2,y-h,w,h*.62,color,null,4);box(ctx,x-w*.3,y-h*1.05,w*.55,h*.45,rgba(color,.7),null,3);circle(ctx,x-w*.3,y,h*.28,C.board,C.chalk,2);circle(ctx,x+w*.3,y,h*.28,C.board,C.chalk,2)}
 
-/* ---------- CH1: pushes and pulls ---------- */
+/* ---------- CH1: pushes and pulls: the delivery run ---------- */
+/* An endless street. Friction is the ground you are on, mass is the crates you load, and the push comes from a kid who has to run to keep up. */
+const sfx=Chalk.sfx;
+const SURF={road:{mu:.2,name:'pavement'},grass:{mu:.4,name:'grass'},sand:{mu:.6,name:'sand'},ice:{mu:.04,name:'ice'}};
+const RUN=6,KIDGAP=1.05,WALK=2.2;
+const hash=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 const ps=makeSim('cv-push',{
-  init(s){s.F=80;s.m=5;s.mu=.2;s.reset(s)},
-  reset(s){s.x=2;s.v=0;s.dir=0;s.hit=false;s.box=[7+Math.random()*5,0];s.box[1]=s.box[0]+1.4;s.push=false},
-  ppm(s){return s.w/14},
-  down(p,s){s.push=true;s.dir=Math.sign(s.x*s.ppm(s)-p.x)||1},move(p,s){if(s.push)s.dir=Math.sign(s.x*s.ppm(s)-p.x)||s.dir},up(p,s){s.push=false},leave(s){s.push=false},
-  step(dt,s){const sub=4,h=dt/sub;for(let k=0;k<sub;k++){const Fp=s.push?s.F*s.dir:0;let fr=0;if(Math.abs(s.v)>1e-3)fr=-Math.sign(s.v)*s.mu*s.m*G;else if(Math.abs(Fp)<=s.mu*s.m*G){s.v=0;continue}const a=(Fp+fr)/s.m;const v0=s.v;s.v+=a*h;if(!s.push&&Math.sign(s.v)!==Math.sign(v0)&&v0!==0)s.v=0;s.x+=s.v*h;if(s.x<.5){s.x=.5;s.v=-s.v*.3}if(s.x>13.5){s.x=13.5;s.v=-s.v*.3}}
-    if(!s.push&&Math.abs(s.v)<1e-3&&s.x>s.box[0]&&s.x<s.box[1])s.hit=true},
-  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const P=s.ppm(s),gy=h*.72;
-    ctx.save();ctx.globalAlpha=.25+s.mu*.9;ctx.strokeStyle=C.chalk;ctx.lineWidth=3;ctx.setLineDash(s.mu<.08?[]:[2,Math.max(2,10-s.mu*14)]);ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();ctx.restore();
-    box(ctx,s.box[0]*P,gy-6,(s.box[1]-s.box[0])*P,10,rgba(s.hit?C.green:C.yellow,.35),s.hit?C.green:C.yellow,2,2);text(ctx,s.hit?'stopped in the box!':'the box',(s.box[0]+s.box[1])/2*P,gy+22,{size:17,color:s.hit?C.green:C.yellow});
-    for(let m=0;m<=14;m+=2)text(ctx,m+' m',m*P,h*.9,{size:13,alpha:.5});
-    car(ctx,s.x*P,gy,44,26,C.blue);
-    if(s.push)arrow(ctx,s.x*P-s.dir*60,gy-16,s.dir*40,0,C.pink,3);
-    const fr=Math.abs(s.v)>1e-3?s.mu*s.m*G:0;
-    const lines=at('g8')?[`push ${s.push?s.F+' N':'off'}   friction ${fr.toFixed(1)} N   speed ${Math.abs(s.v).toFixed(2)} m/s`]:[`push: ${s.push?'ON':'off'}    speed: ${Math.abs(s.v).toFixed(1)} m/s`];
-    if(at('g8'))lines.push(`a = (push − friction) ÷ mass = ${(((s.push?s.F:0)-fr)/s.m).toFixed(1)} m/s²`);if(at('hs'))lines.push(`friction = μ m g = ${s.mu} × ${s.m} × 9.8;  after you let go, a = −μg = −${(s.mu*G).toFixed(1)} m/s² for any mass`);if(at('col'))lines.push(`stopping distance from here: v²/(2μg) = ${(s.v*s.v/(2*s.mu*G)).toFixed(2)} m`);
-    readout(ctx,lines,16,12,{size:12});if(!s.push&&s.v===0&&!s.hit)text(ctx,'press and hold on the floor: the car is pushed away from your finger',w/2,h*.16+ (at('col')?40:at('hs')?22:at('g8')?4:-10),{size:17,alpha:.6})}
+  init(s){s.view=clamp(s.w/42,8,14);s.F=50;s.xray=false;try{s.xray=localStorage.getItem('chalk:xray')==='1'}catch(e){}s.hold={left:false,right:false};s.touch=0;s.newRun(s)},
+  newRun(s){s.r=rng((Math.random()*1e9)|0);s.segs=[{x0:-60,x1:7,k:'road'}];s.x=2;s.v=0;s.fr=0;s.pushing=0;s.crates=0;s.kid={x:2-KIDGAP,dir:1,ph:0};s.cam=0;s.delivered=0;s.streak=0;s.best=0;s.over=false;s.pops=[];s.parts=[];s.iceParked=false;s.lastK='road';s.birds=null;s.birdT=5;s.parkT=0;s.nextBay(s)},
+  genTo(s,x){while(s.segs[s.segs.length-1].x1<x){const last=s.segs[s.segs.length-1];const ks=['road','grass','sand','ice','road','grass'];let k=ks[Math.floor(s.r()*ks.length)];if(k===last.k)k=k==='road'?'ice':'road';s.segs.push({x0:last.x1,x1:last.x1+4+s.r()*8,k})}},
+  surf(s,x){for(let i=s.segs.length-1;i>=0;i--){const g=s.segs[i];if(x>=g.x0&&x<g.x1)return g.k}return 'road'},
+  nextBay(s){const x=s.x+7+s.r()*10;s.genTo(s,x+40);s.bay={x0:x,x1:x+1.8};s.over=false},
+  mass(s){return 5+10*s.crates},
+  pop(s,t,x,y,color,size=24){s.pops.push({t,x,y,color,size,age:0})},
+  dirWant(s){const d=(s.hold.right?1:0)-(s.hold.left?1:0);return d||s.touch},
+  down(p,s){const cx=(s.x-s.cam)*s.w/s.view;s.touch=p.x<cx?1:-1},move(p,s){if(s.touch){const cx=(s.x-s.cam)*s.w/s.view;s.touch=p.x<cx?1:-1}},up(p,s){s.touch=0},leave(s){s.touch=0},
+  step(dt,s){s.view=clamp(s.w/42,8,14);const VIEW=s.view;const m=s.mass(s),dir=s.dirWant(s),K=s.kid;
+    if(dir)K.dir=dir;const side=s.x-K.dir*KIDGAP;let touching=dir!==0&&Math.abs(K.x-side)<.2;
+    if(dir&&!touching){const d=side-K.x;K.x+=Math.sign(d)*Math.min(Math.abs(d),RUN*dt);K.ph+=dt*14}
+    else if(!dir){const d=side-K.x;if(Math.abs(d)>.25){K.x+=Math.sign(d)*Math.min(Math.abs(d)-.2,WALK*dt);K.ph+=dt*8}}
+    const sub=6,h=dt/sub;
+    for(let i=0;i<sub;i++){const mu=SURF[s.surf(s,s.x)].mu;const Fp=touching?s.F*dir:0;
+      if(Math.abs(s.v)<1e-3&&Math.abs(Fp)<=mu*m*G){s.v=0;s.fr=-Fp;continue}
+      s.fr=Math.abs(s.v)>1e-3?-Math.sign(s.v)*mu*m*G:-Math.sign(Fp)*mu*m*G;
+      const v0=s.v;s.v+=(Fp+s.fr)/m*h;if(!Fp&&v0!==0&&Math.sign(s.v)!==Math.sign(v0)){s.v=0;s.fr=0}s.x+=s.v*h}
+    if(touching){if(Math.abs(s.v)<=RUN||Math.sign(s.v)!==K.dir){K.x=s.x-K.dir*KIDGAP;K.ph+=dt*(2+Math.abs(s.v)*3)}else{K.x+=K.dir*RUN*dt;K.ph+=dt*16;if(!s.tooFast){s.tooFast=true;s.pop(s,'too fast to keep up!',K.x,2.6,C.pink,20)}}}else s.tooFast=false;
+    s.pushing=touching&&Math.abs(K.x-(s.x-K.dir*KIDGAP))<.2?dir:0;
+    // the world
+    const k=s.surf(s,s.x);if(k!==s.lastK){s.lastK=k;s.pop(s,SURF[k].name+(k==='ice'?'!':''),s.x,2.2,k==='ice'?C.blue:k==='sand'?C.yellow:k==='grass'?C.green:C.chalk,20);sfx('tick')}
+    if(Math.abs(s.v)>1.5&&(k==='sand'||k==='grass')&&Math.random()<dt*Math.abs(s.v)*3)s.parts.push({x:s.x-Math.sign(s.v)*.5,y:.05,vx:-s.v*.3+(Math.random()-.5),vy:1+Math.random()*1.5,age:0,life:.6,color:k==='sand'?C.yellow:C.green,r:2});
+    if(k==='ice'&&Math.abs(s.v)>1&&Math.random()<dt*6)s.parts.push({x:s.x+(Math.random()-.5),y:.02,vx:0,vy:.4,age:0,life:.5,color:C.chalk,r:1.4,spark:true});
+    for(const q of s.parts){q.age+=dt;q.vy-=G*.5*dt;q.x+=q.vx*dt;q.y=Math.max(0,q.y+q.vy*dt)}s.parts=s.parts.filter(q=>q.age<q.life);
+    for(const q of s.pops)q.age+=dt;s.pops=s.pops.filter(q=>q.age<1.6);
+    if(s.x>s.bay.x1+.6)s.over=true;
+    if(!dir&&s.v===0&&s.x>=s.bay.x0&&s.x<=s.bay.x1){s.delivered++;s.streak=s.over?1:s.streak+1;s.best=Math.max(s.best,s.streak);if(k==='ice')s.iceParked=true;
+      const big=s.streak>=3;s.pop(s,big?s.streak+' in a row!':'parked!',s.x,2.8,big?C.yellow:C.green,big?40:32);sfx(big?'big':'park');s.parkT=.6;
+      for(let i=0;i<(big?40:18);i++){const a=Math.PI*(.15+.7*Math.random());s.parts.push({x:s.x,y:.3,vx:Math.cos(a)*4*(Math.random()<.5?-1:1),vy:Math.sin(a)*6,age:0,life:1+Math.random()*.6,color:[C.yellow,C.pink,C.blue,C.green][i%4],r:2.5})}
+      s.nextBay(s)}
+    s.parkT=Math.max(0,s.parkT-dt);
+    const target=s.x-VIEW*.32+clamp(s.v*.35,-2,3);s.cam+=(target-s.cam)*Math.min(1,dt*3);s.genTo(s,s.cam+VIEW+30);
+    if(!Chalk.REDUCE){s.birdT-=dt;if(s.birdT<=0&&!s.birds){s.birds={x:1.1,y:.16+Math.random()*.12,sp:.12+Math.random()*.06};s.birdT=10+Math.random()*10}if(s.birds){s.birds.x-=s.birds.sp*dt;if(s.birds.x<-.2)s.birds=null}}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const VIEW=s.view||14,P=w/VIEW,gy=h*.72,X=x=>(x-s.cam)*P,Y=y=>gy-y*P,t=Chalk.REDUCE?0:s.t;
+    // sky: clouds drift on their own, hills and houses slide by at their own depths
+    for(let i=-2;i<8;i++){const par=.15,span=w*.45,base=((i*span-(s.cam*P*par)-t*8)%(span*8)+span*8)%(span*8)-span;const cy=h*(.1+.06*hash(i));ctx.save();ctx.globalAlpha=.14;ctx.strokeStyle=C.chalk;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(base,cy,34,10,0,0,Math.PI*2);ctx.ellipse(base+24,cy-6,24,9,0,0,Math.PI*2);ctx.stroke();ctx.restore()}
+    ctx.save();ctx.globalAlpha=.16;ctx.strokeStyle=C.green;ctx.lineWidth=2;ctx.beginPath();for(let px=0;px<=w;px+=8){const wx=px/P+s.cam*.4;const y=gy-h*.13-Math.sin(wx*.35)*h*.04-Math.sin(wx*.13+1)*h*.05;px?ctx.lineTo(px,y):ctx.moveTo(px,y)}ctx.stroke();ctx.restore();
+    const par2=.7;for(let n=Math.floor((s.cam*par2)/5)-1;n<Math.floor((s.cam*par2+VIEW)/5)+2;n++){if(hash(n)<.45)continue;const px=(n*5-s.cam*par2)*P;const tall=hash(n+7)>.5;ctx.save();ctx.globalAlpha=.22;if(tall){poly(ctx,[[px,gy],[px,gy-44],[px+30,gy-44],[px+30,gy]],C.chalk,1.5,1);poly(ctx,[[px-4,gy-44],[px+15,gy-62],[px+34,gy-44]],C.chalk,1.5,1);box(ctx,px+10,gy-20,10,20,null,C.chalk,1,1.2)}else{poly(ctx,[[px+10,gy],[px+10,gy-26]],C.chalk,2,1);circle(ctx,px+10,gy-36,14,null,C.green,1.5)}ctx.restore()}
+    if(s.birds){const bx=s.birds.x*w,by=s.birds.y*h;for(let i=0;i<3;i++){const ox=bx+i*18,oy=by+(i%2)*8,f=Math.sin(s.t*9+i)*4;poly(ctx,[[ox-7,oy-f],[ox,oy],[ox+7,oy-f]],C.chalk,1.5,.5)}}
+    // ground: each stretch of street is its own surface
+    for(const g of s.segs){const a=X(g.x0),b=X(g.x1);if(b<0||a>w)continue;const L=Math.max(0,a),R=Math.min(w,b);ctx.save();
+      if(g.k==='ice'){ctx.fillStyle=rgba(C.blue,.28);ctx.fillRect(L,gy,R-L,14);ctx.strokeStyle=rgba(C.chalk,.6);ctx.lineWidth=1.2;for(let x=Math.ceil((g.x0)*2)/2;x<g.x1;x+=1.3){const px=X(x);if(px<L||px>R-10)continue;ctx.beginPath();ctx.moveTo(px,gy+10);ctx.lineTo(px+9,gy+3);ctx.stroke()}}
+      else if(g.k==='grass'){ctx.fillStyle=rgba(C.green,.14);ctx.fillRect(L,gy,R-L,14);ctx.strokeStyle=rgba(C.green,.8);ctx.lineWidth=1.5;for(let x=Math.ceil(g.x0*4)/4;x<g.x1;x+=.25){const px=X(x);if(px<L||px>R)continue;const hh=4+hash(x*4)*5;ctx.beginPath();ctx.moveTo(px,gy);ctx.lineTo(px-2,gy-hh);ctx.stroke()}}
+      else if(g.k==='sand'){ctx.fillStyle=rgba(C.yellow,.18);ctx.fillRect(L,gy,R-L,14);ctx.fillStyle=rgba(C.yellow,.8);for(let x=Math.ceil(g.x0*6)/6;x<g.x1;x+=1/6){const px=X(x);if(px<L||px>R)continue;ctx.fillRect(px,gy+3+hash(x*6)*8,1.6,1.6)}}
+      else{ctx.fillStyle=rgba(C.chalk,.07);ctx.fillRect(L,gy,R-L,14);ctx.strokeStyle=rgba(C.chalk,.35);ctx.lineWidth=2;for(let x=Math.ceil(g.x0);x<g.x1;x+=1){const px=X(x);if(px<L||px>R-12)continue;ctx.beginPath();ctx.moveTo(px,gy+7);ctx.lineTo(px+12,gy+7);ctx.stroke()}}
+      ctx.restore();poly(ctx,[[L,gy],[R,gy]],C.chalk,2,.6);const mid=(Math.max(g.x0,s.cam)+Math.min(g.x1,s.cam+VIEW))/2;if(R-L>60)text(ctx,SURF[g.k].name,X(mid),gy+28,{size:14,alpha:.5})}
+    for(let m=Math.ceil(s.cam/2)*2;m<s.cam+VIEW;m+=2){const px=X(m);poly(ctx,[[px,gy+14],[px,gy+19]],C.chalk,1,.3);text(ctx,m+' m',px,gy+46,{size:11,alpha:.3})}
+    // the box to park in
+    const bx0=X(s.bay.x0),bx1=X(s.bay.x1);if(bx1>0&&bx0<w){ctx.save();ctx.setLineDash([6,5]);box(ctx,bx0,gy-64,bx1-bx0,64,rgba(C.yellow,.07),C.yellow,4,2);ctx.restore();text(ctx,'park here',clamp((bx0+bx1)/2,44,w-44),gy-76,{size:17,color:C.yellow})}
+    else if(bx0>=w){const d=s.bay.x0-s.x;text(ctx,`box ${d.toFixed(0)} m →`,w-14,gy-90,{size:17,color:C.yellow,align:'right'})}
+    else{text(ctx,'← box behind you',14,gy-90,{size:17,color:C.yellow,align:'left'})}
+    // speed lines
+    if(Math.abs(s.v)>3){const n=Math.min(6,Math.floor(Math.abs(s.v)));for(let i=0;i<n;i++){const y=gy-8-i*5,x0=X(s.x)-Math.sign(s.v)*(30+i*6);poly(ctx,[[x0,y],[x0-Math.sign(s.v)*(10+Math.abs(s.v)*3),y]],C.chalk,1.5,.4)}}
+    // car, crates, kid
+    const cx=X(s.x),sq=s.parkT>0?1+Math.sin(s.parkT*20)*.05:1;ctx.save();ctx.translate(cx,gy);ctx.scale(1/sq,sq);const ks=P/40;ctx.scale(ks,ks);car(ctx,0,0,48,28,C.blue);for(let i=0;i<s.crates;i++){box(ctx,-16+i*17,-28-17,15,15,rgba(C.yellow,.3),C.yellow,2,2);poly(ctx,[[-16+i*17,-45],[-1+i*17,-30]],C.yellow,1,.6)}ctx.restore();
+    const K=s.kid,kx=X(K.x),push=s.pushing!==0,lean=push?K.dir*.35:0,run=Math.sin(K.ph);ctx.save();ctx.translate(kx,gy);ctx.scale(P/40,P/40);ctx.strokeStyle=C.chalk;ctx.lineWidth=2.5;ctx.lineCap='round';
+      const hipX=Math.sin(lean)*0,hipY=-22,shX=Math.sin(lean)*20,shY=-22-Math.cos(lean)*20;ctx.beginPath();ctx.moveTo(-run*7,0);ctx.lineTo(0,hipY);ctx.lineTo(run*7,0);ctx.moveTo(0,hipY);ctx.lineTo(shX,shY);ctx.stroke();circle(ctx,shX+Math.sin(lean)*7,shY-7,6.5,C.board,C.chalk,2.5);
+      ctx.beginPath();ctx.moveTo(shX,shY+3);if(push){ctx.lineTo(K.dir*(KIDGAP*40-26),-18);ctx.moveTo(shX,shY+6);ctx.lineTo(K.dir*(KIDGAP*40-26),-12)}else{ctx.lineTo(shX-6,shY+18);ctx.moveTo(shX,shY+3);ctx.lineTo(shX+6,shY+18)}ctx.stroke();ctx.restore();
+    for(const q of s.parts){ctx.save();ctx.globalAlpha=Math.max(0,1-q.age/q.life);ctx.fillStyle=q.color;if(q.spark){ctx.fillRect(X(q.x)-3,Y(q.y)-.5,6,1);ctx.fillRect(X(q.x)-.5,Y(q.y)-3,1,6)}else{ctx.beginPath();ctx.arc(X(q.x),Y(q.y),q.r,0,Math.PI*2);ctx.fill()}ctx.restore()}
+    for(const q of s.pops){const u=q.age/1.6,sc=u<.12?.6+u/.12*.5:1.1-Math.min(.1,u-.12);text(ctx,q.t,clamp(X(q.x),80,w-80),Y(q.y)-u*26,{size:q.size*sc,color:q.color,alpha:u<.7?1:Math.max(0,1-(u-.7)/.3)})}
+    // x-ray: the forces, drawn on the car
+    const m=s.mass(s),mu=SURF[s.surf(s,s.x)].mu,Fp=s.pushing?s.F*s.pushing:0;
+    if(s.xray){const sc=clamp(90/Math.max(s.F,mu*m*G,1),.3,1.6);if(Fp)arrow(ctx,cx-Math.sign(Fp)*30,gy-40,Fp*sc,0,C.pink,3.5);if(Math.abs(s.fr)>.01)arrow(ctx,cx,gy+4,s.fr*sc,0,C.blue,3.5);
+      const lab=v=>at('g8')?` ${Math.abs(v).toFixed(0)} N`:'';if(Fp)text(ctx,'push'+lab(Fp),cx+Fp*sc*.5-Math.sign(Fp)*30,gy-54,{size:15,color:C.pink});if(Math.abs(s.fr)>.01)text(ctx,'friction'+lab(s.fr),cx+s.fr*sc*.5,gy+64,{size:15,color:C.blue})}
+    const lines=[];if(!at('g8'))lines.push(`parked ${s.delivered}${s.streak>1?'   in a row '+s.streak:''}`);else lines.push(`parked ${s.delivered}${s.streak>1?' · in a row '+s.streak:''} · speed ${Math.abs(s.v).toFixed(1)} m/s · mass ${m} kg`);
+    if(s.xray&&at('hs'))lines.push(`${SURF[s.surf(s,s.x)].name}: μ = ${mu}; friction = μmg = ${(mu*m*G).toFixed(1)} N; a = (F + f) ÷ m = ${((Fp+s.fr)/m).toFixed(1)} m/s²`);
+    if(s.xray&&at('col'))lines.push(`stopping distance from here: v²/(2μg) = ${(s.v*s.v/(2*mu*G)).toFixed(1)} m, whatever the mass`);
+    if(s.xray&&at('max'))lines.push(`the kid tops out at ${RUN} m/s: past that your push does no work, since power = F·v needs contact`);
+    readout(ctx,lines,14,10,{size:12});
+    if(s.delivered===0&&s.v===0&&!s.dirWant(s))text(ctx,'hold ▶ to push',X(s.x)+P*1.4,gy-P*3,{size:20,color:C.yellow,align:'left',alpha:.6+.3*Math.sin(s.t*3)})}
 });
-slide('ps-f',v=>{if(ps)ps.F=v},v=>v+' N');slide('ps-m',v=>{if(ps)ps.m=v},v=>v+' kg');slide('ps-mu',v=>{if(ps)ps.mu=v},v=>v.toFixed(2));hook('ps-reset',()=>ps&&ps.reset(ps));
+const psPad=Chalk.pad(ps,{labels:{left:'push left',right:'push right',a:'crate',b:'x-ray',start:'new street'},help:'Hold <b>◀ ▶</b> to push, let go to coast. <b>A</b> loads a crate (stopped only). <b>B</b> shows the forces.<span class="keys"> Keys: <kbd>←</kbd> <kbd>→</kbd>, <kbd>Z</kbd> for A, <kbd>X</kbd> for B, <kbd>Enter</kbd> for START.</span>',
+  on(k,d){if(!ps)return;if(k==='left'||k==='right'){ps.hold[k]=d;if(d)sfx('push')}
+    else if(k==='a'&&d){if(Math.abs(ps.v)>.05){ps.pop(ps,'stop first',ps.x,2.4,C.pink,20);sfx('no')}else{ps.crates=(ps.crates+1)%3;ps.pop(ps,ps.crates?`+10 kg (${ps.mass(ps)} kg)`:'unloaded (5 kg)',ps.x,2.4,C.yellow,20);sfx('thud')}}
+    else if(k==='b'&&d){ps.xray=!ps.xray;try{localStorage.setItem('chalk:xray',ps.xray?'1':'0')}catch(e){}sfx('blip')}
+    else if(k==='start'&&d){ps.newRun(ps);sfx('blip')}}});
+slide('ps-f',v=>{if(ps)ps.F=v},v=>v+' N');
 
 /* ---------- CH2: everything falls the same ---------- */
 const fl=makeSim('cv-fall',{
@@ -948,7 +1071,7 @@ const rk=makeSim('cv-rocket',{
 hook('rk-go',()=>rk&&rk.go(rk));slide('rk-fuel',v=>{if(rk){rk.fuel=v;rk.reset(rk)}},v=>v+' kg');slide('rk-ve',v=>{if(rk)rk.ve=v},v=>v.toLocaleString('en-US')+' m/s');slide('rk-mdot',v=>{if(rk)rk.mdot=v},v=>v+' kg/s');toggle('rk-stage',()=>rk.stage,v=>{rk.stage=v;rk.reset(rk)},v=>'Two stages: '+(v?'on':'off'));
 
 Chalk.start({key:'launch',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
-  l1:()=>ps&&ps.hit,l1b:()=>ps&&ps.hit&&ps.mu<.05,
+  l1:()=>ps&&ps.delivered>0,l1b:()=>ps&&ps.iceParked,l1c:()=>ps&&ps.best>=3,
   l2:()=>fl&&!fl.air&&fl.obj[0].down&&fl.obj[1].down&&Math.abs(fl.obj[0].t-fl.obj[1].t)<.05,l2b:()=>fl&&fl.g===1.62&&fl.obj[0].down,
   l3:()=>ln&&ln.hits>0,l3b:()=>ln&&ln.streak>=3,l3c:()=>ln&&ln.predErr!=null&&ln.predErr<=.05,l3d:()=>ln&&ln.hitAir,l3r:()=>ln&&ln.raced,l3s:()=>ln&&ln.racedAir,
   l4:()=>cr&&cr.stopped,l4b:()=>cr&&cr.stuckDone,

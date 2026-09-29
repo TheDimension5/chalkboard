@@ -4,26 +4,91 @@ const group=(attr,fn)=>document.querySelectorAll(`[${attr}]`).forEach(b=>b.addEv
 const toggle=(id,get,set,label)=>hook(id,()=>{set(!get());const b=$(id);b.classList.toggle('is-on',get());b.setAttribute('aria-pressed',String(get()));b.textContent=label(get())});
 function car(ctx,x,y,w,h,color){box(ctx,x-w/2,y-h,w,h*.62,color,null,4);box(ctx,x-w*.3,y-h*1.05,w*.55,h*.45,rgba(color,.7),null,3);circle(ctx,x-w*.3,y,h*.28,C.board,C.chalk,2);circle(ctx,x+w*.3,y,h*.28,C.board,C.chalk,2)}
 
-/* ---------- CH1: pushes and pulls ---------- */
+/* ---------- CH1: pushes and pulls: the delivery run ---------- */
+/* An endless street. Friction is the ground you are on, mass is the crates you load, and the push comes from a kid who has to run to keep up. */
+const sfx=Chalk.sfx;
+const SURF={road:{mu:.2,name:'pavement'},grass:{mu:.4,name:'grass'},sand:{mu:.6,name:'sand'},ice:{mu:.04,name:'ice'}};
+const RUN=6,KIDGAP=1.05,WALK=2.2;
+const hash=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 const ps=makeSim('cv-push',{
-  init(s){s.F=80;s.m=5;s.mu=.2;s.reset(s)},
-  reset(s){s.x=2;s.v=0;s.dir=0;s.hit=false;s.box=[7+Math.random()*5,0];s.box[1]=s.box[0]+1.4;s.push=false},
-  ppm(s){return s.w/14},
-  down(p,s){s.push=true;s.dir=Math.sign(s.x*s.ppm(s)-p.x)||1},move(p,s){if(s.push)s.dir=Math.sign(s.x*s.ppm(s)-p.x)||s.dir},up(p,s){s.push=false},leave(s){s.push=false},
-  step(dt,s){const sub=4,h=dt/sub;for(let k=0;k<sub;k++){const Fp=s.push?s.F*s.dir:0;let fr=0;if(Math.abs(s.v)>1e-3)fr=-Math.sign(s.v)*s.mu*s.m*G;else if(Math.abs(Fp)<=s.mu*s.m*G){s.v=0;continue}const a=(Fp+fr)/s.m;const v0=s.v;s.v+=a*h;if(!s.push&&Math.sign(s.v)!==Math.sign(v0)&&v0!==0)s.v=0;s.x+=s.v*h;if(s.x<.5){s.x=.5;s.v=-s.v*.3}if(s.x>13.5){s.x=13.5;s.v=-s.v*.3}}
-    if(!s.push&&Math.abs(s.v)<1e-3&&s.x>s.box[0]&&s.x<s.box[1])s.hit=true},
-  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const P=s.ppm(s),gy=h*.72;
-    ctx.save();ctx.globalAlpha=.25+s.mu*.9;ctx.strokeStyle=C.chalk;ctx.lineWidth=3;ctx.setLineDash(s.mu<.08?[]:[2,Math.max(2,10-s.mu*14)]);ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();ctx.restore();
-    box(ctx,s.box[0]*P,gy-6,(s.box[1]-s.box[0])*P,10,rgba(s.hit?C.green:C.yellow,.35),s.hit?C.green:C.yellow,2,2);text(ctx,s.hit?'stopped in the box!':'the box',(s.box[0]+s.box[1])/2*P,gy+22,{size:17,color:s.hit?C.green:C.yellow});
-    for(let m=0;m<=14;m+=2)text(ctx,m+' m',m*P,h*.9,{size:13,alpha:.5});
-    car(ctx,s.x*P,gy,44,26,C.blue);
-    if(s.push)arrow(ctx,s.x*P-s.dir*60,gy-16,s.dir*40,0,C.pink,3);
-    const fr=Math.abs(s.v)>1e-3?s.mu*s.m*G:0;
-    const lines=at('g8')?[`push ${s.push?s.F+' N':'off'}   friction ${fr.toFixed(1)} N   speed ${Math.abs(s.v).toFixed(2)} m/s`]:[`push: ${s.push?'ON':'off'}    speed: ${Math.abs(s.v).toFixed(1)} m/s`];
-    if(at('g8'))lines.push(`a = (push − friction) ÷ mass = ${(((s.push?s.F:0)-fr)/s.m).toFixed(1)} m/s²`);if(at('hs'))lines.push(`friction = μ m g = ${s.mu} × ${s.m} × 9.8;  after you let go, a = −μg = −${(s.mu*G).toFixed(1)} m/s² for any mass`);if(at('col'))lines.push(`stopping distance from here: v²/(2μg) = ${(s.v*s.v/(2*s.mu*G)).toFixed(2)} m`);
-    readout(ctx,lines,16,12,{size:12});if(!s.push&&s.v===0&&!s.hit)text(ctx,'press and hold on the floor: the car is pushed away from your finger',w/2,h*.16+ (at('col')?40:at('hs')?22:at('g8')?4:-10),{size:17,alpha:.6})}
+  init(s){s.view=clamp(s.w/42,8,14);s.F=50;s.xray=false;try{s.xray=localStorage.getItem('chalk:xray')==='1'}catch(e){}s.hold={left:false,right:false};s.touch=0;s.newRun(s)},
+  newRun(s){s.r=rng((Math.random()*1e9)|0);s.segs=[{x0:-60,x1:7,k:'road'}];s.x=2;s.v=0;s.fr=0;s.pushing=0;s.crates=0;s.kid={x:2-KIDGAP,dir:1,ph:0};s.cam=0;s.delivered=0;s.streak=0;s.best=0;s.over=false;s.pops=[];s.parts=[];s.iceParked=false;s.lastK='road';s.birds=null;s.birdT=5;s.parkT=0;s.nextBay(s)},
+  genTo(s,x){while(s.segs[s.segs.length-1].x1<x){const last=s.segs[s.segs.length-1];const ks=['road','grass','sand','ice','road','grass'];let k=ks[Math.floor(s.r()*ks.length)];if(k===last.k)k=k==='road'?'ice':'road';s.segs.push({x0:last.x1,x1:last.x1+4+s.r()*8,k})}},
+  surf(s,x){for(let i=s.segs.length-1;i>=0;i--){const g=s.segs[i];if(x>=g.x0&&x<g.x1)return g.k}return 'road'},
+  nextBay(s){const x=s.x+7+s.r()*10;s.genTo(s,x+40);s.bay={x0:x,x1:x+1.8};s.over=false},
+  mass(s){return 5+10*s.crates},
+  pop(s,t,x,y,color,size=24){s.pops.push({t,x,y,color,size,age:0})},
+  dirWant(s){const d=(s.hold.right?1:0)-(s.hold.left?1:0);return d||s.touch},
+  down(p,s){const cx=(s.x-s.cam)*s.w/s.view;s.touch=p.x<cx?1:-1},move(p,s){if(s.touch){const cx=(s.x-s.cam)*s.w/s.view;s.touch=p.x<cx?1:-1}},up(p,s){s.touch=0},leave(s){s.touch=0},
+  step(dt,s){s.view=clamp(s.w/42,8,14);const VIEW=s.view;const m=s.mass(s),dir=s.dirWant(s),K=s.kid;
+    if(dir)K.dir=dir;const side=s.x-K.dir*KIDGAP;let touching=dir!==0&&Math.abs(K.x-side)<.2;
+    if(dir&&!touching){const d=side-K.x;K.x+=Math.sign(d)*Math.min(Math.abs(d),RUN*dt);K.ph+=dt*14}
+    else if(!dir){const d=side-K.x;if(Math.abs(d)>.25){K.x+=Math.sign(d)*Math.min(Math.abs(d)-.2,WALK*dt);K.ph+=dt*8}}
+    const sub=6,h=dt/sub;
+    for(let i=0;i<sub;i++){const mu=SURF[s.surf(s,s.x)].mu;const Fp=touching?s.F*dir:0;
+      if(Math.abs(s.v)<1e-3&&Math.abs(Fp)<=mu*m*G){s.v=0;s.fr=-Fp;continue}
+      s.fr=Math.abs(s.v)>1e-3?-Math.sign(s.v)*mu*m*G:-Math.sign(Fp)*mu*m*G;
+      const v0=s.v;s.v+=(Fp+s.fr)/m*h;if(!Fp&&v0!==0&&Math.sign(s.v)!==Math.sign(v0)){s.v=0;s.fr=0}s.x+=s.v*h}
+    if(touching){if(Math.abs(s.v)<=RUN||Math.sign(s.v)!==K.dir){K.x=s.x-K.dir*KIDGAP;K.ph+=dt*(2+Math.abs(s.v)*3)}else{K.x+=K.dir*RUN*dt;K.ph+=dt*16;if(!s.tooFast){s.tooFast=true;s.pop(s,'too fast to keep up!',K.x,2.6,C.pink,20)}}}else s.tooFast=false;
+    s.pushing=touching&&Math.abs(K.x-(s.x-K.dir*KIDGAP))<.2?dir:0;
+    // the world
+    const k=s.surf(s,s.x);if(k!==s.lastK){s.lastK=k;s.pop(s,SURF[k].name+(k==='ice'?'!':''),s.x,2.2,k==='ice'?C.blue:k==='sand'?C.yellow:k==='grass'?C.green:C.chalk,20);sfx('tick')}
+    if(Math.abs(s.v)>1.5&&(k==='sand'||k==='grass')&&Math.random()<dt*Math.abs(s.v)*3)s.parts.push({x:s.x-Math.sign(s.v)*.5,y:.05,vx:-s.v*.3+(Math.random()-.5),vy:1+Math.random()*1.5,age:0,life:.6,color:k==='sand'?C.yellow:C.green,r:2});
+    if(k==='ice'&&Math.abs(s.v)>1&&Math.random()<dt*6)s.parts.push({x:s.x+(Math.random()-.5),y:.02,vx:0,vy:.4,age:0,life:.5,color:C.chalk,r:1.4,spark:true});
+    for(const q of s.parts){q.age+=dt;q.vy-=G*.5*dt;q.x+=q.vx*dt;q.y=Math.max(0,q.y+q.vy*dt)}s.parts=s.parts.filter(q=>q.age<q.life);
+    for(const q of s.pops)q.age+=dt;s.pops=s.pops.filter(q=>q.age<1.6);
+    if(s.x>s.bay.x1+.6)s.over=true;
+    if(!dir&&s.v===0&&s.x>=s.bay.x0&&s.x<=s.bay.x1){s.delivered++;s.streak=s.over?1:s.streak+1;s.best=Math.max(s.best,s.streak);if(k==='ice')s.iceParked=true;
+      const big=s.streak>=3;s.pop(s,big?s.streak+' in a row!':'parked!',s.x,2.8,big?C.yellow:C.green,big?40:32);sfx(big?'big':'park');s.parkT=.6;
+      for(let i=0;i<(big?40:18);i++){const a=Math.PI*(.15+.7*Math.random());s.parts.push({x:s.x,y:.3,vx:Math.cos(a)*4*(Math.random()<.5?-1:1),vy:Math.sin(a)*6,age:0,life:1+Math.random()*.6,color:[C.yellow,C.pink,C.blue,C.green][i%4],r:2.5})}
+      s.nextBay(s)}
+    s.parkT=Math.max(0,s.parkT-dt);
+    const target=s.x-VIEW*.32+clamp(s.v*.35,-2,3);s.cam+=(target-s.cam)*Math.min(1,dt*3);s.genTo(s,s.cam+VIEW+30);
+    if(!Chalk.REDUCE){s.birdT-=dt;if(s.birdT<=0&&!s.birds){s.birds={x:1.1,y:.16+Math.random()*.12,sp:.12+Math.random()*.06};s.birdT=10+Math.random()*10}if(s.birds){s.birds.x-=s.birds.sp*dt;if(s.birds.x<-.2)s.birds=null}}},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const VIEW=s.view||14,P=w/VIEW,gy=h*.72,X=x=>(x-s.cam)*P,Y=y=>gy-y*P,t=Chalk.REDUCE?0:s.t;
+    // sky: clouds drift on their own, hills and houses slide by at their own depths
+    for(let i=-2;i<8;i++){const par=.15,span=w*.45,base=((i*span-(s.cam*P*par)-t*8)%(span*8)+span*8)%(span*8)-span;const cy=h*(.1+.06*hash(i));ctx.save();ctx.globalAlpha=.14;ctx.strokeStyle=C.chalk;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(base,cy,34,10,0,0,Math.PI*2);ctx.ellipse(base+24,cy-6,24,9,0,0,Math.PI*2);ctx.stroke();ctx.restore()}
+    ctx.save();ctx.globalAlpha=.16;ctx.strokeStyle=C.green;ctx.lineWidth=2;ctx.beginPath();for(let px=0;px<=w;px+=8){const wx=px/P+s.cam*.4;const y=gy-h*.13-Math.sin(wx*.35)*h*.04-Math.sin(wx*.13+1)*h*.05;px?ctx.lineTo(px,y):ctx.moveTo(px,y)}ctx.stroke();ctx.restore();
+    const par2=.7;for(let n=Math.floor((s.cam*par2)/5)-1;n<Math.floor((s.cam*par2+VIEW)/5)+2;n++){if(hash(n)<.45)continue;const px=(n*5-s.cam*par2)*P;const tall=hash(n+7)>.5;ctx.save();ctx.globalAlpha=.22;if(tall){poly(ctx,[[px,gy],[px,gy-44],[px+30,gy-44],[px+30,gy]],C.chalk,1.5,1);poly(ctx,[[px-4,gy-44],[px+15,gy-62],[px+34,gy-44]],C.chalk,1.5,1);box(ctx,px+10,gy-20,10,20,null,C.chalk,1,1.2)}else{poly(ctx,[[px+10,gy],[px+10,gy-26]],C.chalk,2,1);circle(ctx,px+10,gy-36,14,null,C.green,1.5)}ctx.restore()}
+    if(s.birds){const bx=s.birds.x*w,by=s.birds.y*h;for(let i=0;i<3;i++){const ox=bx+i*18,oy=by+(i%2)*8,f=Math.sin(s.t*9+i)*4;poly(ctx,[[ox-7,oy-f],[ox,oy],[ox+7,oy-f]],C.chalk,1.5,.5)}}
+    // ground: each stretch of street is its own surface
+    for(const g of s.segs){const a=X(g.x0),b=X(g.x1);if(b<0||a>w)continue;const L=Math.max(0,a),R=Math.min(w,b);ctx.save();
+      if(g.k==='ice'){ctx.fillStyle=rgba(C.blue,.28);ctx.fillRect(L,gy,R-L,14);ctx.strokeStyle=rgba(C.chalk,.6);ctx.lineWidth=1.2;for(let x=Math.ceil((g.x0)*2)/2;x<g.x1;x+=1.3){const px=X(x);if(px<L||px>R-10)continue;ctx.beginPath();ctx.moveTo(px,gy+10);ctx.lineTo(px+9,gy+3);ctx.stroke()}}
+      else if(g.k==='grass'){ctx.fillStyle=rgba(C.green,.14);ctx.fillRect(L,gy,R-L,14);ctx.strokeStyle=rgba(C.green,.8);ctx.lineWidth=1.5;for(let x=Math.ceil(g.x0*4)/4;x<g.x1;x+=.25){const px=X(x);if(px<L||px>R)continue;const hh=4+hash(x*4)*5;ctx.beginPath();ctx.moveTo(px,gy);ctx.lineTo(px-2,gy-hh);ctx.stroke()}}
+      else if(g.k==='sand'){ctx.fillStyle=rgba(C.yellow,.18);ctx.fillRect(L,gy,R-L,14);ctx.fillStyle=rgba(C.yellow,.8);for(let x=Math.ceil(g.x0*6)/6;x<g.x1;x+=1/6){const px=X(x);if(px<L||px>R)continue;ctx.fillRect(px,gy+3+hash(x*6)*8,1.6,1.6)}}
+      else{ctx.fillStyle=rgba(C.chalk,.07);ctx.fillRect(L,gy,R-L,14);ctx.strokeStyle=rgba(C.chalk,.35);ctx.lineWidth=2;for(let x=Math.ceil(g.x0);x<g.x1;x+=1){const px=X(x);if(px<L||px>R-12)continue;ctx.beginPath();ctx.moveTo(px,gy+7);ctx.lineTo(px+12,gy+7);ctx.stroke()}}
+      ctx.restore();poly(ctx,[[L,gy],[R,gy]],C.chalk,2,.6);const mid=(Math.max(g.x0,s.cam)+Math.min(g.x1,s.cam+VIEW))/2;if(R-L>60)text(ctx,SURF[g.k].name,X(mid),gy+28,{size:14,alpha:.5})}
+    for(let m=Math.ceil(s.cam/2)*2;m<s.cam+VIEW;m+=2){const px=X(m);poly(ctx,[[px,gy+14],[px,gy+19]],C.chalk,1,.3);text(ctx,m+' m',px,gy+46,{size:11,alpha:.3})}
+    // the box to park in
+    const bx0=X(s.bay.x0),bx1=X(s.bay.x1);if(bx1>0&&bx0<w){ctx.save();ctx.setLineDash([6,5]);box(ctx,bx0,gy-64,bx1-bx0,64,rgba(C.yellow,.07),C.yellow,4,2);ctx.restore();text(ctx,'park here',clamp((bx0+bx1)/2,44,w-44),gy-76,{size:17,color:C.yellow})}
+    else if(bx0>=w){const d=s.bay.x0-s.x;text(ctx,`box ${d.toFixed(0)} m →`,w-14,gy-90,{size:17,color:C.yellow,align:'right'})}
+    else{text(ctx,'← box behind you',14,gy-90,{size:17,color:C.yellow,align:'left'})}
+    // speed lines
+    if(Math.abs(s.v)>3){const n=Math.min(6,Math.floor(Math.abs(s.v)));for(let i=0;i<n;i++){const y=gy-8-i*5,x0=X(s.x)-Math.sign(s.v)*(30+i*6);poly(ctx,[[x0,y],[x0-Math.sign(s.v)*(10+Math.abs(s.v)*3),y]],C.chalk,1.5,.4)}}
+    // car, crates, kid
+    const cx=X(s.x),sq=s.parkT>0?1+Math.sin(s.parkT*20)*.05:1;ctx.save();ctx.translate(cx,gy);ctx.scale(1/sq,sq);const ks=P/40;ctx.scale(ks,ks);car(ctx,0,0,48,28,C.blue);for(let i=0;i<s.crates;i++){box(ctx,-16+i*17,-28-17,15,15,rgba(C.yellow,.3),C.yellow,2,2);poly(ctx,[[-16+i*17,-45],[-1+i*17,-30]],C.yellow,1,.6)}ctx.restore();
+    const K=s.kid,kx=X(K.x),push=s.pushing!==0,lean=push?K.dir*.35:0,run=Math.sin(K.ph);ctx.save();ctx.translate(kx,gy);ctx.scale(P/40,P/40);ctx.strokeStyle=C.chalk;ctx.lineWidth=2.5;ctx.lineCap='round';
+      const hipX=Math.sin(lean)*0,hipY=-22,shX=Math.sin(lean)*20,shY=-22-Math.cos(lean)*20;ctx.beginPath();ctx.moveTo(-run*7,0);ctx.lineTo(0,hipY);ctx.lineTo(run*7,0);ctx.moveTo(0,hipY);ctx.lineTo(shX,shY);ctx.stroke();circle(ctx,shX+Math.sin(lean)*7,shY-7,6.5,C.board,C.chalk,2.5);
+      ctx.beginPath();ctx.moveTo(shX,shY+3);if(push){ctx.lineTo(K.dir*(KIDGAP*40-26),-18);ctx.moveTo(shX,shY+6);ctx.lineTo(K.dir*(KIDGAP*40-26),-12)}else{ctx.lineTo(shX-6,shY+18);ctx.moveTo(shX,shY+3);ctx.lineTo(shX+6,shY+18)}ctx.stroke();ctx.restore();
+    for(const q of s.parts){ctx.save();ctx.globalAlpha=Math.max(0,1-q.age/q.life);ctx.fillStyle=q.color;if(q.spark){ctx.fillRect(X(q.x)-3,Y(q.y)-.5,6,1);ctx.fillRect(X(q.x)-.5,Y(q.y)-3,1,6)}else{ctx.beginPath();ctx.arc(X(q.x),Y(q.y),q.r,0,Math.PI*2);ctx.fill()}ctx.restore()}
+    for(const q of s.pops){const u=q.age/1.6,sc=u<.12?.6+u/.12*.5:1.1-Math.min(.1,u-.12);text(ctx,q.t,clamp(X(q.x),80,w-80),Y(q.y)-u*26,{size:q.size*sc,color:q.color,alpha:u<.7?1:Math.max(0,1-(u-.7)/.3)})}
+    // x-ray: the forces, drawn on the car
+    const m=s.mass(s),mu=SURF[s.surf(s,s.x)].mu,Fp=s.pushing?s.F*s.pushing:0;
+    if(s.xray){const sc=clamp(90/Math.max(s.F,mu*m*G,1),.3,1.6);if(Fp)arrow(ctx,cx-Math.sign(Fp)*30,gy-40,Fp*sc,0,C.pink,3.5);if(Math.abs(s.fr)>.01)arrow(ctx,cx,gy+4,s.fr*sc,0,C.blue,3.5);
+      const lab=v=>at('g8')?` ${Math.abs(v).toFixed(0)} N`:'';if(Fp)text(ctx,'push'+lab(Fp),cx+Fp*sc*.5-Math.sign(Fp)*30,gy-54,{size:15,color:C.pink});if(Math.abs(s.fr)>.01)text(ctx,'friction'+lab(s.fr),cx+s.fr*sc*.5,gy+64,{size:15,color:C.blue})}
+    const lines=[];if(!at('g8'))lines.push(`parked ${s.delivered}${s.streak>1?'   in a row '+s.streak:''}`);else lines.push(`parked ${s.delivered}${s.streak>1?' · in a row '+s.streak:''} · speed ${Math.abs(s.v).toFixed(1)} m/s · mass ${m} kg`);
+    if(s.xray&&at('hs'))lines.push(`${SURF[s.surf(s,s.x)].name}: μ = ${mu}; friction = μmg = ${(mu*m*G).toFixed(1)} N; a = (F + f) ÷ m = ${((Fp+s.fr)/m).toFixed(1)} m/s²`);
+    if(s.xray&&at('col'))lines.push(`stopping distance from here: v²/(2μg) = ${(s.v*s.v/(2*mu*G)).toFixed(1)} m, whatever the mass`);
+    if(s.xray&&at('max'))lines.push(`the kid tops out at ${RUN} m/s: past that your push does no work, since power = F·v needs contact`);
+    readout(ctx,lines,14,10,{size:12});
+    if(s.delivered===0&&s.v===0&&!s.dirWant(s))text(ctx,'hold ▶ to push',X(s.x)+P*1.4,gy-P*3,{size:20,color:C.yellow,align:'left',alpha:.6+.3*Math.sin(s.t*3)})}
 });
-slide('ps-f',v=>{if(ps)ps.F=v},v=>v+' N');slide('ps-m',v=>{if(ps)ps.m=v},v=>v+' kg');slide('ps-mu',v=>{if(ps)ps.mu=v},v=>v.toFixed(2));hook('ps-reset',()=>ps&&ps.reset(ps));
+const psPad=Chalk.pad(ps,{labels:{left:'push left',right:'push right',a:'crate',b:'x-ray',start:'new street'},help:'Hold <b>◀ ▶</b> to push, let go to coast. <b>A</b> loads a crate (stopped only). <b>B</b> shows the forces.<span class="keys"> Keys: <kbd>←</kbd> <kbd>→</kbd>, <kbd>Z</kbd> for A, <kbd>X</kbd> for B, <kbd>Enter</kbd> for START.</span>',
+  on(k,d){if(!ps)return;if(k==='left'||k==='right'){ps.hold[k]=d;if(d)sfx('push')}
+    else if(k==='a'&&d){if(Math.abs(ps.v)>.05){ps.pop(ps,'stop first',ps.x,2.4,C.pink,20);sfx('no')}else{ps.crates=(ps.crates+1)%3;ps.pop(ps,ps.crates?`+10 kg (${ps.mass(ps)} kg)`:'unloaded (5 kg)',ps.x,2.4,C.yellow,20);sfx('thud')}}
+    else if(k==='b'&&d){ps.xray=!ps.xray;try{localStorage.setItem('chalk:xray',ps.xray?'1':'0')}catch(e){}sfx('blip')}
+    else if(k==='start'&&d){ps.newRun(ps);sfx('blip')}}});
+slide('ps-f',v=>{if(ps)ps.F=v},v=>v+' N');
 
 /* ---------- CH2: everything falls the same ---------- */
 const fl=makeSim('cv-fall',{
@@ -185,7 +250,7 @@ const rk=makeSim('cv-rocket',{
 hook('rk-go',()=>rk&&rk.go(rk));slide('rk-fuel',v=>{if(rk){rk.fuel=v;rk.reset(rk)}},v=>v+' kg');slide('rk-ve',v=>{if(rk)rk.ve=v},v=>v.toLocaleString('en-US')+' m/s');slide('rk-mdot',v=>{if(rk)rk.mdot=v},v=>v+' kg/s');toggle('rk-stage',()=>rk.stage,v=>{rk.stage=v;rk.reset(rk)},v=>'Two stages: '+(v?'on':'off'));
 
 Chalk.start({key:'launch',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
-  l1:()=>ps&&ps.hit,l1b:()=>ps&&ps.hit&&ps.mu<.05,
+  l1:()=>ps&&ps.delivered>0,l1b:()=>ps&&ps.iceParked,l1c:()=>ps&&ps.best>=3,
   l2:()=>fl&&!fl.air&&fl.obj[0].down&&fl.obj[1].down&&Math.abs(fl.obj[0].t-fl.obj[1].t)<.05,l2b:()=>fl&&fl.g===1.62&&fl.obj[0].down,
   l3:()=>ln&&ln.hits>0,l3b:()=>ln&&ln.streak>=3,l3c:()=>ln&&ln.predErr!=null&&ln.predErr<=.05,l3d:()=>ln&&ln.hitAir,l3r:()=>ln&&ln.raced,l3s:()=>ln&&ln.racedAir,
   l4:()=>cr&&cr.stopped,l4b:()=>cr&&cr.stuckDone,

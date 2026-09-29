@@ -261,7 +261,7 @@ def card(b,meta,svg,badge=''):
     B=BOARDS[b];bd=f'<span class="badge">{badge}</span>' if badge else '';return f'<a class="card" href="{B["url"]}">{bd}<span class="subj">{B["subject"]}</span>{svg}<h2>{B["title"]}</h2><p>{meta[0]}</p><span class="meta">{meta[1]}</span><span class="go">Open the board →</span></a>'
 ICONS=json.load(open('icons.json',encoding='utf-8'))
 cards_html='\n'.join([
- card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 23 missions"),ICONS['launch'],'Good first board'),
+ card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 24 missions"),ICONS['launch'],'Good first board'),
  card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 31 missions"),ICONS['heat']),
  card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 24 missions"),ICONS['elec']),
  card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 32 missions"),ICONS['phys']),
