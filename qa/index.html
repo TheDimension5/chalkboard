@@ -423,6 +423,11 @@ html.classroom .mode-link .mode-off{display:inline}
 details.bench{border:2px dashed var(--chalk-faint);border-radius:10px;padding:.4rem .9rem}
 details.bench>summary{cursor:pointer;font-weight:900;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk-dim);padding:.3rem 0}
 details.bench[open]>summary{margin-bottom:.5rem}
+.pad{grid-template-columns:auto minmax(0,1fr) auto;max-width:100%}
+.pk-wrap small{white-space:normal;text-align:center;max-width:6.5rem;line-height:1.2}
+@media (max-width:520px){.pad-ab{gap:.6rem}.pk-wrap small{max-width:4.6rem;font-size:.6rem}}
+.levels-in{min-width:0}.levels-btns{min-width:0;flex:1 1 auto}
+@media (max-width:560px){.levels-in>*{min-width:0}}
 </style>
 </head>
 <body>
@@ -432,7 +437,7 @@ details.bench[open]>summary{margin-bottom:.5rem}
 <main><table id="qa-table"><thead><tr><th>Board</th><th>Canvases</th><th>Painted</th><th>Missions</th><th>Levels</th><th>Errors</th><th>Result</th></tr></thead><tbody id="qa-body"></tbody></table><div id="qa-frames"></div></main>
 </div>
 <script>
-const BOARDS=[{"id": "einstein", "url": "https://thedimension5.github.io/chalkboard/einstein/"}, {"id": "electricity", "url": "https://thedimension5.github.io/chalkboard/electricity/"}, {"id": "infinity", "url": "https://thedimension5.github.io/chalkboard/infinity/"}, {"id": "launch", "url": "https://thedimension5.github.io/chalkboard/launch/"}, {"id": "heat", "url": "https://thedimension5.github.io/chalkboard/heat/"}, {"id": "history", "url": "https://thedimension5.github.io/chalkboard/history/"}, {"id": "life", "url": "https://thedimension5.github.io/chalkboard/life/"}, {"id": "scale", "url": "https://thedimension5.github.io/chalkboard/scale/"}];
+const BOARDS=[{"id": "einstein", "url": "https://thedimension5.github.io/chalkboard/einstein/"}, {"id": "electricity", "url": "https://thedimension5.github.io/chalkboard/electricity/"}, {"id": "infinity", "url": "https://thedimension5.github.io/chalkboard/infinity/"}, {"id": "launch", "url": "https://thedimension5.github.io/chalkboard/launch/"}, {"id": "heat", "url": "https://thedimension5.github.io/chalkboard/heat/"}, {"id": "history", "url": "https://thedimension5.github.io/chalkboard/history/"}, {"id": "life", "url": "https://thedimension5.github.io/chalkboard/life/"}, {"id": "scale", "url": "https://thedimension5.github.io/chalkboard/scale/"}, {"id": "time", "url": "https://thedimension5.github.io/chalkboard/time/"}];
 const $=id=>document.getElementById(id);
 function painted(doc){const cs=[...doc.querySelectorAll('canvas')];let n=0;for(const c of cs){try{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let k=0;for(let i=3;i<d.length;i+=40)if(d[i]>0){k++;break}if(k)n++}catch(e){}}return[n,cs.length]}
 async function testBoard(b){const tr=document.createElement('tr');tr.innerHTML=`<td>${b.id}</td><td colspan="6">loading…</td>`;$('qa-body').appendChild(tr);
