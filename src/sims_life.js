@@ -35,11 +35,11 @@ toggle('cp-proof',()=>cp&&cp.proof,v=>{if(cp){cp.proof=v;cp.clean=0}},v=>'Proofr
 /* ---------- CH2: the moth game ---------- */
 const mo=makeSim('cv-moth',{
   init(s){s.N=40;s.soot=.1;s.auto=false;s.dark70=false;s.pale30=false;s.stable=false;s.ate10=false;s.reset(s)},
-  reset(s){s.moths=Array.from({length:s.N},()=>({sh:clamp(.5+gauss()*.2,0,1),x:0,y:0,alive:true}));s.scatter(s);s.phase='idle';s.timer=0;s.eaten=0;s.gen=0;s.hist=[s.mean(s.moths)];s.msg='';s.autoGens=0;s.wait=0;s.stat=null;s.wasAuto=false},
+  reset(s){s.moths=Array.from({length:s.N},()=>({sh:clamp(.5+gauss()*.2,0,1),x:0,y:0,alive:true}));s.scatter(s);s.phase='idle';s.timer=0;s.eaten=0;s.gen=0;s.hist=[s.mean(s.moths)];s.msg='';s.autoGens=0;s.wait=0;s.stat=null;s.wasAuto=false;s.fx=[];s.big=null},
   scatter(s){for(const m of s.moths){m.x=.05+R()*.9;m.y=.1+R()*.72}},
   mean(a){const v=a.filter(m=>m.alive);return v.length?v.reduce((t,m)=>t+m.sh,0)/v.length:0},
-  start(s){if(s.phase==='hunt')return;s.phase='hunt';s.timer=8;s.eaten=0;s.msg='';for(const m of s.moths)m.alive=true;s.scatter(s);s.wasAuto=false},
-  eatAt(p,s){if(s.phase!=='hunt')return;const r=Math.max(16,s.w*.035);let best=null,bd=1e9;for(const m of s.moths){if(!m.alive)continue;const d=Math.hypot(m.x*s.w-p.x,m.y*s.h-p.y);if(d<r&&d<bd){bd=d;best=m}}if(best){best.alive=false;s.eaten++;if(s.eaten>=10)s.ate10=true;if(s.eaten>=s.N/2)s.endRound(s)}},
+  start(s){if(s.phase==='hunt')return;s.big=null;s.phase='hunt';s.timer=8;s.eaten=0;s.msg='';for(const m of s.moths)m.alive=true;s.scatter(s);s.wasAuto=false},
+  eatAt(p,s){if(s.phase!=='hunt')return;const r=Math.max(16,s.w*.035);let best=null,bd=1e9;for(const m of s.moths){if(!m.alive)continue;const d=Math.hypot(m.x*s.w-p.x,m.y*s.h-p.y);if(d<r&&d<bd){bd=d;best=m}}if(best){best.alive=false;s.fx.push({x:best.x,y:best.y,t:0,n:s.eaten+1});s.eaten++;if(s.eaten>=10)s.ate10=true;if(s.eaten>=s.N/2)s.endRound(s)}},
   down(p,s){if(s.phase==='idle')s.start(s);else s.eatAt(p,s)},
   autoRound(s){for(const m of s.moths)m.alive=true;s.scatter(s);const sc=s.moths.map(m=>({m,k:Math.abs(m.sh-s.soot)+R()*.22})).sort((a,b)=>b.k-a.k);for(let i=0;i<s.N/2;i++)sc[i].m.alive=false;s.eaten=s.N/2;s.wasAuto=true;s.endRound(s)},
   endRound(s){s.phase='breed';s.timer=1.2;const all=s.moths,sur=all.filter(m=>m.alive);const before=all.reduce((t,m)=>t+m.sh,0)/all.length;
@@ -51,13 +51,16 @@ const mo=makeSim('cv-moth',{
     if(s.wasAuto&&Math.abs(s.soot-.5)<=.1){s.autoGens++;if(s.autoGens>=20&&Math.abs(mn-.5)<.1)s.stable=true}else s.autoGens=0;
     if(sur.length)s.msg=`generation ${s.gen}: ${sur.length} of ${s.N} survived and bred. Average darkness now ${(mn*100).toFixed(0)}%`},
   run20(s){for(let i=0;i<20;i++)s.autoRound(s);s.phase='breed';s.timer=1.2},
-  step(dt,s){if(s.phase==='hunt'){s.timer-=dt;if(s.timer<=0)s.endRound(s)}else if(s.phase==='breed'){s.timer-=dt;if(s.timer<=0){s.phase='idle';s.wait=0}}else if(s.auto){s.wait+=dt;if(s.wait>1.3){s.wait=0;s.autoRound(s)}}},
+  step(dt,s){for(const f of s.fx)f.t+=dt;s.fx=s.fx.filter(f=>f.t<.6);if(s.big){s.big.t+=dt;if(s.big.t>1.6)s.big=null}
+    if(s.phase==='hunt'){s.timer-=dt;if(s.timer<=0)s.endRound(s)}else if(s.phase==='breed'){s.timer-=dt;if(s.timer<=0){s.phase='idle';s.wait=0}}else if(s.auto){s.wait+=dt;if(s.wait>1.3){s.wait=0;s.autoRound(s)}}},
   bark(s){const key=[s.w,s.h,s.soot].join();if(s.bk&&s.bk.key===key)return s.bk.c;const c=document.createElement('canvas');const dpr=Chalk.lowPower?1:Math.min(devicePixelRatio||1,2);c.width=s.w*dpr;c.height=s.h*dpr;const g=c.getContext('2d');g.scale(dpr,dpr);g.fillStyle=mix('#D8CBB2','#2A2622',s.soot);g.fillRect(0,0,s.w,s.h);const r=rng(11);const dark=mix('#8A7758','#0E0C0B',s.soot),light=mix('#F2EAD8','#4A423B',s.soot);
     for(let i=0;i<70;i++){const x=r()*s.w,wob=6+r()*10,a=.10+r()*.16;g.strokeStyle=r()<.5?dark:light;g.globalAlpha=a;g.lineWidth=1+r()*3;g.beginPath();for(let y=0;y<=s.h;y+=12)g.lineTo(x+Math.sin(y/40+i)*wob,y);g.stroke()}
     g.globalAlpha=.25;for(let i=0;i<9;i++){const x=r()*s.w,y=r()*s.h,rr2=8+r()*14;g.strokeStyle=dark;g.lineWidth=2;for(let k=1;k<4;k++){g.beginPath();g.ellipse(x,y,rr2*k*.5,rr2*k*.32,r()*.6,0,Math.PI*2);g.stroke()}}
     g.globalAlpha=1;s.bk={key,c};return c},
   draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);ctx.drawImage(s.bark(s),0,0,w,h);const r=Math.max(9,w*.02);
     for(const m of s.moths){if(!m.alive)continue;const x=m.x*w,y=m.y*h,col=mix('#EFE8D6','#23262A',m.sh);ctx.save();ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x-r*.55,y,r*.75,r*.5,-.35,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x+r*.55,y,r*.75,r*.5,.35,0,Math.PI*2);ctx.fill();ctx.fillStyle=mix('#EFE8D6','#23262A',clamp(m.sh+.25,0,1));ctx.globalAlpha=.45;circle(ctx,x-r*.6,y-r*.05,r*.16,ctx.fillStyle);circle(ctx,x+r*.6,y-r*.05,r*.16,ctx.fillStyle);ctx.globalAlpha=1;ctx.strokeStyle=mix('#EFE8D6','#23262A',clamp(m.sh+.3,0,1));ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x,y-r*.35);ctx.lineTo(x,y+r*.4);ctx.stroke();ctx.restore()}
+    for(const f of s.fx){const u=f.t/.6;ctx.save();ctx.globalAlpha=1-u;ctx.strokeStyle=C.yellow;ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x*w,f.y*h,r*(1+u*2.2),0,Math.PI*2);ctx.stroke();for(let k=0;k<6;k++){const a=k*1.047+f.n;circle(ctx,f.x*w+Math.cos(a)*r*(1+u*3),f.y*h+Math.sin(a)*r*(1+u*3),2.2,C.chalk)}ctx.restore();text(ctx,'+'+f.n,f.x*w,f.y*h-r*1.4-u*18,{size:20,color:C.yellow,alpha:1-u})}
+    if(s.big){const u=s.big.t/1.6;text(ctx,s.big.text,w/2,h*.42,{size:44*(u<.12?.6+u/.12*.4:1),color:C.yellow,alpha:u<.7?1:Math.max(0,1-(u-.7)/.3)})}
     const mn=s.mean(s.moths);const lines=[];
     if(s.phase==='hunt'){lines.push(`EAT THE MOTHS  ·  ${s.timer.toFixed(1)} s left  ·  eaten ${s.eaten}`);ctx.save();ctx.fillStyle=rgba(C.yellow,.85);ctx.fillRect(0,h-6,w*s.timer/8,6);ctx.restore()}
     else lines.push(s.phase==='idle'&&!s.gen?'tap the bark to start a round: you are the bird':`generation ${s.gen} · average darkness ${(mn*100).toFixed(0)}% · bark ${(s.soot*100).toFixed(0)}% sooty`);
@@ -69,6 +72,16 @@ const mo=makeSim('cv-moth',{
     if(s.msg&&s.phase!=='hunt')text(ctx,s.msg,w/2,h*.9-(at('g8')?44:0),{size:Math.min(17,w*.032),color:C.yellow,alpha:.95});
     if(at('g8')&&s.hist.length>1){const gx=16,gw=w-32,gy=h-44,gh=36;ctx.save();ctx.fillStyle=rgba(C.board,.55);ctx.fillRect(gx-4,gy-4,gw+8,gh+8);ctx.strokeStyle=rgba(C.chalk,.5);ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(gx,gy+gh*(1-s.soot));ctx.lineTo(gx+gw,gy+gh*(1-s.soot));ctx.stroke();ctx.setLineDash([]);const n=s.hist.length;ctx.strokeStyle=C.yellow;ctx.lineWidth=2;ctx.beginPath();s.hist.forEach((v,i)=>{const x=gx+gw*i/Math.max(n-1,20),y=gy+gh*(1-v);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();text(ctx,'darkness over generations (dashed: bark)',gx+gw,gy-8,{size:11,align:'right',fam:'body',alpha:.7});ctx.restore()}}
 });
+function moSoot(v){const el=$('mo-soot');if(!el)return;el.value=v;el.dispatchEvent(new Event('input'))}
+/* the bet uses a gentler bird than the game's automatic one: it catches a fifth of the moths each generation, mostly the most visible */
+function moMild(){for(const m of mo.moths)m.alive=true;mo.scatter(mo);const sc=mo.moths.map(m=>({m,k:Math.abs(m.sh-mo.soot)+R()*.8})).sort((a,b)=>b.k-a.k);const kill=Math.round(mo.N*.2);for(let i=0;i<kill;i++)sc[i].m.alive=false;mo.eaten=kill;mo.wasAuto=true;mo.endRound(mo)}
+function moRun(api,until,done){let n=0;const tick=()=>{moMild();n++;mo.big={t:0,text:'generation '+n};const mn=mo.mean(mo.moths);if(until(mn)||n>=80){setTimeout(()=>{api.busy=false;done(n,mn)},700);return}setTimeout(tick,Chalk.REDUCE?150:n<3?600:170)};setTimeout(tick,300)}
+const mothBet=Chalk.bet('mo-bet',{canvas:'cv-moth',placed:'Soot is falling.',
+  pick(p,api){if(!mo)return;api.busy=true;mo.auto=false;mo.reset(mo);for(const m of mo.moths)m.sh=clamp(.12+gauss()*.08,0,1);mo.hist=[mo.mean(mo.moths)];moSoot(1);moRun(api,mn=>mn>.7,(n)=>{mo.betDone=true;mo.big={t:0,text:n+' generations!'};const lv=Chalk.level();
+    const head=p==='10'?`You called it: ${n} generations.`:`Just ${n} generations.`;
+    const body=lv==='k5'?'Nobody planned it. Pale moths stood out on the black bark and got eaten; dark moths hid, lived, and had dark babies. This really happened in England: the first black moth was spotted near Manchester in 1848, and about fifty years later almost all of them were black.':lv==='g8'?'The birds did all of it. Pale moths stood out on black bark, dark ones survived to breed. It really happened near Manchester: the first black peppered moth was recorded in 1848, and by 1895 about 98% were black. One moth generation is a year, so that is evolution inside one human lifetime.':'Strong selection on a heritable trait: the response per generation is R = h²S, and here S is large. The real peppered moth went from a first black specimen in 1848 to about 98% black by 1895 near Manchester, roughly fifty generations.';
+    api.say(`<b>${head}</b> ${body}`+api.next('Now clean the air','clean'))})},
+  next(k,api){api.busy=true;moSoot(.05);moRun(api,mn=>mn<.3,(n)=>{mo.big={t:0,text:'back in '+n};api.say(`<b>${n} generations back to pale.</b> It runs both ways. It really did: after Britain’s Clean Air Act of 1956 cut the soot, the pale moths came back. Now hunt them yourself.`)})}});
 hook('mo-go',()=>mo&&mo.start(mo));hook('mo-run',()=>mo&&mo.run20(mo));hook('mo-reset',()=>mo&&mo.reset(mo));
 slide('mo-soot',v=>{if(mo)mo.soot=v},v=>Math.round(v*100)+'%');
 toggle('mo-auto',()=>mo&&mo.auto,v=>{if(mo)mo.auto=v},v=>'Automatic bird: '+(v?'on':'off'));
@@ -211,7 +224,7 @@ const tr=makeSim('cv-tree',{
 });
 hook('tr-new',()=>tr&&tr.newPuzzle(tr));hook('tr-show',()=>tr&&tr.show(tr));slide('tr-rate',v=>{if(tr)tr.rate=v},v=>v+' changes per Myr');
 
-Chalk.start({key:'life',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
+Chalk.start({key:'life',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({lf2e:()=>!!(mo&&mo.betDone),
   lf1:()=>cp&&cp.did10,lf1b:()=>cp&&cp.broke,lf1c:()=>cp&&cp.cleanDone,
   lf2:()=>mo&&mo.ate10,lf2b:()=>mo&&mo.dark70,lf2c:()=>mo&&mo.pale30,lf2d:()=>mo&&mo.stable,
   lf3:()=>pe&&pe.d40,lf3b:()=>pe&&pe.done3b,lf3c:()=>pe&&pe.half,lf3d:()=>pe&&pe.allTall,

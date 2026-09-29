@@ -13,7 +13,7 @@ FONTS='<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="p
 SPEAKER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>'
 READ=f'<button class="btn read" data-lv="k5 g8" type="button">{SPEAKER}<span>Read to me</span></button>'
 STD={}
-SKILL={'launch':{'l1','l1b','l3','l3b','l3c','l3d','l5','l5b'},'heat':{'ht3','ht6','bo1','bo2','bo3','bo4','bo5'},'einstein':{'ch2a','ch2b','ch2c','ch2d','ch6c','ch7a','ch7b','ch9c','ch10a','ch10c'},'electricity':set(),'infinity':set(),'history':set(),'life':{'lf2d','lf4d','lf4e','lf5d','lf6c'},'scale':{'sc1e','sc2g'}}
+SKILL={'launch':{'l1','l1b','l3','l3b','l3c','l3d','l5','l5b'},'heat':{'ht3','ht6','bo1','bo2','bo3','bo4','bo5'},'einstein':{'ch2a','ch2b','ch2c','ch2d','ch6c','ch7a','ch7b','ch9c','ch10a','ch10c'},'electricity':set(),'infinity':set(),'history':set(),'life':{'lf2d','lf4d','lf4e','lf5d','lf6c'},'scale':{'sc1e','sc2g'},'time':{'p1d','p2e'}}
 EIN_STD={1:"3-PS2-3, 5-PS2-1, MS-PS2-3, MS-PS2-4",2:"5-PS2-1, MS-PS2-4, HS-PS2-4",3:"3-PS2-3, MS-PS2-5, HS-PS2-5",4:"MS-PS2-5, HS-PS2-4",5:"HS-PS2-4",6:"HS-PS2-4",7:"HS-PS2-4",8:"MS-PS2-4, HS-PS1-8",9:"HS-ETS1-1",10:"MS-PS2-4, HS-PS2-4"}
 for n,v in EIN_STD.items(): STD[('einstein',n)]=v
 CARDS={'boards':[]}
@@ -23,19 +23,21 @@ UNITS_OF={}
 for u in UNITS:
     for i,st in enumerate(u['steps']): UNITS_OF.setdefault(st,[]).append((u,i+1))
 def chapter_url(bid,n): return BOARDS[bid]['url']+f'#ch{n}'
+MODE_LINK='<p class="teach mode-link"><a class="mode-on" href="?classroom=1">Teaching a class? Turn on classroom mode</a><a class="mode-off" href="?classroom=0">Classroom mode is on. Turn it off</a></p>'
+LEVELBTNS='''    <span class="levels-label">How deep?</span>
+    <div class="levels-btns" role="tablist">
+      <button role="tab" data-level="k5" aria-selected="true">First look<small class="d">the big idea</small><small class="g">K to 5th</small></button>
+      <button role="tab" data-level="g8" aria-selected="false">Closer<small class="d">how it works</small><small class="g">middle school</small></button>
+      <button role="tab" data-level="hs" aria-selected="false">Deeper<small class="d">with the numbers</small><small class="g">high school</small></button>
+      <button role="tab" data-level="col" aria-selected="false">Deepest<small class="d">the real math</small><small class="g">college</small></button>
+      <button role="tab" data-level="max" aria-selected="false">Max<small class="d">no limits</small><small class="g">no limits</small></button>
+    </div>
+'''
 def levelbar():
     return f'''<nav class="levels" aria-label="Reading level">
   <div class="wrap levels-in">
     <a class="home" href="{BOARDS_URL}">The Chalkboard</a>
-    <span class="levels-label">Who's reading?</span>
-    <div class="levels-btns" role="tablist">
-      <button role="tab" data-level="k5" aria-selected="true">Kids<small>K to 5th</small></button>
-      <button role="tab" data-level="g8" aria-selected="false">8th grade<small>middle school</small></button>
-      <button role="tab" data-level="hs" aria-selected="false">High school<small>physics class</small></button>
-      <button role="tab" data-level="col" aria-selected="false">College<small>major</small></button>
-      <button role="tab" data-level="max" aria-selected="false">Max<small>no limits</small></button>
-    </div>
-    <span class="mcount" id="mcount"></span>
+{LEVELBTNS}    <span class="mcount" id="mcount"></span>
     <button class="lowpow" id="lowpow" type="button" aria-pressed="false" title="Fewer effects for older computers">Low power</button>
   </div>
 </nav>'''
@@ -47,26 +49,28 @@ for bi,band in enumerate(re.findall(r'<section class="band">(.*?)</section>',tg,
         m=re.search(r'<h3>(\d+) ·',chap); qs=re.findall(r'<li>(.*?)</li>',re.search(r'<ol class="qs">(.*?)</ol>',chap,re.S).group(1)) if '<ol class="qs">' in chap else None
         if m and qs: EIN_DISCUSS.setdefault(int(m.group(1)),{})[bi]=qs
 def warmup(bid,n):
-    L=LESSON[(bid,n)]; return f'<p class="warmup"><b>Warm-up</b>{L["warm"]}</p>'
+    L=LESSON[(bid,n)]; return f'<p class="warmup"><b>Wonder</b>{L["warm"]}</p>'
 def lesson_end(bid,n):
     L=LESSON[(bid,n)]
     if L['discuss'] is None:
         d=EIN_DISCUSS.get(n,{});ol=''.join(f'<ol class="lv lv-{l}">'+''.join(f'<li>{q}</li>' for q in d.get(BAND[l],[]))+'</ol>' for l in LV)
     else: ol='<ol>'+''.join(f'<li>{q}</li>' for q in L['discuss'])+'</ol>'
     before=[a for a,b in EDGES if b==(bid,n)]; after=[b for a,b in EDGES if a==(bid,n)]
-    links=[]
-    if before: links.append('Before this: '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]} {x[1]}, {TITLES[x]}</a>' for x in before))
-    if after: links.append('After this: '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]} {x[1]}, {TITLES[x]}</a>' for x in after))
     badges=''.join(f'<span class="unitbadge">{u["title"]} · step {i}</span>' for u,i in UNITS_OF.get((bid,n),[]))
     std=STD.get((bid,n))
-    return f'''<div class="lesson-end">
+    holes=[]
+    if before: holes.append('Comes from '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]}: {TITLES[x]}</a>' for x in before))
+    if after: holes.append('Leads to '+', '.join(f'<a href="{chapter_url(*x)}">{BOARDS[x[0]]["title"]}: {TITLES[x]}</a>' for x in after))
+    return f'''<div class="lesson-end{'' if holes else ' no-holes'}">
+      {('<p class="holes"><b>Rabbit holes</b>'+' · '.join(holes)+'</p>') if holes else ''}
+      <div class="teach-only">
       <p class="skill"><b>You can now:</b> {L["skill"]}.</p>
       <details class="discuss"><summary>Discuss</summary>{ol}</details>
       <p class="exit"><b>Exit ticket</b> {L["exit"]}</p>
-      {('<p class="links">'+' · '.join(links)+'</p>') if links else ''}
       {('<p class="links">'+badges+'</p>') if badges else ''}
       {('<p class="links std"><b>Standards</b> '+std+'</p>') if std else ''}
       <div class="handin" data-ch="ch{n}" data-board="{_h.escape(BOARDS[bid]['title'],True)}" data-title="{_h.escape(TITLES[(bid,n)],True)}"><p class="mh">Hand it in</p><p>Write your exit ticket answer, put your name, and make a receipt to show your teacher. Nothing is sent anywhere.</p><div class="row"><input class="hi-name" type="text" placeholder="your name or initials" aria-label="your name"></div><textarea class="hi-exit" placeholder="your exit ticket answer" aria-label="your exit ticket answer"></textarea><div class="row"><button class="btn hi-make" type="button">Make my receipt</button><span class="hi-tools row" hidden><button class="btn hi-copy" type="button">Copy</button><button class="btn hi-print" type="button">Print</button></span></div><pre class="receipt" hidden></pre></div>
+      </div>
     </div>'''
 def checkbox_numeric(P,n):
     CK=P.CHECK; opts='<option value="">unit…</option>'+''.join(f'<option value="{u}">{nm}</option>' for u,nm in P.UNITS); parts=[]
@@ -152,6 +156,7 @@ def build_page(mod,sims):
   <p class="big" style="margin-left:auto;margin-right:auto">{P.CLOSING[0]}</p>
   <div class="cert" id="cert" hidden data-board="{_h.escape(BOARDS[bid]["title"],True)}"><p class="mh">Certificate</p><p class="cert-note"></p><button class="btn primary" id="cert-go" type="button">Print my certificate</button><div class="certout" hidden></div></div>
   <p class="teach"><a href="{BOARDS_URL}">More boards at The Chalkboard</a></p>
+  {MODE_LINK}
 </footer>
 </div>
 <div class="tray" aria-hidden="true"></div>
@@ -204,10 +209,15 @@ Chalk.start({key:'einstein',missions:MISSION_DEFS,checks:Object.assign(MCHECK,{'
     h=h.replace('</style>',open('extra.css',encoding='utf-8').read()+'</style>',1)
     h=h.replace('<a class="home" href="https://thedimension5.github.io/chalkboard/">','<a class="home" href="'+BOARDS_URL+'">',1)
     h=h.replace('https://thedimension5.github.io/one-rule-for-everything/teachers.html',HUB+'einstein/teachers.html')
+    a1=h.index('    <span class="levels-label">');a2=h.index('    <span class="mcount" id="mcount"></span>')
+    h=h[:a1]+LEVELBTNS+h[a2:]
+    h=h.replace('</footer>','  '+MODE_LINK+'\n</footer>',1)
+    from bets import bet as _bet
+    h=h.replace('<div class="panel"><canvas id="cv-pulls"',_bet('pulls-bet',"A fridge magnet tries to lift a paper clip. The whole Earth pulls the clip down. Who wins?",[('earth','The whole Earth'),('magnet','The little magnet'),('tie',"It's a tie")])+'<div class="panel"><canvas id="cv-pulls"',1)
     h=h.replace('<p class="teach">','<div class=\"cert\" id=\"cert\" hidden data-board=\"One Rule for Everything\"><p class=\"mh\">Certificate</p><p class=\"cert-note\"></p><button class=\"btn primary\" id=\"cert-go\" type=\"button\">Print my certificate</button><div class=\"certout\" hidden></div></div><p class="teach">',1)
     return h,defs
 # ================= build =================
-for d in ['site/infinity','site/history','site/electricity','site/launch','site/heat','site/life','site/scale','frag']: os.makedirs(d,exist_ok=True)
+for d in ['site/infinity','site/history','site/electricity','site/launch','site/heat','site/life','site/scale','site/time','frag']: os.makedirs(d,exist_ok=True)
 MAPDATA={'boards':[],'edges':[[a[0],a[1],b[0],b[1]] for a,b in EDGES],'units':[{'id':u['id'],'title':u['title'],'steps':[list(x) for x in u['steps']]} for u in UNITS]}
 def board_entry(bid,missions,nch):
     ch=[]
@@ -228,7 +238,7 @@ for n in range(1,11):
     _echs.append({'n':n,'title':titles,'std':STD.get(('einstein',n),''),'warm':L['warm'],'skill':L['skill'],'exit':L['exit'],'discuss':[EIN_DISCUSS.get(n,{}).get(b,[]) for b in range(4)],'figcap':_strip(fc.group(1)) if fc else 'Play the experiment on the page.','missions':[{'id':d['id'],'text':d['text'],'lv':d['lv'],'skill':d['id'] in SKILL['einstein']} for d in ein_defs if d['ch'] in (f'ch{n}',f'ch{n}t')],'check':ck})
 CARDS['boards'].insert(0,{'id':'einstein','title':BOARDS['einstein']['title'],'url':BOARDS['einstein']['url'],'subject':BOARDS['einstein']['subject'],'chapters':_echs})
 print('einstein',len(ein_html))
-for mod,sims in [('page_heat','sims_heat.js'),('page_launch','sims_launch.js'),('page_electric','sims_electric.js'),('page_infinity','sims_infinity.js'),('page_history','sims_history.js'),('page_life','sims_life.js'),('page_scale','sims_scale.js')]:
+for mod,sims in [('page_heat','sims_heat.js'),('page_launch','sims_launch.js'),('page_electric','sims_electric.js'),('page_infinity','sims_infinity.js'),('page_history','sims_history.js'),('page_life','sims_life.js'),('page_scale','sims_scale.js'),('page_time','sims_time.js')]:
     P,frag,missions=build_page(mod,sims)
     chs=[]
     for n in sorted(P.CH):
@@ -251,14 +261,15 @@ def card(b,meta,svg,badge=''):
     B=BOARDS[b];bd=f'<span class="badge">{badge}</span>' if badge else '';return f'<a class="card" href="{B["url"]}">{bd}<span class="subj">{B["subject"]}</span>{svg}<h2>{B["title"]}</h2><p>{meta[0]}</p><span class="meta">{meta[1]}</span><span class="go">Open the board →</span></a>'
 ICONS=json.load(open('icons.json',encoding='utf-8'))
 cards_html='\n'.join([
- card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 21 missions"),ICONS['launch'],'Good first board'),
- card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 30 missions"),ICONS['heat']),
- card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 23 missions"),ICONS['elec']),
- card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 31 missions"),ICONS['phys']),
- card('infinity',("Some infinities are bigger than others. Prove it yourself.","5 chapters · 15 missions"),ICONS['math']),
- card('history',("How the past reaches us, from scribes and dead scripts to bit rot.","6 chapters · 18 missions"),ICONS['hist']),
- card('life',("Copy a recipe, hunt moths as the bird, flip peas, race germs, then rebuild the tree of life.","6 chapters · 29 missions"),ICONS['life'],'New'),
- card('scale',("Telescope and microscope in one eyepiece: from the edge of the universe to the Planck length.","2 chapters · 14 missions"),ICONS['scale'],'New')])
+ card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 24 missions"),ICONS['launch'],'Good first board'),
+ card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 32 missions"),ICONS['heat']),
+ card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 25 missions"),ICONS['elec']),
+ card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 33 missions"),ICONS['phys']),
+ card('infinity',("Some infinities are bigger than others. Prove it yourself.","5 chapters · 16 missions"),ICONS['math']),
+ card('history',("How the past reaches us, from scribes and dead scripts to bit rot.","6 chapters · 19 missions"),ICONS['hist']),
+ card('life',("Copy a recipe, hunt moths as the bird, flip peas, race germs, then rebuild the tree of life.","6 chapters · 30 missions"),ICONS['life'],'New'),
+ card('scale',("Telescope and microscope in one eyepiece: from the edge of the universe to the Planck length.","2 chapters · 15 missions"),ICONS['scale'],'New'),
+ card('time',("Everything has a heartbeat. Dive inside yours, or rise to the tide, the seasons and the galaxy.","2 chapters · 12 missions"),ICONS['time'],'New')])
 units_html=''.join(f'''<div class="unit" data-unit="{u["id"]}"><h3>{u["title"]}</h3><p>{u["blurb"]}</p><ol>'''+''.join(f'<li><a href="{chapter_url(*st)}">{TITLES[st]}</a> <small>{BOARDS[st[0]]["title"]}, chapter {st[1]}</small></li>' for st in u['steps'])+'</ol></div>' for u in UNITS)
 qlist=''.join(f'<li><a href="{chapter_url(b,n)}">{LESSON[(b,n)]["warm"]}</a><small>{BOARDS[b]["title"]} {n}</small></li>' for (b,n) in sorted(LESSON,key=lambda k:(list(BOARDS).index(k[0]),k[1])))
 grade='<div class="grade"><span class="lbl">Who\'s reading?</span><button class="btn" data-glevel="k5">Kids</button><button class="btn" data-glevel="g8">8th grade</button><button class="btn" data-glevel="hs">High school</button><button class="btn" data-glevel="col">College</button><button class="btn" data-glevel="max">Max</button><span class="hint" id="gnote"></span></div>'
@@ -298,7 +309,7 @@ hub=f'''{HEAD("The Chalkboard","Hard ideas made playable: interactive science, m
   <div><h3>Play, then teach it back</h3><p>Missions light up as the physics awards them. A question at the end of every chapter checks the number and the unit.</p></div>
   <div><h3>Read to me</h3><p>On the two youngest levels a button reads each chapter aloud, so a six-year-old can play alone.</p></div>
 </div>
-<div class="teachers"><span class="eyebrow">For teachers</span><p>Every chapter is a 25-minute lesson. <a href="{HUB}classroom/">The Classroom</a> gives you a printable lesson card for any chapter, with the answer key, a student link at the right level, and a checker for the receipts students hand in. <a href="{HUB}map/">The Map</a> shows all 53 chapters, the units, and a search by question. <a href="{HUB}kits/">Chalk Kits</a> are the hands-on twins of the experiments.</p></div>
+<div class="teachers"><span class="eyebrow">For teachers</span><p>Every chapter is a 25-minute lesson. <a href="{HUB}classroom/">The Classroom</a> gives you a printable lesson card for any chapter, with the answer key, a student link at the right level, and a checker for the receipts students hand in. <a href="{HUB}map/">The Map</a> shows all 55 chapters, the units, and a search by question. <a href="{HUB}kits/">Chalk Kits</a> are the hands-on twins of the experiments.</p></div>
 </main>
 <footer class="closing" style="padding-top:3rem">
   <p class="eyebrow">Made with chalk</p>

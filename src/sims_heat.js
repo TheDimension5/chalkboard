@@ -75,23 +75,63 @@ const bl=makeSim('cv-boil',{
 });
 hook('bl-go',()=>bl&&bl.go(bl));slide('bl-p',v=>{if(bl)bl.P=v},v=>v+' W');slide('bl-m',v=>{if(bl)bl.m=v},v=>v+' L');
 
-/* ---------- CH3: the wood fire ---------- */
+/* ---------- CH3: the wood fire: a long night at the cabin ---------- */
+/* Keep a real stove model in the band while the weather gets worse. A module on the plate charges a lantern, then a radio, then a phone. */
+const sfx=Chalk.sfx;
+const NIGHT=[{name:'the lantern',wh:2,k:15,gust:0,sky:'calm'},{name:'the radio',wh:3,k:19,gust:3,sky:'windy'},{name:'the phone',wh:5,k:23,gust:6,sky:'blizzard'}];
+const ACCEL=120,TEGF=1.5/(0.2+1.5+0.5);
 const st=makeSim('cv-stove',{
-  init(s){s.air=.6;s.fire=makeFire();s.reset(s)},
-  reset(s){s.T=20;s.fuel=0;s.hold=0;s.over=false;s.log=0},
-  addLog(s){s.fuel+=1;s.log++},
-  step(dt,s){const h=dt*30;const burn=s.fuel>0?Math.min(s.fuel,s.air/3600*h):0;s.fuel-=burn;const P=burn*16e6/h;const loss=15*(s.T-20);s.T+=(P*.5-loss)*h/12000;s.T=Math.max(20,s.T);
-    if(s.T>=150&&s.T<=170)s.hold+=dt;else s.hold=0;if(s.T>170)s.over=true;s.P=P},
-  draw(s){const{ctx,w,h,dt}=s;ctx.clearRect(0,0,w,h);const k=s.fuel>0?clamp(s.air/1.5,.25,1)*clamp(s.fuel,.3,1):0;
-    poly(ctx,[[0,h*.86],[w,h*.86]],C.chalk,2,.35);drawStove(ctx,s,w*.36,h*.86,w*.3,h*.42,s.T,s.fuel,k,s.fire,dt);
-    for(let i=0;i<Math.min(6,Math.ceil(s.fuel));i++)void 0;
-    const gx=w*.8,gy=h*.5,gr=Math.min(w,h)*.18;circle(ctx,gx,gy,gr,rgba(C.board,.6),C.chalk,2);const a0=Math.PI*.8,a1=Math.PI*2.2;const ang=T=>a0+(a1-a0)*clamp(T/300,0,1);
-    ctx.save();ctx.lineWidth=8;ctx.strokeStyle=rgba(C.green,.7);ctx.beginPath();ctx.arc(gx,gy,gr-8,ang(150),ang(170));ctx.stroke();ctx.strokeStyle=rgba(C.pink,.7);ctx.beginPath();ctx.arc(gx,gy,gr-8,ang(170),ang(300));ctx.stroke();ctx.restore();
-    const a=ang(s.T);poly(ctx,[[gx,gy],[gx+Math.cos(a)*(gr-14),gy+Math.sin(a)*(gr-14)]],C.chalk,3);circle(ctx,gx,gy,4,C.chalk);text(ctx,`${s.T.toFixed(0)} °C`,gx,gy+gr+22,{size:22,color:s.T>170?C.pink:s.T>=150?C.green:C.chalk});text(ctx,'top plate',gx,gy+gr+42,{size:14,alpha:.7});
-    const lines=[`fuel in the box ${s.fuel.toFixed(2)} kg   burning ${s.air} kg/h   fire ${((s.P||0)/1000).toFixed(1)} kW`,s.T>170?'TOO HOT: over 170 °C, a module up here is being damaged':s.T>=150?`in the band: ${s.hold.toFixed(0)} s`:'below the band: add a log or more air'];
-    if(at('g8'))lines.push(`16 MJ per kg: ${s.air} kg/h is ${(s.air*16e6/3600/1000).toFixed(1)} kW of heat`);if(at('hs'))lines.push('plate settles where heat in = heat out; about half of the fire reaches the plate here');readout(ctx,lines,16,12,{size:12})}
+  init(s){s.fire=makeFire();s.xray=false;try{s.xray=localStorage.getItem('chalk:xray')==='1'}catch(e){}s.hold={left:false,right:false};s.reset(s)},
+  reset(s){s.T=20;s.fuel=0;s.air=.8;s.clock=20*3600;s.lvl=0;s.wh=0;s.dmg=0;s.broken=false;s.band=0;s.hold30=false;s.done=[];s.allDone=false;s.k=NIGHT[0].k;s.gustT=0;s.snow=[];s.pops=[];s.P=0;s.Pm=0;s.warm=0;s.hot=false},
+  addLog(s){if(s.fuel>3.5){s.pop(s,'the box is full',C.pink);sfx('no');return}s.fuel+=1;s.pop(s,'+1 log',C.yellow);sfx('thud')},
+  pop(s,t,color,size=22){s.pops.push({t,color,size,age:0})},
+  step(dt,s){const N=NIGHT[Math.min(s.lvl,NIGHT.length-1)],h=dt*ACCEL;
+    const dAir=(s.hold.right?1:0)-(s.hold.left?1:0);if(dAir)s.air=clamp(s.air+dAir*dt*.7,.2,2);
+    s.gustT-=dt;if(s.gustT<=0){s.gustT=2+Math.random()*3;s.gust=N.gust*(Math.random()*2-1)}s.k+=((N.k+s.gust)-s.k)*Math.min(1,dt*.8);
+    const burn=s.fuel>0?Math.min(s.fuel,s.air/3600*h):0;s.fuel-=burn;s.P=burn*16e6/h;const loss=s.k*(s.T-20);s.T=Math.max(20,s.T+(s.P*.5-loss)*h/12000);s.clock+=h;
+    const dT=Math.max(0,(s.T-20)*TEGF);s.Pm=s.broken?0:modP(dT)*(1-s.dmg);
+    if(s.T>170&&!s.broken){s.dmg=Math.min(1,s.dmg+(s.T-170)*h/9000);if(!s.hot){s.hot=true;s.pop(s,'too hot! the module is cooking',C.pink,24);sfx('no')}if(s.dmg>=1){s.broken=true;Chalk.flash(s,'the module cracked',C.pink,.35);sfx('no')}}else if(s.T<165)s.hot=false;
+    if(s.T>=150&&s.T<=170){s.band+=dt;if(s.band>=30)s.hold30=true}else s.band=0;
+    if(!s.allDone){s.wh+=s.Pm*h/3600;if(s.wh>=N.wh){s.done.push(N.name);s.wh=0;s.lvl++;sfx(s.lvl>=NIGHT.length?'big':'park');if(s.lvl>=NIGHT.length){s.allDone=true;Chalk.flash(s,'everything charged!',C.yellow,.3)}else{Chalk.flash(s,N.name.replace('the ','')+' charged!',C.green,.3);s.pop(s,`the wind picks up: ${NIGHT[s.lvl].sky}`,C.blue,22)}}}
+    s.warm+=((s.done.length?1:0)-s.warm)*Math.min(1,dt*2);
+    const wind=clamp((s.k-15)/10,0,1);if(!Chalk.REDUCE&&Math.random()<dt*(20+40*wind))s.snow.push({x:Math.random()*1.3-.3,y:-.05,vy:.12+Math.random()*.1,vx:.02+wind*.35+Math.random()*.05});for(const f of s.snow){f.x+=f.vx*dt;f.y+=f.vy*dt}s.snow=s.snow.filter(f=>f.y<1.05&&f.x<1.1);
+    for(const q of s.pops)q.age+=dt;s.pops=s.pops.filter(q=>q.age<2.2)},
+  draw(s){const{ctx,w,h,dt}=s;ctx.clearRect(0,0,w,h);const floor=h*.86,dawn=clamp((s.clock-(28.5*3600))/(1.5*3600),0,1);
+    if(s.warm>.01){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(w*.82,h*.42,0,w*.82,h*.42,w*.6);g.addColorStop(0,`rgba(246,212,107,${.12*s.warm})`);g.addColorStop(1,'rgba(246,212,107,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.restore()}
+    // window with the weather
+    const wx=w*.05,wy=h*.1,ww=w*.22,wh=h*.3;ctx.save();rr(ctx,wx,wy,ww,wh,4);ctx.clip();ctx.fillStyle=`rgb(${Math.round(12+60*dawn)},${Math.round(20+70*dawn)},${Math.round(34+90*dawn)})`;ctx.fillRect(wx,wy,ww,wh);ctx.fillStyle='rgba(241,236,223,.85)';for(const f of s.snow){ctx.beginPath();ctx.arc(wx+f.x*ww,wy+f.y*wh,1.6,0,Math.PI*2);ctx.fill()}ctx.fillStyle='rgba(241,236,223,.25)';ctx.fillRect(wx,wy+wh-8,ww,8);ctx.restore();box(ctx,wx,wy,ww,wh,null,C.chalk,4,2);poly(ctx,[[wx+ww/2,wy],[wx+ww/2,wy+wh]],C.chalk,2,.7);poly(ctx,[[wx,wy+wh/2],[wx+ww,wy+wh/2]],C.chalk,2,.7);
+    text(ctx,NIGHT[Math.min(s.lvl,2)].sky,wx+ww/2,wy+wh+16,{size:15,color:C.blue,alpha:.8});
+    // clock
+    const cx0=w*.5,cy0=h*.13,cr=Math.min(w,h)*.06,hr=(s.clock/3600)%12,mn=(s.clock/60)%60;circle(ctx,cx0,cy0,cr,rgba(C.board,.6),C.chalk,2);poly(ctx,[[cx0,cy0],[cx0+Math.sin(hr/12*6.283)*cr*.5,cy0-Math.cos(hr/12*6.283)*cr*.5]],C.chalk,3);poly(ctx,[[cx0,cy0],[cx0+Math.sin(mn/60*6.283)*cr*.8,cy0-Math.cos(mn/60*6.283)*cr*.8]],C.chalk,1.5);
+    const hh=Math.floor(s.clock/3600)%24,mm=Math.floor(s.clock/60)%60;text(ctx,`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`,cx0,cy0+cr+14,{size:14,fam:'body',alpha:.7});
+    poly(ctx,[[0,floor],[w,floor]],C.chalk,2,.35);
+    // logs waiting by the stove
+    for(let i=0;i<5;i++){ctx.fillStyle='#6b4a2b';rr(ctx,w*.1+(i%3)*18+(i>2?9:0),floor-10-(i>2?10:0),16,9,3);ctx.fill()}
+    const k=s.fuel>0?clamp(s.air/1.5,.25,1)*clamp(s.fuel,.3,1):0;const SX=w*.4,SW=Math.min(w*.3,200),SH=Math.min(h*.42,180);drawStove(ctx,s,SX,floor,SW,SH,s.T,s.fuel,k,s.fire,dt);
+    // module, fins and wire to the device shelf
+    const top=floor-SH-10,mx=SX+SW*.08,mw=SW*.3;box(ctx,mx,top-8,mw,8,s.broken?C.pink:rgba(C.yellow,.9),C.chalk,2,1.5);for(let i=0;i<5;i++)poly(ctx,[[mx+4+i*(mw-8)/4,top-8],[mx+4+i*(mw-8)/4,top-22]],C.chalk,1.5,.8);
+    const dx=w*.83,dy=h*.44;ctx.save();ctx.setLineDash([2,4]);poly(ctx,[[mx+mw,top-4],[dx-40,top-4],[dx-40,dy],[dx-26,dy]],s.Pm>0.05?C.yellow:C.chalk,1.5,s.Pm>0.05?.9:.35);ctx.restore();
+    // the thing charging, and the ones already done
+    const cur=NIGHT[Math.min(s.lvl,2)],frac=s.allDone?1:clamp(s.wh/cur.wh,0,1);box(ctx,dx-26,dy-26,52,52,rgba(C.board,.6),C.chalk,8,2);box(ctx,dx-20,dy+14,40*frac,6,C.green,null,2);
+    text(ctx,s.allDone?'all charged':cur.name.replace('the ',''),dx,dy-4,{size:16,color:s.allDone?C.green:C.chalk});text(ctx,s.allDone?'':`${s.wh.toFixed(1)} / ${cur.wh} Wh`,dx,dy+36,{size:12,fam:'body',alpha:.75});
+    s.done.forEach((n,i)=>{const lx=dx-30+i*30,ly=dy-54;glow(ctx,lx,ly,16,C.yellow,.5);circle(ctx,lx,ly,6,C.yellow);text(ctx,n.replace('the ',''),lx,ly-14,{size:11,fam:'body',alpha:.7})});
+    // gauge
+    const gx=w*.83,gy=h*.74,gr=Math.min(w,h)*.1;circle(ctx,gx,gy,gr,rgba(C.board,.6),C.chalk,2);const a0=Math.PI*.8,a1=Math.PI*2.2,ang=T=>a0+(a1-a0)*clamp(T/300,0,1);ctx.save();ctx.lineWidth=7;ctx.strokeStyle=rgba(C.green,.75);ctx.beginPath();ctx.arc(gx,gy,gr-7,ang(150),ang(170));ctx.stroke();ctx.strokeStyle=rgba(C.pink,.7);ctx.beginPath();ctx.arc(gx,gy,gr-7,ang(170),ang(300));ctx.stroke();ctx.restore();const a=ang(s.T);poly(ctx,[[gx,gy],[gx+Math.cos(a)*(gr-12),gy+Math.sin(a)*(gr-12)]],C.chalk,3);circle(ctx,gx,gy,3,C.chalk);
+    text(ctx,`${s.T.toFixed(0)} °C`,gx,gy+gr+14,{size:18,color:s.T>170?C.pink:s.T>=150?C.green:C.chalk});
+    // damper
+    const ax=SX-SW/2-26,ay=floor-SH*.55;text(ctx,'air',ax,ay-26,{size:14,alpha:.7});box(ctx,ax-6,ay-16,12,40,null,C.chalk,3,1.5);box(ctx,ax-4,ay+22-36*clamp((s.air-.2)/1.8,0,1),8,6,C.yellow,null,2);
+    // x-ray: where the heat goes
+    if(s.xray){const fx=SX,fy=floor-SH*.45;const kw=v=>(v/1000).toFixed(1)+' kW';arrow(ctx,fx,fy,0,-SH*.35,C.pink,2+s.P/1500);text(ctx,at('g8')?'fire '+kw(s.P):'fire',fx+14,fy-SH*.2,{size:14,color:C.pink,align:'left'});const L=s.k*(s.T-20);arrow(ctx,SX+SW/2+6,top+10,40,0,C.blue,2+L/800);text(ctx,at('g8')?'into the room '+kw(L):'into the room',SX+SW/2+8,top+26,{size:13,color:C.blue,align:'left'});
+      if(at('g8'))text(ctx,`module ${s.Pm.toFixed(2)} W`,mx+mw/2,top-32,{size:13,color:C.yellow})}
+    const lines=[`${s.allDone?'all charged: stay warm till morning':'charging '+cur.name}${s.broken?' · module broken: press START':''}`];
+    if(s.xray&&at('hs'))lines.push(`plate in = ½ × fire = ${(s.P/2000).toFixed(1)} kW; out = ${s.k.toFixed(0)} W/K × ${(s.T-20).toFixed(0)} K; module ΔT = ${((s.T-20)*TEGF).toFixed(0)} K → ${s.Pm.toFixed(2)} W`);
+    if(s.xray&&at('col'))lines.push(`steady plate here: 20 + ½ × ${(s.air*16e6/3600/1000).toFixed(1)} kW ÷ ${s.k.toFixed(0)} W/K = ${(20+s.air*16e6/3600*.5/s.k).toFixed(0)} °C, if the fuel holds`);
+    readout(ctx,lines,14,10,{size:12});
+    s.pops.forEach((q,i)=>{const u=q.age/2.2;text(ctx,q.t,SX,floor-SH-70-i*26-u*14,{size:q.size,color:q.color,alpha:u<.7?1:Math.max(0,1-(u-.7)/.3)})});
+    if(s.fuel<=0&&s.T<25&&!s.done.length)text(ctx,'press A to add a log',SX,floor-SH-70,{size:20,color:C.yellow,alpha:.6+.3*Math.sin(s.t*3)})}
 });
-hook('st-log',()=>st&&st.addLog(st));hook('st-reset',()=>st&&st.reset(st));slide('st-air',v=>{if(st)st.air=v},v=>v.toFixed(1)+' kg/h');
+Chalk.pad(st,{labels:{left:'less air',right:'more air',a:'add a log',b:'x-ray',start:'new night'},help:'<b>A</b> adds a log. Hold <b>◀ ▶</b> to close or open the air. Keep the plate in the green band: too cold charges nothing, too hot cooks the module. <b>B</b> shows where the heat goes.<span class="keys"> Keys: <kbd>←</kbd> <kbd>→</kbd>, <kbd>Z</kbd>, <kbd>X</kbd>, <kbd>Enter</kbd>.</span>',
+  on(k,d){if(!st)return;if(k==='left'||k==='right')st.hold[k]=d;else if(k==='a'&&d)st.addLog(st);else if(k==='b'&&d){st.xray=!st.xray;try{localStorage.setItem('chalk:xray',st.xray?'1':'0')}catch(e){}sfx('blip')}else if(k==='start'&&d){st.reset(st);sfx('blip')}}});
 
 /* ---------- CH4: hot side, cold side ---------- */
 const SRC={stove:{T:170,Rh:.2,n:'stove top'},fire:{T:400,Rh:.3,n:'camp fire'},exhaust:{T:220,Rh:.3,n:'exhaust pipe'},coffee:{T:70,Rh:3,n:'cup of coffee'},rock:{T:45,Rh:2,n:'sun-warmed rock'},hand:{T:33,Rh:10,n:'your hand'},candle:{T:250,Rh:6,n:'candle'}};
@@ -105,12 +145,21 @@ const tg=makeSim('cv-teg',{
     box(ctx,cx-mw/2,cy-18,mw,22,st.over?C.pink:rgba(C.yellow,.85),C.chalk,3,2);text(ctx,'module',cx,cy-7,{size:16,color:C.board});
     box(ctx,cx-mw/2,cy-18-h*.22,mw,h*.22,tcol(st.Tc),C.chalk,6,2);text(ctx,SNK[s.snk].n+` ${SNK[s.snk].T} °C`,cx,cy-18-h*.11,{size:18,color:C.board});
     text(ctx,`hot face ${st.Th.toFixed(0)} °C`,cx+mw/2+12,cy+2,{size:15,align:'left',color:st.over?C.pink:C.chalk});text(ctx,`cold face ${st.Tc.toFixed(0)} °C`,cx+mw/2+12,cy-22,{size:15,align:'left'});text(ctx,`ΔT ${st.dT.toFixed(0)} K`,cx-mw/2-12,cy-10,{size:18,align:'right',color:C.yellow});
-    glow(ctx,w*.12,h*.5,30+st.P*6,C.yellow,clamp(st.P/6,.1,.9));text(ctx,`${st.P.toFixed(st.P<1?2:1)} W`,w*.12,h*.5,{size:30,color:C.yellow});
+    glow(ctx,w*.13,h*.8,30+st.P*6,C.yellow,clamp(st.P/6,.1,.9));text(ctx,`${st.P.toFixed(st.P<1?2:1)} W`,w*.13,h*.8,{size:30,color:C.yellow});
     const lines=[st.over?`hot face over ${MOD.Tmax} °C: this module would be damaged. Add the spacer or use a cooler source`:`open-circuit ${(MOD.S*st.dT).toFixed(1)} V, matched load ${st.P.toFixed(2)} W, best so far ${s.best.toFixed(2)} W`];
     if(at('g8'))lines.push(`heat through the module ${st.Q.toFixed(0)} W; electricity is ${pct(st.P/Math.max(st.Q,1e-6))} of it`);if(at('hs'))lines.push(`P = (0.04 × ΔT)² / (4 × 2.5) = 1.6e-4 × ΔT²`);if(at('col'))lines.push(`ΔT = ${(SRC[s.src].T-SNK[s.snk].T)} × R_m/(R_h + R_m + R_c) = ${(SRC[s.src].T-SNK[s.snk].T)} × 1.5/(${(SRC[s.src].Rh+(s.spacer?1.2:0)).toFixed(1)} + 1.5 + ${SNK[s.snk].Rc})`);readout(ctx,lines,16,12,{size:12})}
 });
 ['tg-src','tg-sink'].forEach(id=>{const el=$(id);if(el)el.addEventListener('change',()=>{if(tg){tg.src=$('tg-src').value;tg.snk=$('tg-sink').value}})});
 toggle('tg-spacer',()=>tg.spacer,v=>{tg.spacer=v},v=>'Spacer: '+(v?'on':'off'));
+function tgSet(src,snk){if(!tg)return;const a=$('tg-src'),b=$('tg-sink');if(a)a.value=src;if(b)b.value=snk;tg.src=src;tg.snk=snk}
+Chalk.bet('tg-bet',{canvas:'cv-teg',placed:'Plain air first.',
+  pick(p,api){if(!tg)return;api.busy=true;if(tg.spacer)$('tg-spacer').click();tgSet('stove','air');const A=tegState('stove','air',false),W=tegState('stove','water',false);
+    setTimeout(()=>Chalk.flash(tg,`air: ${A.P.toFixed(2)} W`,C.chalk,.12),300);
+    setTimeout(()=>{tgSet('stove','water');Chalk.flash(tg,`water: ${W.P.toFixed(1)} W`,C.yellow,.12)},2300);
+    setTimeout(()=>{api.busy=false;tg.betDone=true;const r=Math.round(W.P/A.P),lv=Chalk.level();
+      const head=p==='20'?`You called it: about ${r} times more.`:`About ${r} times more.`;
+      const body=lv==='k5'?'The module only makes electricity from the difference between its two sides. With plain air on top, the top gets almost as hot as the stove, so the difference is small. Water carries the heat away and keeps the top cool. The cold side matters just as much as the fire.':`With air on top the module only sees ${A.dT.toFixed(0)} K of the stove's 150 K; the rest is lost getting heat out of the top. Pumped water lets it see ${W.dT.toFixed(0)} K. Power grows with the difference squared, so ${(W.dT/A.dT).toFixed(1)} times the difference gives about ${r} times the watts.`+(at('hs')?' Every thermal resistance in the chain takes its share of ΔT; the sink is usually the biggest one.':'');
+      api.say(`<b>${head}</b> ${body}`)},4600)}});
 
 /* ---------- CH5: Carnot and ZT ---------- */
 const cn=makeSim('cv-carnot',{
@@ -221,10 +270,10 @@ toggle('bo-pump',()=>bo.pump,v=>{bo.pump=v},v=>'Pump: '+(v?'on':'off'));toggle('
 toggle('bo-lamp',()=>bo.lamp,v=>{bo.lamp=v},v=>'Lamp: '+(v?'on':'off'));toggle('bo-phone',()=>bo.phone,v=>{bo.phone=v},v=>'Phone: '+(v?'charging':'unplugged'));toggle('bo-radio',()=>bo.radio,v=>{bo.radio=v},v=>'Radio: '+(v?'on':'off'));toggle('bo-fridge',()=>bo.fridge,v=>{bo.fridge=v},v=>'Fridge: '+(v?'on':'off'));
 hook('bo-reset',()=>{if(bo){bo.reset(bo);$('bo-cut').textContent='Cut the grid';for(const[id,v,l]of[['bo-pump',true,'Pump: on'],['bo-loop',false,'Loop to radiator: off'],['bo-lamp',true,'Lamp: on'],['bo-phone',true,'Phone: charging'],['bo-radio',false,'Radio: off'],['bo-fridge',false,'Fridge: off']]){const b=$(id);b.classList.toggle('is-on',v);b.setAttribute('aria-pressed',String(v));b.textContent=l}}});
 
-Chalk.start({key:'heat',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
+Chalk.start({key:'heat',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({ht4d:()=>!!(tg&&tg.betDone),
   ht1:()=>fw&&fw.met,ht1b:()=>fw&&fw.hold>=30,
   ht2:()=>bl&&bl.boiledAt!=null&&bl.m===1,ht2b:()=>bl&&bl.err!=null&&bl.err<=.1,
-  ht3:()=>st&&st.hold>=30,ht3b:()=>st&&st.over,
+  ht3:()=>st&&st.done.length>0,ht3b:()=>st&&st.allDone,ht3c:()=>st&&st.hold30,
   ht4:()=>tg&&tg.best>=1,ht4b:()=>tg&&tg.best>=3,ht4c:()=>tg&&tg.handTried,
   ht5:()=>cn&&cn.th===170&&cn.tc===0,ht5b:()=>cn&&cn.real>=.10,
   ht6:()=>ld&&ld.near,ht6b:()=>ld&&ld.boost&&ld.usb>=2,

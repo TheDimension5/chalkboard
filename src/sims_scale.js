@@ -106,12 +106,14 @@ GL.land=(c,x,y,d,col)=>{const r=d/2,g=rng(13),pts=[];for(let i=0;i<14;i++){const
 /* viewer */
 function makeViewer(id,px,E0){
   const s=makeSim(id,{
-    init(s){s.E=E0;s.target=E0;s.maxE=E0;s.minE=E0;s.gapSeen=false;s.lightSeen=false;s.fromUni=false;s.pu=true;s.fromYou=false;s.py=true;s.homeFine=false;s.atomFine=false;s.drag=null;s.pinch=null;s.sync(s)},
+    init(s){s.E=E0;s.target=E0;s.maxE=E0;s.minE=E0;s.gapSeen=false;s.lightSeen=false;s.fromUni=false;s.pu=true;s.fromYou=false;s.py=true;s.homeFine=false;s.atomFine=false;s.drag=null;s.pinch=null;s.tour=null;s.sync(s)},
+    fly(s,list,cb){s.pu=true;s.py=true;s.tour={list,i:0,t:.5,cb,done:false,flash:0}},
     setE(s,e,jump){s.target=clamp(e,EMIN,EMAX);if(jump)s.E=s.target;s.sync(s)},
     preset(s,e){s.pu=true;s.py=true;s.setE(s,e,false)},
     sync(s){const sl=$(px+'-e');if(sl&&Math.abs(parseFloat(sl.value)-s.target)>.001)sl.value=s.target.toFixed(2);const o=$(px+'-e-val');if(o)o.textContent='10'+sup(Math.round(s.E))+' m across'},
-    down(p,s){if(s.pinch)return;s.drag={y:p.y,E:s.target}},move(p,s){if(s.drag&&!s.pinch)s.setE(s,s.drag.E-(p.y-s.drag.y)/45)},up(p,s){s.drag=null},leave(s){s.drag=null},
-    step(dt,s){const k=1-Math.exp(-dt*6);s.E+=(s.target-s.E)*k;if(Math.abs(s.target-s.E)<.002)s.E=s.target;s.maxE=Math.max(s.maxE,s.E);s.minE=Math.min(s.minE,s.E);
+    down(p,s){if(s.pinch||(s.tour&&!s.tour.done))return;s.drag={y:p.y,E:s.target}},move(p,s){if(s.drag&&!s.pinch)s.setE(s,s.drag.E-(p.y-s.drag.y)/45)},up(p,s){s.drag=null},leave(s){s.drag=null},
+    step(dt,s){if(s.tour&&!s.tour.done){const T=s.tour;T.flash=Math.max(0,T.flash-dt);T.t-=dt;if(T.t<=0){if(T.i<T.list.length){s.setE(s,T.list[T.i]);T.i++;T.flash=.3;T.t=T.i<3?.75:T.i>T.list.length-3?.7:.36}else if(Math.abs(s.E-s.target)<.05){T.done=true;T.cb&&T.cb()}}}
+      const k=1-Math.exp(-dt*6);s.E+=(s.target-s.E)*k;if(Math.abs(s.target-s.E)<.002)s.E=s.target;s.maxE=Math.max(s.maxE,s.E);s.minE=Math.min(s.minE,s.E);
       if(s.E>=27&&s.target>=27){s.fromUni=true;s.pu=false}if(s.E>=0&&s.E<=1&&s.target>=0&&s.target<=1){s.fromYou=true;s.py=false}
       if(s.fromUni&&!s.pu&&s.E>=7&&s.E<=7.6)s.homeFine=true;if(s.fromYou&&!s.py&&s.E<=-9.9)s.atomFine=true;
       if(s.E>=16.2&&s.E<=17.2)s.gapSeen=true;if(s.E>=-6.5&&s.E<=-5.8)s.lightSeen=true;s.sync(s)},
@@ -136,7 +138,8 @@ function makeViewer(id,px,E0){
       const nin=OBJ.filter(o=>o.size/W<.02).sort((a,b)=>b.size-a.size)[0],nout=OBJ.filter(o=>o.size/W>1.5).sort((a,b)=>a.size-b.size)[0];
       text(ctx,nin?'↓ '+nin.name:'',8,h-10,{size:11,align:'left',fam:'body',alpha:.6});if(!at('hs'))text(ctx,nout?'↑ '+nout.name:'',w-8,h-10,{size:11,align:'right',fam:'body',alpha:.6});
       if(focus)readout(ctx,[focus.fact],cx,cy+Rv+12,{align:'center',size:12});
-      if(s.t<6&&s.E===E0)text(ctx,'drag up and down, or roll the wheel',cx,cy+Rv*.75,{size:15,alpha:.6})}
+      if(s.tour&&s.tour.i>0){const T=s.tour,n=T.i;text(ctx,n+(n===1?' click':' clicks'),cx,cy-Rv+34,{size:30+T.flash*30,color:C.yellow,alpha:T.done?.7:1})}
+      if(s.t<6&&s.E===E0&&!s.tour)text(ctx,'drag up and down, or roll the wheel',cx,cy+Rv*.75,{size:15,alpha:.6})}
   });
   if(!s)return null;const cv=s.cv;
   cv.addEventListener('wheel',e=>{e.preventDefault();s.setE(s,s.target+e.deltaY*.004)},{passive:false});
@@ -148,7 +151,13 @@ function makeViewer(id,px,E0){
   return s}
 const te=makeViewer('cv-tele','te',0.7),mi=makeViewer('cv-micro','mi',0.3);
 const both=f=>(te&&f(te))||(mi&&f(mi));
+const scaleBet=Chalk.bet('sc-bet',{canvas:'cv-tele',placed:'Here we go.',
+  pick(p,api){if(!te)return;api.busy=true;te.setE(te,0.7,true);const list=[];for(let n=1;n<=26;n++)list.push(0.7+n);list.push(27.2);
+    te.fly(te,list,()=>{api.busy=false;te.betDone=true;const lv=Chalk.level();const head=p==='27'?'You called it: about 27 clicks.':'Only about 27 clicks.';
+      const body=lv==='k5'?'Twenty-seven times ten times wider, and you go from you to everything anyone has ever seen. The universe is huge, but tens get big fast.':lv==='g8'?'Each click multiplies by ten, so 27 clicks is 10²⁷: a one with 27 zeros. The other way, 19 clicks take you down to the smallest thing any experiment has ever probed. You live closer to the middle of it all than you might think.':'log₁₀(8.8 × 10²⁶ m ÷ 5 m) ≈ 26.2. Intuition is linear; the universe is logarithmic. Down to the LHC’s reach is 19 more, and to the Planck length 35: you are nearer in scale to the whole observable universe than to the Planck length.';
+      api.say(`<b>${head}</b> ${body}`+api.next('Now fly me home','home'))})},
+  next(k,api){api.busy=true;const list=[];for(let e=26.2;e>0.7;e-=1)list.push(e);list.push(0.7);te.fly(te,list,()=>{api.busy=false;api.say('<b>Home again.</b> Now drag the eyepiece yourself and find the emptiest place on the way out.')})}});
 Chalk.start({key:'scale',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
-  sc1:()=>both(s=>s.maxE>=7.3),sc1b:()=>both(s=>s.maxE>=13),sc1c:()=>both(s=>s.gapSeen),sc1d:()=>both(s=>s.maxE>=27),sc1e:()=>both(s=>s.homeFine),
+  sc1:()=>both(s=>s.maxE>=7.3),sc1b:()=>both(s=>s.maxE>=13),sc1c:()=>both(s=>s.gapSeen),sc1d:()=>both(s=>s.maxE>=27),sc1e:()=>both(s=>s.homeFine),sc1f:()=>!!(te&&te.betDone),
   sc2:()=>both(s=>s.minE<=-5),sc2b:()=>both(s=>s.minE<=-6.9),sc2c:()=>both(s=>s.lightSeen),sc2d:()=>both(s=>s.minE<=-9.9),sc2e:()=>both(s=>s.minE<=-14.8),sc2f:()=>both(s=>s.minE<=-34.3),sc2g:()=>both(s=>s.atomFine)
 },Object.fromEntries(Array.from({length:2},(_,i)=>[`tb${i+1}`,()=>Chalk.checkPassed(`ch${i+1}`)])))});

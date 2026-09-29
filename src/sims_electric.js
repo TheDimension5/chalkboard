@@ -5,22 +5,60 @@ function bulb(ctx,x,y,r,k){glow(ctx,x,y,r*3.2,C.yellow,.55*k);circle(ctx,x,y,r,r
 function battery(ctx,x,y,w,h,level,label){box(ctx,x,y,w,h,null,C.chalk,6,2);box(ctx,x+w*.35,y-8,w*.3,8,C.chalk,null,2);if(level>0)box(ctx,x+4,y+4+(h-8)*(1-level),w-8,(h-8)*level,rgba(C.green,.8),null,3);if(label)text(ctx,label,x+w/2,y+h+18,{size:16,alpha:.8})}
 function flow(ctx,pts,n,phase,color,r=3){const segs=[];let L=0;for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);segs.push([pts[i-1],pts[i],d]);L+=d}for(let k=0;k<n;k++){let s=((k/n+phase)%1+1)%1*L;for(const[a,b,d]of segs){if(s<=d){const t=s/d;circle(ctx,a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,r,color);break}s-=d}}}
 
-/* ---------- CH1: watts and watt-hours ---------- */
+/* ---------- CH1: watts and watt-hours: pedal power ---------- */
+/* Your legs are the power station. Pedalling rate is watts; the battery bucket counts watt-hours. */
+const sfx=Chalk.sfx;
+const LOADS=[{n:'LED bulb',w:10},{n:'phone charger',w:15},{n:'old light bulb',w:60},{n:'TV',w:100},{n:'blender',w:400},{n:'toaster',w:900}];
+const GOALS=[{load:0,t:4,say:'light the LED'},{load:2,t:4,say:'light the old bulb'},{load:3,t:4,say:'run the TV'},{load:5,t:8,say:'try the toaster',tryit:true},{bucket:15,say:'fill the battery with 15 Wh'}];
+const EFF=.8,BUCKET_ACCEL=60;
 const en=makeSim('cv-energy',{
-  init(s){s.cap=2500;s.wh=2500;s.load=250;s.src=0;s.hours=0;s.ph=0},
-  step(dt,s){const net=s.src-s.load;const accel=1800;s.wh=clamp(s.wh+net*dt*accel/3600,0,s.cap);if(s.wh>0||net>0)s.hours+=dt*accel/3600;s.ph+=dt},
-  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const lvl=s.wh/s.cap;
-    battery(ctx,w*.4,h*.2,w*.2,h*.5,lvl,`bucket: ${nf(s.wh)} Wh`);
-    bulb(ctx,w*.85,h*.42,26,clamp(s.load/600,0,1)*(s.wh>0||s.src>=s.load?1:0));text(ctx,`tap: ${nf(s.load)} W`,w*.85,h*.42+62,{size:16,alpha:.8});
-    if(s.load>0&&(s.wh>0||s.src>=s.load))flow(ctx,[[w*.6,h*.45],[w*.85-30,h*.45]],Math.max(1,Math.round(s.load/60)),s.ph*(s.load/500),C.yellow);
-    const np=Math.ceil(s.src/250);for(let i=0;i<np;i++){box(ctx,w*.08+i*36,h*.22,30,42,rgba(C.blue,.35),C.blue,3,1.5);for(let j=1;j<3;j++)poly(ctx,[[w*.08+i*36,h*.22+j*14],[w*.08+i*36+30,h*.22+j*14]],C.blue,1,.6)}
-    text(ctx,s.src?`panels: ${nf(s.src)} W`:'no panels',w*.08+Math.max(np,1)*18,h*.22+62,{size:16,alpha:.8});
-    if(s.src>0&&s.wh<s.cap)flow(ctx,[[w*.08+np*36,h*.4],[w*.4-4,h*.4]],Math.max(1,Math.round(s.src/60)),s.ph*(s.src/500),C.blue);
-    const net=s.src-s.load;const lines=[`rate in ${nf(s.src)} W, rate out ${nf(s.load)} W, net ${net>=0?'+':''}${nf(net)} W`];
-    if(net<0)lines.push(s.wh>0?`empties in ${(s.wh/-net).toFixed(1)} h at this rate`:'empty. add panels or turn the tap down');else if(net>0)lines.push(s.wh<s.cap?`fills in ${((s.cap-s.wh)/net).toFixed(1)} h at this rate`:'full');else lines.push('balanced: the bucket stays where it is');
-    lines.push(`simulated time: ${s.hours.toFixed(1)} h (30 minutes per second)`);if(at('g8'))lines.push('Wh = W × h:  amount = rate × time');if(at('hs'))lines.push(`${nf(s.load)} W for 1 h = ${nf(s.load)} Wh = ${nf(s.load*3600)} J`);readout(ctx,lines,16,h*.97-lines.length*18,{size:12})}
+  init(s){s.xray=false;try{s.xray=localStorage.getItem('chalk:xray')==='1'}catch(e){}s.reset(s)},
+  reset(s){s.load=0;s.cad=0;s.strokes=[];s.last=null;s.lastT=0;s.stam=1;s.Ph=0;s.Pe=0;s.lit=0;s.goal=0;s.gt=0;s.wh=0;s.crank=0;s.sweat=[];s.pops=[];s.tried=false;s.bulbLit=false;s.full=false;s.best=0},
+  pedal(s,key){const now=s.t;if(key===s.last&&now-s.lastT<.35)return;s.last=key;s.lastT=now;s.strokes.push(now);if(!s.stroked){s.stroked=true}},
+  pop(s,t,color,size=22){s.pops.push({t,color,size,age:0})},
+  step(dt,s){s.strokes=s.strokes.filter(t=>s.t-t<1.2);const rate=s.strokes.length/1.2;s.cad+=(rate-s.cad)*Math.min(1,dt*3);
+    const want=12.5*s.cad*s.cad,cap=120+400*s.stam;s.Ph=Math.min(want,cap);
+    if(s.Ph>150)s.stam=Math.max(0,s.stam-(s.Ph-150)/1200*dt);else if(s.Ph<100)s.stam=Math.min(1,s.stam+.12*dt);
+    s.Pe=s.Ph*EFF;s.best=Math.max(s.best,s.Pe);s.crank+=s.cad*dt*Math.PI;
+    const G=GOALS[Math.min(s.goal,GOALS.length-1)];const L=LOADS[s.load].w;s.lit=clamp(s.Pe/L,0,1);
+    const surplus=Math.max(0,s.Pe-(G.bucket?0:L));if(G.bucket)s.wh+=s.Pe*dt*BUCKET_ACCEL/3600;
+    if(s.goal<GOALS.length){if(G.bucket){if(s.wh>=G.bucket){s.full=true;s.advance(s,`15 Wh in the bucket!`)}}else if(s.load===G.load){if(G.tryit?s.cad>1:s.lit>=.97){s.gt+=dt;if(s.gt>=G.t){if(G.tryit){s.tried=true;s.advance(s,'the toaster wins')}else{if(G.load===2)s.bulbLit=true;s.advance(s,LOADS[G.load].n+' on!')}}}else s.gt=Math.max(0,s.gt-dt*.5)}}
+    if(s.stam<.35&&s.cad>1&&Math.random()<dt*4)s.sweat.push({x:0,y:0,vx:(Math.random()-.5)*30,vy:-40,age:0});for(const d of s.sweat){d.age+=dt;d.vy+=160*dt;d.x+=d.vx*dt;d.y+=d.vy*dt}s.sweat=s.sweat.filter(d=>d.age<.6);
+    for(const q of s.pops)q.age+=dt;s.pops=s.pops.filter(q=>q.age<2.4)},
+  advance(s,msg){s.goal++;s.gt=0;sfx(s.goal>=GOALS.length?'big':'park');Chalk.flash(s,msg,C.yellow,.07);const N=GOALS[s.goal];if(N&&N.load!=null)s.pop(s,'next: '+N.say+'. Use ▲ ▼ to pick it',C.chalk,18);else if(N)s.pop(s,'next: '+N.say,C.chalk,18)},
+  draw(s){const{ctx,w,h}=s;ctx.clearRect(0,0,w,h);const floor=h*.84,L=LOADS[s.load];
+    if(s.lit>0){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(w*.74,h*.45,0,w*.74,h*.45,w*.55);g.addColorStop(0,`rgba(246,212,107,${.16*s.lit*Math.min(1,L.w/60)})`);g.addColorStop(1,'rgba(246,212,107,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.restore()}
+    poly(ctx,[[0,floor],[w,floor]],C.chalk,2,.35);
+    // the bike: a trainer stand, a flywheel and a rider whose legs follow your rhythm
+    const bx=w*.26,wr=Math.min(w,h)*.11,wy=floor-wr-6;circle(ctx,bx+wr*1.6,wy,wr,null,C.chalk,2.5);for(let i=0;i<6;i++){const a=s.crank*2+i*Math.PI/3;poly(ctx,[[bx+wr*1.6,wy],[bx+wr*1.6+Math.cos(a)*wr,wy+Math.sin(a)*wr]],C.chalk,1,.5)}
+    poly(ctx,[[bx-wr*.9,floor],[bx,wy-wr*.2],[bx+wr*1.6,wy]],C.chalk,3,.9);poly(ctx,[[bx,wy-wr*.2],[bx-wr*.1,wy-wr*1.2]],C.chalk,3,.9);poly(ctx,[[bx+wr*1.6,wy],[bx+wr*1.2,wy-wr*1.3],[bx+wr*1.5,wy-wr*1.35]],C.chalk,3,.9);poly(ctx,[[bx-wr*.9,floor],[bx+wr*2.4,floor]],C.chalk,3,.6);
+    const crx=bx+wr*.2,cry=wy+wr*.1,cl=wr*.38,p1={x:crx+Math.cos(s.crank)*cl,y:cry+Math.sin(s.crank)*cl},p2={x:crx-Math.cos(s.crank)*cl,y:cry-Math.sin(s.crank)*cl};circle(ctx,crx,cry,cl*.35,null,C.chalk,2);
+    const hip={x:bx-wr*.1,y:wy-wr*1.25},sh={x:bx+wr*.6,y:wy-wr*2.3},hd={x:sh.x+wr*.3,y:sh.y-wr*.45};const knee=(f)=>{const mx=(hip.x+f.x)/2,my=(hip.y+f.y)/2;return{x:mx+wr*.35,y:my-wr*.25}};
+    ctx.save();ctx.strokeStyle=C.chalk;ctx.lineWidth=3;ctx.lineCap='round';for(const f of[p1,p2]){const k=knee(f);ctx.beginPath();ctx.moveTo(hip.x,hip.y);ctx.lineTo(k.x,k.y);ctx.lineTo(f.x,f.y);ctx.stroke()}ctx.beginPath();ctx.moveTo(hip.x,hip.y);ctx.lineTo(sh.x,sh.y);ctx.lineTo(bx+wr*1.25,wy-wr*1.32);ctx.stroke();ctx.restore();circle(ctx,hd.x,hd.y,wr*.28,C.board,C.chalk,3);
+    for(const d of s.sweat)circle(ctx,hd.x+d.x,hd.y+d.y,2,C.blue);
+    // wire from the flywheel to the load, dots flow with the watts
+    const lx=w*.74,ly=h*.42;const path=[[bx+wr*1.6,wy],[bx+wr*2.6,wy],[bx+wr*2.6,ly+40],[lx-50,ly+40]];poly(ctx,path,C.chalk,2,.4);if(s.Pe>1)flow(ctx,path,Math.max(1,Math.round(Math.min(s.Pe,600)/40)),s.t*(.3+s.Pe/300),C.yellow);
+    // the load
+    if(L.n==='TV'){box(ctx,lx-44,ly-30,88,60,s.lit>.97?rgba(C.blue,.35):rgba(C.board,.8),C.chalk,6,2.5);if(s.lit>.3)for(let i=0;i<12;i++){const yy=ly-24+((i*7+s.t*60)%48);poly(ctx,[[lx-38,yy],[lx+38,yy]],C.chalk,1,.12+.3*s.lit*Math.random())}}
+    else if(L.n==='toaster'||L.n==='blender'){box(ctx,lx-38,ly-24,76,52,rgba(C.board,.8),C.chalk,10,2.5);for(let i=0;i<4;i++)poly(ctx,[[lx-26+i*17,ly-14],[lx-26+i*17,ly+16]],s.lit>.05?`rgba(255,${Math.round(90+120*s.lit)},60,${.3+.7*s.lit})`:C.chalk,2.5,s.lit>.05?1:.3);if(L.n==='blender')text(ctx,'blender',lx,ly+44,{size:12,alpha:0})}
+    else if(L.n==='phone charger'){box(ctx,lx-18,ly-34,36,64,rgba(C.board,.8),C.chalk,6,2.5);box(ctx,lx-12,ly+18-44*s.lit,24,44*s.lit,rgba(C.green,.6),null,2)}
+    else bulb(ctx,lx,ly,L.w>=60?26:18,s.lit);
+    text(ctx,`${L.n}: ${L.w} W`,lx,ly+68,{size:17});text(ctx,'▲ ▼ to change',lx,ly+88,{size:13,alpha:.5});
+    if(L.w>s.Pe&&s.cad>1&&L.w>=400)text(ctx,`needs ${L.w} W · you make ${Math.round(s.Pe)} W`,lx,ly-54,{size:15,color:C.pink});
+    // power meter and the battery bucket
+    const mx=w*.06,my=h*.14,mw=w*.34;box(ctx,mx,my,mw,12,rgba(C.board,.6),C.chalk,6,1.5);box(ctx,mx+1,my+1,(mw-2)*clamp(s.Pe/500,0,1),10,s.Pe>L.w?C.green:C.yellow,null,5);const tick=mx+mw*clamp(L.w/500,0,1);poly(ctx,[[tick,my-5],[tick,my+17]],C.pink,2,L.w<=500?1:0);
+    text(ctx,`${Math.round(s.Pe)} W`,mx,my+30,{size:22,align:'left',color:C.yellow});text(ctx,'you, right now',mx+70,my+31,{size:13,align:'left',alpha:.6});
+    const stx=mx,sty=my+48;text(ctx,'legs',stx,sty,{size:12,fam:'body',align:'left',alpha:.6});box(ctx,stx+36,sty-5,90,8,null,C.chalk,4,1);box(ctx,stx+37,sty-4,88*s.stam,6,s.stam<.35?C.pink:C.green,null,3);
+    const G=GOALS[Math.min(s.goal,GOALS.length-1)];if(G.bucket||s.goal>=GOALS.length){const bw=46,bh=70,bkx=w*.5,bky=h*.2;battery(ctx,bkx,bky,bw,bh,clamp(s.wh/15,0,1),'');text(ctx,`${s.wh.toFixed(1)} Wh`,bkx+bw/2,bky+bh+16,{size:15,color:C.green});if(s.Pe>1&&!s.full)flow(ctx,[[bx+wr*2.6,wy-10],[bkx+bw/2,wy-10],[bkx+bw/2,bky+bh+26]],3,s.t,C.green)}
+    const goalTxt=s.goal>=GOALS.length?'every goal done: now just ride':G.say;const prog=G.t?`  ${Math.min(G.t,s.gt).toFixed(0)}/${G.t} s`:'';
+    const lines=[`goal: ${goalTxt}${prog}`];if(s.xray&&at('g8'))lines.push(`cadence ${(s.cad*30).toFixed(0)} rpm · legs ${Math.round(s.Ph)} W · generator keeps ${Math.round(EFF*100)}% → ${Math.round(s.Pe)} W`);
+    if(s.xray&&at('hs'))lines.push(`the bucket runs 1 min per second: Wh = W × h, so ${Math.round(s.Pe)} W fills 15 Wh in ${s.Pe>1?(15/s.Pe*60).toFixed(0)+' min':'forever'}`);if(s.xray&&at('col'))lines.push('a fit rider holds ~150 W for an hour and bursts to ~500 W for seconds; the legs meter models that');
+    readout(ctx,lines,14,h-14-lines.length*17,{size:12});
+    s.pops.forEach((q,i)=>{const u=q.age/2.4;text(ctx,q.t,w*.66,h*.24-i*24-u*10,{size:q.size,color:q.color,alpha:u<.75?1:Math.max(0,1-(u-.75)/.25)})});
+    if(!s.stroked)text(ctx,'tap ◀ ▶ ◀ ▶ to pedal',bx+wr*.8,floor-wr*3.4,{size:20,color:C.yellow,alpha:.6+.3*Math.sin(s.t*3)})}
 });
-slide('en-load',v=>{if(en)en.load=v},v=>nf(v)+' W');slide('en-src',v=>{if(en)en.src=v},v=>nf(v)+' W');hook('en-reset',()=>{if(en){en.wh=en.cap;en.hours=0}});
+Chalk.pad(en,{labels:{left:'pedal',right:'pedal',up:'next thing',down:'last thing',b:'x-ray',start:'start over'},help:'Tap <b>◀ ▶ ◀ ▶</b> in turn to pedal: faster rhythm, more watts. <b>▲ ▼</b> picks what you power. <b>B</b> shows the numbers.<span class="keys"> Keys: <kbd>←</kbd> <kbd>→</kbd> in turn, <kbd>↑</kbd> <kbd>↓</kbd>, <kbd>X</kbd>, <kbd>Enter</kbd>.</span>',
+  on(k,d){if(!en||!d)return;if(k==='left'||k==='right')en.pedal(en,k);else if(k==='up'||k==='down'){en.load=clamp(en.load+(k==='up'?1:-1),0,LOADS.length-1);en.gt=0;sfx('tick')}else if(k==='b'){en.xray=!en.xray;try{localStorage.setItem('chalk:xray',en.xray?'1':'0')}catch(e){}sfx('blip')}else if(k==='start'){en.reset(en);sfx('blip')}}});
 
 /* ---------- CH2: Ohm ---------- */
 const ohm=makeSim('cv-ohm',{
@@ -145,6 +183,12 @@ const dr=makeSim('cv-drift',{
     if(at('col')&&s.on){for(let x=L+40;x<R-20;x+=48)for(let y=T+28;y<B-10;y+=26)arrow(ctx,x,y,22,0,rgba(C.yellow,.6),1.5);text(ctx,'S = E × H: energy flows here, between the wires',(L+R)/2,B+30,{size:15,color:C.yellow,alpha:.8})}
     const v=s.i*.074;const lines=[s.on?`electrons drift at ${v.toFixed(2)} mm/s (1 mm² copper)`:'switch is off: electrons sit still',s.on?'the signal crossed the room at nearly the speed of light':'flip the switch'];if(at('hs'))lines.push('v = I / (n·q·A)');readout(ctx,lines,16,12,{size:12})}
 });
+Chalk.bet('dr-bet',{canvas:'cv-drift',placed:'Click.',
+  pick(p,api){if(!dr)return;api.busy=true;dr.on=false;dr.lit=0;dr.pulse=-1;const el=$('dr-i');if(el){el.value=2;el.dispatchEvent(new Event('input'))}
+    setTimeout(()=>{dr.flip(dr);setTimeout(()=>{Chalk.flash(dr,'0.15 mm per second',C.blue,.2);setTimeout(()=>{api.busy=false;dr.betDone=true;const lv=Chalk.level();
+      const head=p==='snail'?'You called it: slower than a snail.':'Slower than a snail.';
+      const body=lv==='k5'?'About a sixth of a millimetre every second. One electron would need more than five hours to crawl three metres from the switch to the lamp. The light comes on at once because the wire is already full of electrons: the push races down the wire, not the electrons. Like a hose that is already full of water.':lv==='g8'?'About 0.15 mm every second, so one electron needs more than five hours to crawl three metres from switch to lamp. The wire is already packed with electrons, so the push travels, not the electrons, and the push moves at a good fraction of the speed of light: it crosses the room in about a hundred-millionth of a second.':'v = I/(nqA) = 2 A ÷ (8.5 × 10²⁸ m⁻³ × 1.6 × 10⁻¹⁹ C × 10⁻⁶ m²) ≈ 0.15 mm/s: more than five hours to cover three metres. The energy travels in the field around the wires (the Poynting vector) at a good fraction of c. With household AC the electrons do not even go anywhere: they jiggle back and forth by less than a micrometre.';
+      api.say(`<b>${head}</b> ${body}`)},1200)},900)},300)}});
 hook('dr-switch',()=>dr&&dr.flip(dr));slide('dr-i',v=>{if(dr)dr.i=v},v=>v+' A');
 
 /* ---------- CH10: the system checker ---------- */
@@ -163,8 +207,8 @@ const sc=makeSim('cv-check',{
 });
 hook('sc-run',()=>sc&&sc.run(sc));
 
-Chalk.start({key:'electricity',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
-  e1:()=>en&&en.load===250&&en.src===0,e1b:()=>en&&en.src>en.load&&en.load>0,
+Chalk.start({key:'electricity',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({e9c:()=>!!(dr&&dr.betDone),
+  e1:()=>en&&en.bulbLit,e1b:()=>en&&en.full,e1c:()=>en&&en.tried,
   e2:()=>ohm&&Math.abs(ohm.v/ohm.r-2)<.06,
   e3:()=>pw&&pw.load>=1200&&(pw.load/pw.v)**2*pw.r<50,
   e4:()=>bt&&bt.bv===12.8&&bt.ah===100&&bt.load===300&&bt.eff===90,e4b:()=>bt&&bt.cut&&bt.wh/(bt.bv*bt.ah)>.1,

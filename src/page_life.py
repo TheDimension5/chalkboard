@@ -126,6 +126,7 @@ MISSIONS=[
  ('lf2b','ch2',ALL,"Soot the bark and keep hunting until the moths are mostly dark (average darkness above 70%)."),
  ('lf2c','ch2',['g8','hs','col','max'],"Clean the bark again and bring them back to mostly pale (below 30%)."),
  ('lf2d','ch2',['col','max'],"Set the bark to grey and run 20 generations with the automatic bird: the moths settle at grey and stay."),
+ ('lf2e','ch2',['k5','g8','hs','col','max'],"Bet on how fast soot turns the moths dark, then watch it happen."),
  ('lf3','ch3',ALL,"Cross Tt with Tt and grow at least 40 plants."),
  ('lf3b','ch3',['g8','hs','col','max'],"Grow 100 or more from Tt × Tt and land within 5 points of three-quarters tall."),
  ('lf3c','ch3',['g8','hs','col','max'],"Find a cross that gives half tall, half short, and grow 40."),
@@ -144,3 +145,6 @@ MISSIONS=[
  ('lf6c','ch6',['hs','col','max'],"Solve three puzzles in a row with no mistakes."),
 ]+[(f'tb{n}',f'ch{n}',ALL,"Teach it back: answer the check question below with the right unit.") for n in range(1,7)]
 CLOSING=("Copy, with mistakes. Keep what works. Repeat.","That is the whole recipe for the recipe. It has no plan, no goal and no author, and in four billion years of copying it wrote every living thing, including the one reading this.")
+
+from bets import bet
+FIG[2]=bet('mo-bet',"Factory smoke turns the tree bark black. Almost all the moths are pale. How many generations until most of them are dark?",[('1000','Thousands'),('100','Hundreds'),('10','A few dozen or fewer')])+FIG[2]

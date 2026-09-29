@@ -4,6 +4,9 @@ const C={chalk:'#F1ECDF',yellow:'#F6D46B',blue:'#8CC4EE',pink:'#F596A8',green:'#
 const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let LOWPOW=false;try{LOWPOW=localStorage.getItem('chalk:lowpow')==='1'}catch(e){}
 function setLowPow(v){LOWPOW=!!v;try{localStorage.setItem('chalk:lowpow',LOWPOW?'1':'0')}catch(e){}const b=$('lowpow');if(b){b.classList.toggle('is-on',LOWPOW);b.setAttribute('aria-pressed',String(LOWPOW))}document.querySelectorAll('canvas').forEach(c=>c.dispatchEvent(new Event('chalk-resize')))}
+/* explorer by default: quizzes, exit tickets, receipts and certificates only show in classroom mode (?classroom=1, remembered) */
+let CLASSROOM=false;try{const q=new URL(location.href).searchParams.get('classroom');if(q!==null)CLASSROOM=q!=='0';try{if(q!==null)localStorage.setItem('chalk:classroom',CLASSROOM?'1':'0');else CLASSROOM=localStorage.getItem('chalk:classroom')==='1'}catch(e){}}catch(e){}
+document.documentElement.classList.toggle('classroom',CLASSROOM);
 const rgba=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -48,7 +51,10 @@ function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getConte
   cv.addEventListener('pointerleave',()=>{s.leave&&s.leave(s)});
   sims.push(s);return s}
 let last=performance.now();
-let skip=false;function loop(now){const dt=Math.min(.05,(now-last)/1000);if(LOWPOW){skip=!skip;if(skip){requestAnimationFrame(loop);return}}last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
+let skip=false;function loop(now){const dt=Math.min(.05,(now-last)/1000);if(LOWPOW){skip=!skip;if(skip){requestAnimationFrame(loop);return}}last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s);if(s._fl)drawFlash(s,dt)}requestAnimationFrame(loop)}
+/* big chalk words over a sim: Chalk.flash(sim,'SAME SPOT!',color) */
+function flash(s,t,color,y){if(s)s._fl={t,color:color||C.yellow,y:y==null?.3:y,age:0}}
+function drawFlash(s,dt){const f=s._fl;f.age+=dt;if(f.age>2.4){s._fl=null;return}const u=f.age/2.4,sc=u<.08?.6+u/.08*.5:1.1-Math.min(.1,u-.08);text(s.ctx,f.t,s.w/2,s.h*f.y,{size:Math.min(44,s.w*.075)*sc,color:f.color,alpha:u<.75?1:Math.max(0,1-(u-.75)/.25)})}
 requestAnimationFrame(loop);
 function tick(dt){for(const s of sims){if(!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}}
 const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
@@ -58,7 +64,7 @@ const slide=(id,fn,f)=>{const el=$(id),out=$(id+'-val');if(!el)return;const go=(
 let DEFS=[],CHECKS={},KEY='chalk',mdone=new Set();
 const mApplies=m=>m.lv.includes(LEVEL);
 function mcount(){const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const mc=$('mcount');if(mc)mc.textContent=all.length?`✓ ${n} of ${all.length}`:'';updateCert(all)}
-function updateCert(all){const box=$('cert');if(!box)return;const must=all.filter(m=>!m.try);const ok=must.length>0&&must.every(m=>mdone.has(m.id));box.hidden=!ok;if(ok){const left=all.filter(m=>m.try&&!mdone.has(m.id)).length;box.querySelector('.cert-note').textContent=left?`Every must-do mission at this level is done. ${left} try-your-best mission${left>1?'s':''} still open.`:'Every mission at this level is done.'}}
+function updateCert(all){const box=$('cert');if(!box)return;if(!CLASSROOM){box.hidden=true;return}const must=all.filter(m=>!m.try);const ok=must.length>0&&must.every(m=>mdone.has(m.id));box.hidden=!ok;if(ok){const left=all.filter(m=>m.try&&!mdone.has(m.id)).length;box.querySelector('.cert-note').textContent=left?`Every must-do mission at this level is done. ${left} try-your-best mission${left>1?'s':''} still open.`:'Every mission at this level is done.'}}
 function makeCert(){const box=$('cert');let name='';try{name=localStorage.getItem('chalk:name')||''}catch(e){}name=name||prompt('Name for the certificate?')||'';const all=DEFS.filter(mApplies);const n=all.filter(m=>mdone.has(m.id)).length;const lines=['THE CHALKBOARD',box.dataset.board,`${LVNAME[LEVEL]} level`,name||'(no name)',`${n} of ${all.length} missions`,new Date().toISOString().slice(0,10)];const code=fnv(lines.join('\n'));const out=box.querySelector('.certout');out.innerHTML=`<p class="c-eyebrow">The Chalkboard certifies that</p><p class="c-name">${name.replace(/</g,'&lt;')||'&nbsp;'}</p><p class="c-what">completed <b>${box.dataset.board}</b> at the ${LVNAME[LEVEL]} level</p><p class="c-meta">${n} of ${all.length} missions · ${lines[5]} · code ${code}</p>`;out.hidden=false;document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},80)}
 function renderMissions(){document.querySelectorAll('.missions').forEach(ul=>{const ms=DEFS.filter(m=>m.ch===ul.dataset.ch&&mApplies(m));ul.hidden=!ms.length;ul.innerHTML='<li class="mh">Mission'+(ms.length>1?'s':'')+'</li>'+ms.map(m=>`<li class="m${mdone.has(m.id)?' done':''}" data-m="${m.id}"><span class="box">✓</span><span>${m.text}</span></li>`).join('')});mcount()}
 function checkMissions(){let changed=false;for(const m of DEFS){if(mdone.has(m.id)||!mApplies(m))continue;let ok=false;try{ok=!!(CHECKS[m.id]&&CHECKS[m.id]())}catch(e){ok=false}
@@ -107,8 +113,43 @@ function wireHandin(){let savedName='';try{savedName=localStorage.getItem('chalk
     box.querySelector('.hi-copy').addEventListener('click',async()=>{const t=out.textContent;try{await navigator.clipboard.writeText(t);box.querySelector('.hi-copy').textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents(out);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);box.querySelector('.hi-copy').textContent='Selected: press copy'}setTimeout(()=>box.querySelector('.hi-copy').textContent='Copy',1800)});
     box.querySelector('.hi-print').addEventListener('click',()=>{document.querySelectorAll('.receipt.printing').forEach(x=>x.classList.remove('printing'));out.classList.add('printing');document.body.classList.add('print-receipt');const done=()=>{document.body.classList.remove('print-receipt');out.classList.remove('printing');removeEventListener('afterprint',done)};addEventListener('afterprint',done);setTimeout(()=>{try{window.print()}catch(e){done()}},50)})})}
 
+/* ---------- game pad: d-pad, A/B, SELECT (sound), START; keyboard and touch ---------- */
+const PADS=[];let AC=null,SOUND=null;
+function sndOn(){if(SOUND===null){let v=null;try{v=localStorage.getItem('chalk:sound')}catch(e){}SOUND=v===null?!CLASSROOM:v==='1'}return SOUND}
+function setSound(v){SOUND=!!v;try{localStorage.setItem('chalk:sound',SOUND?'1':'0')}catch(e){}PADS.forEach(p=>p.syncSound())}
+const SFX={blip:[[660,.05]],push:[[196,.05],[247,.05]],thud:[[110,.12,'triangle']],park:[[523,.08],[659,.08],[784,.08],[1047,.18]],tick:[[988,.03]],no:[[180,.09],[150,.12]],big:[[392,.08],[523,.08],[659,.08],[784,.08],[1047,.08],[1319,.22]]};
+function sfx(kind){if(!sndOn())return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();let at=AC.currentTime+.01;for(const [f,d,type] of (SFX[kind]||SFX.blip)){const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.value=f;g.gain.setValueAtTime(.05,at);g.gain.exponentialRampToValueAtTime(.0001,at+d);o.connect(g);g.connect(AC.destination);o.start(at);o.stop(at+d+.02);at+=d*.9}}catch(e){}}
+function pad(s,o){if(!s||!s.cv)return null;const panel=s.cv.closest('.panel');if(!panel)return null;const L=o.labels||{},has=k=>k in L;
+  const el=document.createElement('div');el.className='pad';el.setAttribute('role','group');el.setAttribute('aria-label','game controls');
+  el.innerHTML=`<div class="pad-d">${['up','left','right','down'].map(k=>`<button type="button" class="pk pk-${k}" data-k="${k}"${has(k)?'':' disabled'} aria-label="${L[k]||k}"></button>`).join('')}<span class="pad-hub"></span></div>`+
+   `<div class="pad-mid"><span class="pk-wrap"><button type="button" class="pk-s" data-k="select" aria-label="sound on or off">SELECT</button><small class="pad-snd"></small></span><span class="pk-wrap"><button type="button" class="pk-s" data-k="start"${has('start')?'':' disabled'} aria-label="${L.start||'start'}">START</button><small>${L.start||''}</small></span></div>`+
+   `<div class="pad-ab">${['b','a'].map(k=>`<span class="pk-wrap"><button type="button" class="pk-r pk-${k}" data-k="${k}"${has(k)?'':' disabled'} aria-label="${L[k]||k}">${k.toUpperCase()}</button><small>${L[k]||''}</small></span>`).join('')}</div>`+
+   (o.help?`<p class="pad-help">${o.help}</p>`:'');
+  panel.after(el);const held=new Set();
+  const api={s,el,held,has:k=>k==='select'||has(k),
+    press(k,down){if(down){if(held.has(k))return;held.add(k)}else{if(!held.has(k))return;held.delete(k)}const b=el.querySelector(`[data-k="${k}"]`);if(b)b.classList.toggle('on',down);if(k==='select'){if(down){setSound(!sndOn());sfx('blip')}return}o.on&&o.on(k,down)},
+    syncSound(){el.querySelector('.pad-snd').textContent=sndOn()?'sound on':'sound off'}};
+  el.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',e=>{if(b.disabled)return;e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}api.press(k,true)});const up=()=>api.press(k,false);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);b.addEventListener('contextmenu',e=>e.preventDefault());
+    b.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();e.stopPropagation();api.press(k,true)}});b.addEventListener('keyup',e=>{if(e.key==='Enter'||e.key===' '){e.stopPropagation();api.press(k,false)}})});
+  api.syncSound();PADS.push(api);return api}
+const PADKEYS={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',KeyA:'left',KeyD:'right',KeyW:'up',KeyS:'down',KeyZ:'a',Space:'a',KeyX:'b',Enter:'start'};
+function activePad(){let best=null,bd=1e9;for(const p of PADS){const r=p.s.cv.getBoundingClientRect();if(r.bottom<80||r.top>innerHeight-80)continue;const d=Math.abs((r.top+r.bottom)/2-innerHeight/2);if(d<bd){bd=d;best=p}}return best}
+addEventListener('keydown',e=>{const t=e.target;if(t&&t.closest&&t.closest('input,textarea,select,button,a,summary,[contenteditable]'))return;if(e.metaKey||e.ctrlKey||e.altKey)return;const k=PADKEYS[e.code];if(!k)return;const p=activePad();if(!p||!p.has(k))return;e.preventDefault();if(!e.repeat)p.press(k,true)});
+addEventListener('keyup',e=>{const k=PADKEYS[e.code];if(k)PADS.forEach(p=>p.press(k,false))});
+addEventListener('blur',()=>PADS.forEach(p=>[...p.held].forEach(k=>p.press(k,false))));
+
+/* ---------- place-your-bet moments ---------- */
+function bet(id,o){const root=$(id);if(!root)return null;const q=root.querySelector('.bet-q span'),row=root.querySelector('.row'),out=root.querySelector('.bet-out');
+  const api={busy:false,onPick:o.pick,say(html){out.innerHTML=html;out.hidden=false},
+    ask(question,opts,onPick){if(q)q.textContent=question;row.innerHTML=opts.map(([v,l])=>`<button class="btn" type="button" data-bet="${v}">${l}</button>`).join('');out.hidden=true;out.innerHTML='';api.onPick=onPick},
+    show(){const cv=o.canvas&&$(o.canvas);if(!cv)return;const r=cv.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)cv.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'end'})},
+    next(label,key){return ` <button class="btn" type="button" data-next="${key}">${label}</button>`}};
+  root.addEventListener('click',e=>{if(api.busy)return;const b=e.target.closest('[data-bet]');if(b){row.querySelectorAll('[data-bet]').forEach(x=>x.classList.toggle('is-on',x===b));api.say('<b>Bet placed.</b> '+(o.placed||'Watch.'));api.show();api.onPick&&api.onPick(b.dataset.bet,api);return}
+    const n=e.target.closest('[data-next]');if(n&&o.next){api.show();o.next(n.dataset.next,api)}});
+  return api}
+
 /* ---------- start ---------- */
-function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
+function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||!/^tb\d+$/.test(m.id));CHECKS=o.checks||{};UNITWHY=o.unitWhy||{};
   try{passed=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':checks')||'[]'))}catch(e){}wireChecks();wireHandin();
   try{mdone=new Set(JSON.parse(localStorage.getItem('chalk:'+KEY+':missions')||'[]'))}catch(e){}
   document.querySelectorAll('.levels-btns button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.level,true)));
@@ -116,5 +157,5 @@ function start(o){KEY=o.key||'chalk';DEFS=o.missions||[];CHECKS=o.checks||{};UNI
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,makeSim,hook,slide,start,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,bet,flash,pad,sfx,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();

@@ -8,6 +8,7 @@ BOARDS={
  'history':{'title':'How History Survives','url':HUB+'history/','strand':'know','subject':'History'},
  'life':{'title':'How Life Changes','url':HUB+'life/','strand':'ideas','subject':'Biology'},
  'scale':{'title':'The Eyepiece','url':HUB+'scale/','strand':'tools','subject':'Scale'},
+ 'time':{'title':'The Pulse','url':HUB+'time/','strand':'tools','subject':'Time'},
 }
 STRANDS={'ideas':'Ideas','tools':'Tools','know':'How we know'}
 TITLES={
@@ -18,6 +19,7 @@ TITLES={
  ('heat',1):'Heat flows downhill',('heat',2):'Boiling water',('heat',3):'The wood fire',('heat',4):'Hot side, cold side',('heat',5):'Why only five percent',('heat',6):'Match the load',('heat',7):'Build a heat-power system',('heat',8):'Blackout',
  ('life',1):'Copy me',('life',2):'The moth game',('life',3):'Pea flips',('life',4):'The bacteria race',('life',5):'Drift island',('life',6):'The tree of life',
  ('scale',1):'All the way out',('scale',2):'All the way in',
+ ('time',1):'Inside one heartbeat',('time',2):'Slower heartbeats',
  ('history',1):'The copying game',('history',2):'Family trees of books',('history',3):'Reading a dead language',('history',4):'How old is it?',('history',5):'Bits rot too',('history',6):'What survives',
 }
 # LESSON[(board,n)] = dict(warm=warm-up question, skill='you can now…', exit=exit ticket, discuss=[3 questions] or None (pulled from the physics teacher's guide))
@@ -69,6 +71,8 @@ LESSON={
  ('life',6):dict(warm="How could you tell that a whale is a closer cousin of a hippo than of a shark?",skill="build a family tree from counts of shared differences and read a split age from a clock",exit="Write the rule: the pair with the ___ differences joins first.",discuss=["Why does a shared copying mistake mean a shared ancestor?","What does a molecular clock assume, and when might it be wrong?","How is this the same method as the family tree of books in the history board?"]),
  ('scale',1):dict(warm="How many times bigger than you is the Earth? Guess a number, then check it in the eyepiece.",skill="read a size as a power of ten and place anything from a person to the whole universe on one line",exit="Write the sizes of you, the Earth and the Sun as powers of ten in metres.",discuss=["Why is most of the eyepiece empty on the way out?","The edge of the observable universe is not the edge of the universe. What is it?","Pick two things and say how many powers of ten apart they are. Was your guess close?"]),
  ('scale',2):dict(warm="What is the smallest thing you have ever seen with your eyes? What is the smallest thing there is?",skill="explain why light cannot show anything smaller than its wavelength, and what lies between the atom and the Planck length",exit="One sentence: why can a microscope that uses light never show an atom?",discuss=["What happens to the picture when the view gets smaller than a wavelength of light?","If an atom is mostly empty, why can you not push your hand through a table?","Why is the last stretch of the focus blank, and is that a failure or an honest map?"]),
+ ('time',1):dict(warm="Put your hand on your chest. How many things do you think happen inside one heartbeat?",skill="compare periods by how many fit inside each other, and name a pulse at milliseconds, nanoseconds, femtoseconds and attoseconds",exit="Fill in: inside one heartbeat, a hummingbird flaps about ___ times.",discuss=["Why does the screen always beat at the same speed?","What does it mean that the second is defined by an atom?","Why is there no pulse at the Planck time?"]),
+ ('time',2):dict(warm="What in nature breathes, besides you?",skill="name the slow pulses of the Earth and sky and read one as a ratio of another",exit="One sentence: how does the whole planet breathe once a year?",discuss=["Which slow pulse could you see yourself if you waited?","Why do tides come every 12 hours 25 minutes, not every 12?","Why might cicadas use prime-numbered cycles?"]),
  ('history',1):dict(warm="Copy a sentence by hand ten times in a row. What happens?",skill="explain why copying errors accumulate and why shared errors matter",exit="Name two kinds of copying mistake.",discuss=["Why do errors add up instead of cancelling out?","What does a mistake shared by two copies tell you?","How is this different from the telephone game?"]),
  ('history',2):dict(warm="Five old copies of a story disagree. Which one is right?",skill="reconstruct an original from copies by counting branches, not manuscripts",exit="Why can three manuscripts be outvoted by two?",discuss=["What is a shared mistake evidence of?","Why is the majority sometimes wrong?","What would break the family-tree method?"]),
  ('history',3):dict(warm="How could you read a language nobody has spoken for a thousand years?",skill="decode a script from a known name and spreading constraints",exit="What three things does a decipherment need?",discuss=["Why were kings' names the way in?","How did Ventris manage without a bilingual?","Why do some scripts stay unread?"]),
@@ -99,6 +103,9 @@ EDGES=[
  (('scale',1),('launch',5)),
  (('scale',2),('life',1)),
  (('scale',2),('einstein',8)),
+ (('scale',1),('time',1)),
+ (('time',2),('einstein',2)),
+ (('time',1),('life',6)),
 ]
 UNITS=[
  {'id':'heatpower','title':'Fire into watts','blurb':"Where heat goes, what a fire is worth, and how a temperature difference becomes usable electricity: seven lessons from a pot of water to a working system.",'steps':[('electricity',1),('heat',1),('heat',2),('heat',3),('heat',4),('heat',5),('heat',6),('heat',7),('heat',8),('electricity',10)]},

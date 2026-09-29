@@ -95,7 +95,11 @@ MISSIONS=[
  ('h5','ch5',ALL,"Reach 200 years with fewer than 3 bad pixels."),
  ('h5b','ch5',['hs','col','max'],"Run 200 years with only the code on and note how many bad pixels get through."),
  ('h5c','ch5',['g8','hs','col','max'],"Migrate the format before the file dies at year 120."),
+ ('h5d','ch5',ALL,"Bet on what survives a thousand years."),
  ('h6','ch6',ALL,"Run 20 centuries and see which kind of writing survives."),
  ('h6b','ch6',ALL,"Dig up the rubbish dump."),
 ]
 CLOSING=("The past is not stored. It is re-copied.","Every generation decides, mostly by accident, what the next one gets to know. Copy something today.")
+
+from bets import bet
+FIG[5]=bet('bits-bet',"Put each of these in a drawer and come back in 1,000 years. Which one can you most likely still read?",[('usb','A USB stick'),('cd','A CD'),('book','A paper book'),('clay','A clay tablet')])+FIG[5]

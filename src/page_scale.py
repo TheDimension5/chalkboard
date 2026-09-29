@@ -60,6 +60,7 @@ MISSIONS=[
  ('sc1c','ch1',ALL,"Find the emptiest place: the gap between the Sun and the nearest star."),
  ('sc1d','ch1',ALL,"Reach the edge of the observable universe."),
  ('sc1e','ch1',['g8','hs','col','max'],"Come back home: from the universe, land on Earth using only the focus, no objective buttons."),
+ ('sc1f','ch1',['k5','g8','hs','col','max'],"Bet on how many clicks it takes to reach the edge of the universe, then watch."),
  ('sc2','ch2',ALL,"Zoom in until a red blood cell fills the eyepiece."),
  ('sc2b','ch2',ALL,"Find the virus."),
  ('sc2c','ch2',['g8','hs','col','max'],"Find the wavelength of visible light: nothing much smaller than it can be seen with light."),
@@ -69,3 +70,6 @@ MISSIONS=[
  ('sc2g','ch2',['hs','col','max'],"From you to the atom using only the focus, no objective buttons."),
 ]+[(f'tb{n}',f'ch{n}',ALL,"Teach it back: answer the check question below with the right unit.") for n in range(1,3)]
 CLOSING=("Sixty-two powers of ten, and you are near the middle.","From the Planck length to the edge of what light has had time to show us, everything sits on one ruler. Read the exponent and you know where you are.")
+
+from bets import bet
+FIG[1]=bet('sc-bet',"Start at you. Each click makes the view ten times wider. How many clicks until the whole observable universe fits?",[('10','About 10'),('27','About 27'),('100','About 100'),('1000','Over 1,000')])+FIG[1]

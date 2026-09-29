@@ -130,9 +130,8 @@ FIG={
  2:'''<div class="panel"><canvas id="cv-boil" aria-label="A pot of water on a fire. Sliders set fire power and water amount; the temperature climbs and then boils."></canvas></div>
     <div class="controls"><button class="btn primary" id="bl-go">Light the fire</button><label class="slider">Heat into the pot <input type="range" id="bl-p" min="100" max="3000" step="100" value="800"><span class="val" id="bl-p-val">800 W</span></label><label class="slider">Water <input type="range" id="bl-m" min="0.25" max="3" step="0.25" value="1"><span class="val" id="bl-m-val">1 L</span></label><label class="slider" data-lv="hs col max">I predict <input type="number" id="bl-pred" step="1" min="0" placeholder="s" style="width:5rem"> s to boil</label></div>
     <figcaption><b>Try this:</b> boil a litre. Double the fire and see what happens to the time. <span data-lv="hs col max">Predict the seconds to the boil first; the lab scores you.</span></figcaption>''',
- 3:'''<div class="panel"><canvas id="cv-stove" aria-label="A wood stove with a temperature gauge on its top plate. Add logs to hold the plate in the green band without overshooting."></canvas></div>
-    <div class="controls"><button class="btn primary" id="st-log">Add a log</button><label class="slider">Air (burn rate) <input type="range" id="st-air" min="0.2" max="1.5" step="0.1" value="0.6"><span class="val" id="st-air-val">0.6 kg/h</span></label><button class="btn" id="st-reset">Cold stove</button></div>
-    <figcaption><b>Try this:</b> hold the top plate between 150 and 170 °C for half a minute. Then find out what too many logs does.</figcaption>''',
+ 3:'''<div class="panel"><canvas id="cv-stove" aria-label="A cabin at night with a wood stove, a window full of snow, a clock and a gauge. A module on the stove top charges a lantern, a radio and a phone while the weather gets worse."></canvas></div>
+    <figcaption><b>Try this:</b> charge the lantern, then the radio, then the phone before morning. When the wind picks up, the room steals heat faster: open the air to keep up, but never cook the module.</figcaption>''',
  4:'''<div class="panel"><canvas id="cv-teg" aria-label="A thermoelectric module between a chosen heat source and a chosen cold sink, with the temperature difference and watts shown."></canvas></div>
     <div class="controls"><span class="lbl">Hot side</span><select id="tg-src"><option value="stove">stove top 170 °C</option><option value="fire">camp fire 400 °C</option><option value="exhaust">exhaust pipe 220 °C</option><option value="coffee">cup of coffee 70 °C</option><option value="rock">sun-warmed rock 45 °C</option><option value="hand">your hand 33 °C</option><option value="candle">candle 250 °C, tiny</option></select><span class="lbl">Cold side</span><select id="tg-sink"><option value="air">bare in still air</option><option value="fins">fins in still air</option><option value="fan">fins and a fan</option><option value="water" selected>water block, pumped</option><option value="ice">ice water</option></select><button class="btn" id="tg-spacer" data-lv="g8 hs col max" aria-pressed="false">Spacer: off</button></div>
     <figcaption><b>Try this:</b> try every hot side with every cold side. Find the biggest watts. <span data-lv="g8 hs col max">The camp fire is too hot for the module: add the spacer and watch what it costs.</span></figcaption>''',
@@ -155,11 +154,13 @@ MISSIONS=[
  ('ht1b','ch1',['g8','hs','col','max'],"Hold a difference of at least 50 degrees for 30 seconds using the heater and the water."),
  ('ht2','ch2',ALL,"Boil one litre."),
  ('ht2b','ch2',['hs','col','max'],"Predict the seconds to the boil within 10%."),
- ('ht3','ch3',ALL,"Hold the stove top between 150 and 170 °C for 30 seconds."),
- ('ht3b','ch3',['g8','hs','col','max'],"Overshoot 170 °C on purpose and read the warning."),
+ ('ht3','ch3',ALL,"Charge the lantern."),
+ ('ht3b','ch3',ALL,"Get through the blizzard with the lantern, the radio and the phone all charged."),
+ ('ht3c','ch3',['g8','hs','col','max'],"Hold the stove top between 150 and 170 °C for 30 seconds."),
  ('ht4','ch4',ALL,"Make one watt."),
  ('ht4b','ch4',ALL,"Make three watts from one module without going over 170 °C."),
  ('ht4c','ch4',['g8','hs','col','max'],"Use your hand as the heat source and read how little you get."),
+ ('ht4d','ch4',ALL,"Bet on how much the cold side matters."),
  ('ht5','ch5',ALL,"Set 170 °C over 0 °C and read the Carnot limit."),
  ('ht5b','ch5',['hs','col','max'],"Reach 10% real efficiency."),
  ('ht6','ch6',ALL,"Find the load that gives the most watts."),
@@ -175,3 +176,6 @@ MISSIONS=[
  ('bo6','ch8',['g8','hs','col','max'],"Switch on the fridge and watch what it does to the battery."),
 ]+[(f'tb{n}',f'ch{n}',ALL,"Teach it back: answer the check question below with the right unit.") for n in range(1,9)]
 CLOSING=("Heat is a difference being spent.","Make the difference, keep the difference, and take a small slice on the way through. Everything else is plumbing.")
+
+from bets import bet
+FIG[4]=bet('tg-bet',"Same stove, same module. Cool the top with plain air, or with pumped water. How much more electricity does the water give?",[('same','About the same'),('2','About twice as much'),('20','About 20 times as much')])+FIG[4]
