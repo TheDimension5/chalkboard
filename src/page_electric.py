@@ -151,9 +151,8 @@ CHECK={
     'max':("A 2,000 W array, 5 sun-hours, 75% system efficiency. Daily Wh?",7500,'Wh',.02,"W × h × efficiency.","Right. 7,500 Wh a day.")},
 }
 FIG={
- 1:'''<div class="panel"><canvas id="cv-energy" aria-label="A battery as a bucket of watt-hours draining into a bulb and filling from solar panels. Sliders set the watts."></canvas></div>
-    <div class="controls"><label class="slider">Bulb (watts) <input type="range" id="en-load" min="0" max="1000" step="10" value="250"><span class="val" id="en-load-val">250 W</span></label><label class="slider">Panels (watts) <input type="range" id="en-src" min="0" max="1000" step="25" value="0"><span class="val" id="en-src-val">0 W</span></label><button class="btn" id="en-reset">Refill to 2,500 Wh</button></div>
-    <figcaption><b>Try this:</b> set the bulb to 250 W and read how long a 2,500 Wh bucket lasts. Then add panels and watch the net rate.</figcaption>''',
+ 1:'''<div class="panel"><canvas id="cv-energy" aria-label="A rider on a bike generator wired to a light bulb, a TV or a toaster, with a watts meter, a legs meter and a battery bucket. Tap left and right in turn to pedal."></canvas></div>
+    <figcaption><b>Try this:</b> pedal the old 60 W bulb to full brightness, then the TV, then try the toaster. Then fill the battery bucket and read how long your watts take to make watt-hours.</figcaption>''',
  2:'''<div class="panel"><canvas id="cv-ohm" aria-label="A simple circuit. Sliders set the push in volts and the opposition in ohms; the flow in amps and the bulb brightness follow."></canvas></div>
     <div class="controls"><label class="slider">Push (volts) <input type="range" id="ohm-v" min="1" max="48" step="1" value="12"><span class="val" id="ohm-v-val">12 V</span></label><label class="slider">Opposition (ohms) <input type="range" id="ohm-r" min="1" max="48" step="1" value="6"><span class="val" id="ohm-r-val">6 Ω</span></label></div>
     <figcaption><b>Try this:</b> double the push and watch the flow double. Double the opposition and watch it halve.</figcaption>''',
@@ -184,8 +183,9 @@ FIG={
 }
 ALL=['k5','g8','hs','col','max']
 MISSIONS=[
- ('e1','ch1',ALL,"Set the bulb to 250 W with no panels and read how long the 2,500 Wh bucket lasts."),
- ('e1b','ch1',['g8','hs','col','max'],"Add enough panel watts that the bucket fills instead of empties."),
+ ('e1','ch1',ALL,"Pedal the old 60 W light bulb to full brightness."),
+ ('e1b','ch1',['g8','hs','col','max'],"Fill the battery bucket with 15 Wh by pedalling."),
+ ('e1c','ch1',ALL,"Try to run the toaster."),
  ('e2','ch2',ALL,"Make the flow exactly 2 amps."),
  ('e3','ch3',ALL,"Deliver 1,200 W with the cable losing less than 50 W."),
  ('e4','ch4',ALL,"Run a 300 W load on a 12.8 V, 100 Ah battery with a 90% inverter and read the real hours."),

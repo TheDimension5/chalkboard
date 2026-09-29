@@ -262,9 +262,9 @@ def card(b,meta,svg,badge=''):
 ICONS=json.load(open('icons.json',encoding='utf-8'))
 cards_html='\n'.join([
  card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 24 missions"),ICONS['launch'],'Good first board'),
- card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 31 missions"),ICONS['heat']),
- card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 24 missions"),ICONS['elec']),
- card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 32 missions"),ICONS['phys']),
+ card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 32 missions"),ICONS['heat']),
+ card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 25 missions"),ICONS['elec']),
+ card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 33 missions"),ICONS['phys']),
  card('infinity',("Some infinities are bigger than others. Prove it yourself.","5 chapters · 16 missions"),ICONS['math']),
  card('history',("How the past reaches us, from scribes and dead scripts to bit rot.","6 chapters · 19 missions"),ICONS['hist']),
  card('life',("Copy a recipe, hunt moths as the bird, flip peas, race germs, then rebuild the tree of life.","6 chapters · 30 missions"),ICONS['life'],'New'),
