@@ -105,12 +105,21 @@ const tg=makeSim('cv-teg',{
     box(ctx,cx-mw/2,cy-18,mw,22,st.over?C.pink:rgba(C.yellow,.85),C.chalk,3,2);text(ctx,'module',cx,cy-7,{size:16,color:C.board});
     box(ctx,cx-mw/2,cy-18-h*.22,mw,h*.22,tcol(st.Tc),C.chalk,6,2);text(ctx,SNK[s.snk].n+` ${SNK[s.snk].T} °C`,cx,cy-18-h*.11,{size:18,color:C.board});
     text(ctx,`hot face ${st.Th.toFixed(0)} °C`,cx+mw/2+12,cy+2,{size:15,align:'left',color:st.over?C.pink:C.chalk});text(ctx,`cold face ${st.Tc.toFixed(0)} °C`,cx+mw/2+12,cy-22,{size:15,align:'left'});text(ctx,`ΔT ${st.dT.toFixed(0)} K`,cx-mw/2-12,cy-10,{size:18,align:'right',color:C.yellow});
-    glow(ctx,w*.12,h*.5,30+st.P*6,C.yellow,clamp(st.P/6,.1,.9));text(ctx,`${st.P.toFixed(st.P<1?2:1)} W`,w*.12,h*.5,{size:30,color:C.yellow});
+    glow(ctx,w*.13,h*.8,30+st.P*6,C.yellow,clamp(st.P/6,.1,.9));text(ctx,`${st.P.toFixed(st.P<1?2:1)} W`,w*.13,h*.8,{size:30,color:C.yellow});
     const lines=[st.over?`hot face over ${MOD.Tmax} °C: this module would be damaged. Add the spacer or use a cooler source`:`open-circuit ${(MOD.S*st.dT).toFixed(1)} V, matched load ${st.P.toFixed(2)} W, best so far ${s.best.toFixed(2)} W`];
     if(at('g8'))lines.push(`heat through the module ${st.Q.toFixed(0)} W; electricity is ${pct(st.P/Math.max(st.Q,1e-6))} of it`);if(at('hs'))lines.push(`P = (0.04 × ΔT)² / (4 × 2.5) = 1.6e-4 × ΔT²`);if(at('col'))lines.push(`ΔT = ${(SRC[s.src].T-SNK[s.snk].T)} × R_m/(R_h + R_m + R_c) = ${(SRC[s.src].T-SNK[s.snk].T)} × 1.5/(${(SRC[s.src].Rh+(s.spacer?1.2:0)).toFixed(1)} + 1.5 + ${SNK[s.snk].Rc})`);readout(ctx,lines,16,12,{size:12})}
 });
 ['tg-src','tg-sink'].forEach(id=>{const el=$(id);if(el)el.addEventListener('change',()=>{if(tg){tg.src=$('tg-src').value;tg.snk=$('tg-sink').value}})});
 toggle('tg-spacer',()=>tg.spacer,v=>{tg.spacer=v},v=>'Spacer: '+(v?'on':'off'));
+function tgSet(src,snk){if(!tg)return;const a=$('tg-src'),b=$('tg-sink');if(a)a.value=src;if(b)b.value=snk;tg.src=src;tg.snk=snk}
+Chalk.bet('tg-bet',{canvas:'cv-teg',placed:'Plain air first.',
+  pick(p,api){if(!tg)return;api.busy=true;if(tg.spacer)$('tg-spacer').click();tgSet('stove','air');const A=tegState('stove','air',false),W=tegState('stove','water',false);
+    setTimeout(()=>Chalk.flash(tg,`air: ${A.P.toFixed(2)} W`,C.chalk,.12),300);
+    setTimeout(()=>{tgSet('stove','water');Chalk.flash(tg,`water: ${W.P.toFixed(1)} W`,C.yellow,.12)},2300);
+    setTimeout(()=>{api.busy=false;tg.betDone=true;const r=Math.round(W.P/A.P),lv=Chalk.level();
+      const head=p==='20'?`You called it: about ${r} times more.`:`About ${r} times more.`;
+      const body=lv==='k5'?'The module only makes electricity from the difference between its two sides. With plain air on top, the top gets almost as hot as the stove, so the difference is small. Water carries the heat away and keeps the top cool. The cold side matters just as much as the fire.':`With air on top the module only sees ${A.dT.toFixed(0)} K of the stove's 150 K; the rest is lost getting heat out of the top. Pumped water lets it see ${W.dT.toFixed(0)} K. Power grows with the difference squared, so ${(W.dT/A.dT).toFixed(1)} times the difference gives about ${r} times the watts.`+(at('hs')?' Every thermal resistance in the chain takes its share of ΔT; the sink is usually the biggest one.':'');
+      api.say(`<b>${head}</b> ${body}`)},4600)}});
 
 /* ---------- CH5: Carnot and ZT ---------- */
 const cn=makeSim('cv-carnot',{
@@ -221,7 +230,7 @@ toggle('bo-pump',()=>bo.pump,v=>{bo.pump=v},v=>'Pump: '+(v?'on':'off'));toggle('
 toggle('bo-lamp',()=>bo.lamp,v=>{bo.lamp=v},v=>'Lamp: '+(v?'on':'off'));toggle('bo-phone',()=>bo.phone,v=>{bo.phone=v},v=>'Phone: '+(v?'charging':'unplugged'));toggle('bo-radio',()=>bo.radio,v=>{bo.radio=v},v=>'Radio: '+(v?'on':'off'));toggle('bo-fridge',()=>bo.fridge,v=>{bo.fridge=v},v=>'Fridge: '+(v?'on':'off'));
 hook('bo-reset',()=>{if(bo){bo.reset(bo);$('bo-cut').textContent='Cut the grid';for(const[id,v,l]of[['bo-pump',true,'Pump: on'],['bo-loop',false,'Loop to radiator: off'],['bo-lamp',true,'Lamp: on'],['bo-phone',true,'Phone: charging'],['bo-radio',false,'Radio: off'],['bo-fridge',false,'Fridge: off']]){const b=$(id);b.classList.toggle('is-on',v);b.setAttribute('aria-pressed',String(v));b.textContent=l}}});
 
-Chalk.start({key:'heat',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
+Chalk.start({key:'heat',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({ht4d:()=>!!(tg&&tg.betDone),
   ht1:()=>fw&&fw.met,ht1b:()=>fw&&fw.hold>=30,
   ht2:()=>bl&&bl.boiledAt!=null&&bl.m===1,ht2b:()=>bl&&bl.err!=null&&bl.err<=.1,
   ht3:()=>st&&st.hold>=30,ht3b:()=>st&&st.over,

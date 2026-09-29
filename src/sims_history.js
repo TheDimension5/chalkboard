@@ -112,6 +112,14 @@ slide('bits-years',v=>{if(bits)bits.years=Math.round(v)},v=>String(Math.round(v)
 hook('bits-copies',()=>{if(!bits)return;bits.copies=!bits.copies;const b=$('bits-copies');b.classList.toggle('is-on',bits.copies);b.setAttribute('aria-pressed',String(bits.copies));b.textContent='Three copies + voting: '+(bits.copies?'on':'off')});
 hook('bits-ecc',()=>{if(!bits)return;bits.ecc=!bits.ecc;const b=$('bits-ecc');b.classList.toggle('is-on',bits.ecc);b.setAttribute('aria-pressed',String(bits.ecc));b.textContent='Error-correcting code: '+(bits.ecc?'on':'off')});
 hook('bits-migrate',()=>{if(bits)bits.migrated=true});
+function bitsYears(api,migrateAt,done){const el=$('bits-years');let y=0;const iv=setInterval(()=>{y=Math.min(200,y+4);if(el){el.value=y;el.dispatchEvent(new Event('input'))}if(migrateAt&&y>=migrateAt&&!bits.migrated){bits.migrated=true;Chalk.flash(bits,'new format!',C.green,.5)}if(y>=200){clearInterval(iv);setTimeout(done,500)}},Chalk.REDUCE?40:90)}
+Chalk.bet('bits-bet',{canvas:'cv-bits',placed:'Into the drawer it goes.',
+  pick(p,api){if(!bits)return;api.busy=true;if(bits.copies)$('bits-copies').click();if(bits.ecc)$('bits-ecc').click();bits.migrated=false;bits.reseed(bits);
+    bitsYears(api,0,()=>{api.busy=false;bits.betDone=true;Chalk.flash(bits,at('g8')?'unreadable':bits.lastBad+' bad pixels',C.pink,.5);const lv=Chalk.level();
+      const head=p==='clay'?'You called it: the clay tablet.':'The clay tablet wins, easily.';
+      const body=lv==='k5'?'Clay tablets from ancient Mesopotamia can still be read after four thousand years. Some survived because the library at Nineveh burned, and the fire baked the clay hard. A good paper book comes second: Gutenberg Bibles are more than 570 years old. A CD or a USB stick left in a drawer can start losing its bits within a few decades, as you just saw. Digital files last only if someone keeps copying them, the way the scribes did.':'Baked clay is nearly indestructible: tablets from Nineveh survive because the library burned in 612 BC and the fire fired them. Good rag paper lasts centuries (Gutenberg Bibles are over 570 years old). Discs and flash memory can lose bits within decades, and formats die even faster when no program reads them. Digital survival is not about the medium; it is about copying, checking and migrating.';
+      api.say(`<b>${head}</b> ${body}`+api.next('Keep three copies and try again','copies'))})},
+  next(k,api){api.busy=true;if(!bits.copies)$('bits-copies').click();bits.migrated=false;bits.reseed(bits);bitsYears(api,at('g8')?110:0,()=>{api.busy=false;Chalk.flash(bits,bits.lastBad+' bad pixel'+(bits.lastBad===1?'':'s'),C.green,.5);api.say(`<b>Three copies, ${bits.lastBad} bad pixel${bits.lastBad===1?'':'s'} after 200 years.</b> When a bit flips in one copy, the other two outvote it.`+(at('g8')?' And moving to a new format at year 110 kept the file readable.':'')+' That is the scribes’ trick, done by machines.')})}});
 
 /* ---------- CH6: what survives ---------- */
 const TYPES=[{k:'laws',c:'#F6D46B',n:40,p:.93},{k:'holy texts',c:'#9DDBA3',n:40,p:.96},{k:'letters',c:'#8CC4EE',n:60,p:.55},{k:'jokes & stories',c:'#F596A8',n:30,p:.7},{k:'science',c:'#F1ECDF',n:30,p:.8}];
@@ -130,7 +138,7 @@ const surv=makeSim('cv-survive',{
 slide('surv-c',v=>{if(surv)surv.c=Math.round(v)},v=>String(Math.round(v)));
 hook('surv-dig',()=>surv&&surv.dig(surv));hook('surv-reset',()=>{if(surv)surv.reset(surv)});
 
-Chalk.start({key:'history',missions:MISSION_DEFS,checks:{
+Chalk.start({key:'history',missions:MISSION_DEFS,checks:{h5d:()=>!!(bits&&bits.betDone),
   h1:()=>copy&&!copy.two&&copy.gens.length>=11,
   h1b:()=>copy&&copy.two&&copy.shared(copy).n>0,
   h2:()=>stemma&&stemma.correct===2,

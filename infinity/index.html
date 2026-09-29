@@ -643,7 +643,10 @@ function makeSim(id,def){const cv=$(id);if(!cv)return null;const ctx=cv.getConte
   cv.addEventListener('pointerleave',()=>{s.leave&&s.leave(s)});
   sims.push(s);return s}
 let last=performance.now();
-let skip=false;function loop(now){const dt=Math.min(.05,(now-last)/1000);if(LOWPOW){skip=!skip;if(skip){requestAnimationFrame(loop);return}}last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}requestAnimationFrame(loop)}
+let skip=false;function loop(now){const dt=Math.min(.05,(now-last)/1000);if(LOWPOW){skip=!skip;if(skip){requestAnimationFrame(loop);return}}last=now;for(const s of sims){if(!s.visible||!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s);if(s._fl)drawFlash(s,dt)}requestAnimationFrame(loop)}
+/* big chalk words over a sim: Chalk.flash(sim,'SAME SPOT!',color) */
+function flash(s,t,color,y){if(s)s._fl={t,color:color||C.yellow,y:y==null?.3:y,age:0}}
+function drawFlash(s,dt){const f=s._fl;f.age+=dt;if(f.age>2.4){s._fl=null;return}const u=f.age/2.4,sc=u<.08?.6+u/.08*.5:1.1-Math.min(.1,u-.08);text(s.ctx,f.t,s.w/2,s.h*f.y,{size:Math.min(44,s.w*.075)*sc,color:f.color,alpha:u<.75?1:Math.max(0,1-(u-.75)/.25)})}
 requestAnimationFrame(loop);
 function tick(dt){for(const s of sims){if(!s.w)continue;s.dt=dt;s.t+=dt;s.step&&s.step(dt,s);s.draw(s)}}
 const hook=(id,fn)=>{const el=$(id);if(el)el.addEventListener('click',fn)};
@@ -721,7 +724,7 @@ function start(o){KEY=o.key||'chalk';DEFS=(o.missions||[]).filter(m=>CLASSROOM||
   let lv0=null;try{lv0=new URL(location.href).searchParams.get('level')}catch(e){}if(!lv0){try{lv0=localStorage.getItem('one-rule-level')}catch(e){}}
   setLevel(lv0||'k5',false);setInterval(checkMissions,300);
   const links=[...document.querySelectorAll('.trail a')];if(links.length){const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)links.forEach(l=>l.classList.toggle('is-active',l.dataset.for===e.target.id))}},{rootMargin:'-45% 0px -50% 0px'});document.querySelectorAll('#top, .chapter').forEach(el=>io.observe(el))}}
-return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,bet,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
+return{C,REDUCE,get lowPower(){return LOWPOW},rgba,clamp,dist,$,fmt,sup,pct,text,circle,glow,shade,poly,rr,box,marble,readout,arrow,rng,at,level:()=>LEVEL,get classroom(){return CLASSROOM},makeSim,hook,slide,start,bet,flash,checkPassed,tick,checkNow:()=>checkMissions(),fnv};
 })();
 </script>
 <script>

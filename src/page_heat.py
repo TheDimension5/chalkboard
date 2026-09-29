@@ -160,6 +160,7 @@ MISSIONS=[
  ('ht4','ch4',ALL,"Make one watt."),
  ('ht4b','ch4',ALL,"Make three watts from one module without going over 170 °C."),
  ('ht4c','ch4',['g8','hs','col','max'],"Use your hand as the heat source and read how little you get."),
+ ('ht4d','ch4',ALL,"Bet on how much the cold side matters."),
  ('ht5','ch5',ALL,"Set 170 °C over 0 °C and read the Carnot limit."),
  ('ht5b','ch5',['hs','col','max'],"Reach 10% real efficiency."),
  ('ht6','ch6',ALL,"Find the load that gives the most watts."),
@@ -175,3 +176,6 @@ MISSIONS=[
  ('bo6','ch8',['g8','hs','col','max'],"Switch on the fridge and watch what it does to the battery."),
 ]+[(f'tb{n}',f'ch{n}',ALL,"Teach it back: answer the check question below with the right unit.") for n in range(1,9)]
 CLOSING=("Heat is a difference being spent.","Make the difference, keep the difference, and take a small slice on the way through. Everything else is plumbing.")
+
+from bets import bet
+FIG[4]=bet('tg-bet',"Same stove, same module. Cool the top with plain air, or with pumped water. How much more electricity does the water give?",[('same','About the same'),('2','About twice as much'),('20','About 20 times as much')])+FIG[4]

@@ -196,6 +196,10 @@ MISSIONS=[
  ('e7','ch7',ALL,"Slow the wave to 1 Hz and watch the bulb flicker."),
  ('e8','ch8',ALL,"Set the phase so the power factor is 0.8."),
  ('e9','ch9',ALL,"Flip the switch and watch the signal beat the electrons."),
+ ('e9c','ch9',ALL,"Bet on how fast the electrons really move."),
  ('e10','ch10',ALL,"Run the checker on a 48 V, 1,200 W load with a 5,120 Wh battery and a 90% inverter."),
 ]+[(f'tb{n}',f'ch{n}',ALL,"Teach it back: answer the check question below with the right unit.") for n in range(1,11)]
 CLOSING=("Rate, amount, push, flow, opposition.","Five words, ten chapters, and you can now read any electrical system from the label to the wire. Go look at one.")
+
+from bets import bet
+FIG[9]=bet('dr-bet',"You flip the switch and the light comes on instantly. How fast are the electrons in the wire moving?",[('light','Nearly the speed of light'),('car','About as fast as a car'),('snail','Slower than a snail')])+FIG[9]

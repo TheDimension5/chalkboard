@@ -212,6 +212,8 @@ Chalk.start({key:'einstein',missions:MISSION_DEFS,checks:Object.assign(MCHECK,{'
     a1=h.index('    <span class="levels-label">');a2=h.index('    <span class="mcount" id="mcount"></span>')
     h=h[:a1]+LEVELBTNS+h[a2:]
     h=h.replace('</footer>','  '+MODE_LINK+'\n</footer>',1)
+    from bets import bet as _bet
+    h=h.replace('<div class="panel"><canvas id="cv-pulls"',_bet('pulls-bet',"A fridge magnet tries to lift a paper clip. The whole Earth pulls the clip down. Who wins?",[('earth','The whole Earth'),('magnet','The little magnet'),('tie',"It's a tie")])+'<div class="panel"><canvas id="cv-pulls"',1)
     h=h.replace('<p class="teach">','<div class=\"cert\" id=\"cert\" hidden data-board=\"One Rule for Everything\"><p class=\"mh\">Certificate</p><p class=\"cert-note\"></p><button class=\"btn primary\" id=\"cert-go\" type=\"button\">Print my certificate</button><div class=\"certout\" hidden></div></div><p class="teach">',1)
     return h,defs
 # ================= build =================
@@ -260,11 +262,11 @@ def card(b,meta,svg,badge=''):
 ICONS=json.load(open('icons.json',encoding='utf-8'))
 cards_html='\n'.join([
  card('launch',("Push it, drop it, launch it, crash it, fling it into orbit. Newton's laws keep score.","6 chapters · 23 missions"),ICONS['launch'],'Good first board'),
- card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 30 missions"),ICONS['heat']),
- card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 23 missions"),ICONS['elec']),
- card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 31 missions"),ICONS['phys']),
+ card('heat',("Turn a fire into electricity, then get through a winter blackout on it.","8 chapters · 31 missions"),ICONS['heat']),
+ card('electricity',("Watts to fields, one idea at a time, with a checker for any system you meet.","10 chapters · 24 missions"),ICONS['elec']),
+ card('einstein',("Einstein's thirty-year hunt for one rule behind gravity and magnetism.","10 chapters · 32 missions"),ICONS['phys']),
  card('infinity',("Some infinities are bigger than others. Prove it yourself.","5 chapters · 16 missions"),ICONS['math']),
- card('history',("How the past reaches us, from scribes and dead scripts to bit rot.","6 chapters · 18 missions"),ICONS['hist']),
+ card('history',("How the past reaches us, from scribes and dead scripts to bit rot.","6 chapters · 19 missions"),ICONS['hist']),
  card('life',("Copy a recipe, hunt moths as the bird, flip peas, race germs, then rebuild the tree of life.","6 chapters · 30 missions"),ICONS['life'],'New'),
  card('scale',("Telescope and microscope in one eyepiece: from the edge of the universe to the Planck length.","2 chapters · 15 missions"),ICONS['scale'],'New')])
 units_html=''.join(f'''<div class="unit" data-unit="{u["id"]}"><h3>{u["title"]}</h3><p>{u["blurb"]}</p><ol>'''+''.join(f'<li><a href="{chapter_url(*st)}">{TITLES[st]}</a> <small>{BOARDS[st[0]]["title"]}, chapter {st[1]}</small></li>' for st in u['steps'])+'</ol></div>' for u in UNITS)

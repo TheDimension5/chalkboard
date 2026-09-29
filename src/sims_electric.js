@@ -145,6 +145,12 @@ const dr=makeSim('cv-drift',{
     if(at('col')&&s.on){for(let x=L+40;x<R-20;x+=48)for(let y=T+28;y<B-10;y+=26)arrow(ctx,x,y,22,0,rgba(C.yellow,.6),1.5);text(ctx,'S = E × H: energy flows here, between the wires',(L+R)/2,B+30,{size:15,color:C.yellow,alpha:.8})}
     const v=s.i*.074;const lines=[s.on?`electrons drift at ${v.toFixed(2)} mm/s (1 mm² copper)`:'switch is off: electrons sit still',s.on?'the signal crossed the room at nearly the speed of light':'flip the switch'];if(at('hs'))lines.push('v = I / (n·q·A)');readout(ctx,lines,16,12,{size:12})}
 });
+Chalk.bet('dr-bet',{canvas:'cv-drift',placed:'Click.',
+  pick(p,api){if(!dr)return;api.busy=true;dr.on=false;dr.lit=0;dr.pulse=-1;const el=$('dr-i');if(el){el.value=2;el.dispatchEvent(new Event('input'))}
+    setTimeout(()=>{dr.flip(dr);setTimeout(()=>{Chalk.flash(dr,'0.15 mm per second',C.blue,.2);setTimeout(()=>{api.busy=false;dr.betDone=true;const lv=Chalk.level();
+      const head=p==='snail'?'You called it: slower than a snail.':'Slower than a snail.';
+      const body=lv==='k5'?'About a sixth of a millimetre every second. One electron would need more than five hours to crawl three metres from the switch to the lamp. The light comes on at once because the wire is already full of electrons: the push races down the wire, not the electrons. Like a hose that is already full of water.':lv==='g8'?'About 0.15 mm every second, so one electron needs more than five hours to crawl three metres from switch to lamp. The wire is already packed with electrons, so the push travels, not the electrons, and the push moves at a good fraction of the speed of light: it crosses the room in about a hundred-millionth of a second.':'v = I/(nqA) = 2 A ÷ (8.5 × 10²⁸ m⁻³ × 1.6 × 10⁻¹⁹ C × 10⁻⁶ m²) ≈ 0.15 mm/s: more than five hours to cover three metres. The energy travels in the field around the wires (the Poynting vector) at a good fraction of c. With household AC the electrons do not even go anywhere: they jiggle back and forth by less than a micrometre.';
+      api.say(`<b>${head}</b> ${body}`)},1200)},900)},300)}});
 hook('dr-switch',()=>dr&&dr.flip(dr));slide('dr-i',v=>{if(dr)dr.i=v},v=>v+' A');
 
 /* ---------- CH10: the system checker ---------- */
@@ -163,7 +169,7 @@ const sc=makeSim('cv-check',{
 });
 hook('sc-run',()=>sc&&sc.run(sc));
 
-Chalk.start({key:'electricity',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({
+Chalk.start({key:'electricity',missions:MISSION_DEFS,unitWhy:UNIT_WHY,checks:Object.assign({e9c:()=>!!(dr&&dr.betDone),
   e1:()=>en&&en.load===250&&en.src===0,e1b:()=>en&&en.src>en.load&&en.load>0,
   e2:()=>ohm&&Math.abs(ohm.v/ohm.r-2)<.06,
   e3:()=>pw&&pw.load>=1200&&(pw.load/pw.v)**2*pw.r<50,
